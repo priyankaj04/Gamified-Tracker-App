@@ -45,6 +45,11 @@ const styles = StyleSheet.create({
     borderColor: palette.border,
     gap: 6,
     minWidth: 100,
+    shadowColor: '#000',
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 4,
   },
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   label: {

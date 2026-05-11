@@ -1,32 +1,53 @@
 import * as Notifications from 'expo-notifications';
+import Constants, { ExecutionEnvironment } from 'expo-constants';
 import { Platform } from 'react-native';
 
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+// expo-notifications is unavailable in Expo Go (SDK 53+). Gate all calls so
+// the app degrades gracefully — features still work, alerts just no-op.
+const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+const notificationsSupported = !isExpoGo;
+
+if (notificationsSupported) {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+}
+
+const safe = async <T>(fn: () => Promise<T>, fallback: T): Promise<T> => {
+  if (!notificationsSupported) return fallback;
+  try {
+    return await fn();
+  } catch {
+    return fallback;
+  }
+};
 
 let permissionPromptInFlight = false;
 
 export const ensurePermission = async (): Promise<boolean> => {
+  if (!notificationsSupported) return false;
   if (permissionPromptInFlight) return false;
-  const { status: existing } = await Notifications.getPermissionsAsync();
-  if (existing === 'granted') return true;
-  permissionPromptInFlight = true;
-  try {
-    const { status } = await Notifications.requestPermissionsAsync();
-    return status === 'granted';
-  } finally {
-    permissionPromptInFlight = false;
-  }
+  return safe(async () => {
+    const { status: existing } = await Notifications.getPermissionsAsync();
+    if (existing === 'granted') return true;
+    permissionPromptInFlight = true;
+    try {
+      const { status } = await Notifications.requestPermissionsAsync();
+      return status === 'granted';
+    } finally {
+      permissionPromptInFlight = false;
+    }
+  }, false);
 };
 
 // Android channel — required for push categorisation. No-op on iOS.
 export const setupChannels = async () => {
+  if (!notificationsSupported) return;
   if (Platform.OS !== 'android') return;
   await Notifications.setNotificationChannelAsync('default', {
     name: 'Default',
@@ -44,6 +65,41 @@ export const setupChannels = async () => {
     importance: Notifications.AndroidImportance.DEFAULT,
     lightColor: '#f97316',
   });
+  await Notifications.setNotificationChannelAsync('fasting', {
+    name: 'Fasting',
+    importance: Notifications.AndroidImportance.HIGH,
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: '#4ade80',
+  });
+};
+
+export const scheduleFastTargetNotification = async (
+  targetSeconds: number,
+): Promise<string | null> => {
+  if (targetSeconds <= 0) return null;
+  const ok = await ensurePermission();
+  if (!ok) return null;
+  return safe(
+    () =>
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Fast complete 🔥',
+          body: 'You hit your target. Tap to end the fast and claim XP.',
+          sound: 'default',
+          data: { tag: 'kaizenarc:fast-target' },
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          seconds: targetSeconds,
+          channelId: 'fasting',
+        },
+      }),
+    null,
+  );
+};
+
+export const cancelFastNotifications = async () => {
+  await cancelByTag('kaizenarc:fast-target');
 };
 
 export const scheduleRestTimerNotification = async (
@@ -52,22 +108,26 @@ export const scheduleRestTimerNotification = async (
   if (seconds <= 0) return null;
   const ok = await ensurePermission();
   if (!ok) return null;
-  return Notifications.scheduleNotificationAsync({
-    content: {
-      title: 'Rest complete',
-      body: 'Time to crush your next set 💪',
-      sound: 'default',
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-      seconds,
-      channelId: 'rest-timer',
-    },
-  });
+  return safe(
+    () =>
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Rest complete',
+          body: 'Time to crush your next set 💪',
+          sound: 'default',
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          seconds,
+          channelId: 'rest-timer',
+        },
+      }),
+    null,
+  );
 };
 
 export const cancelScheduledNotification = async (id: string | null) => {
-  if (!id) return;
+  if (!id || !notificationsSupported) return;
   try {
     await Notifications.cancelScheduledNotificationAsync(id);
   } catch {
@@ -85,23 +145,32 @@ export interface DailyReminderInput {
 export const scheduleDailyReminder = async (input: DailyReminderInput): Promise<string | null> => {
   const ok = await ensurePermission();
   if (!ok) return null;
-  return Notifications.scheduleNotificationAsync({
-    content: {
-      title: input.title,
-      body: input.body,
-      sound: 'default',
-    },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour: input.hour,
-      minute: input.minute,
-      channelId: 'reminders',
-    },
-  });
+  return safe(
+    () =>
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: input.title,
+          body: input.body,
+          sound: 'default',
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DAILY,
+          hour: input.hour,
+          minute: input.minute,
+          channelId: 'reminders',
+        },
+      }),
+    null,
+  );
 };
 
 export const cancelAllReminders = async () => {
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  if (!notificationsSupported) return;
+  try {
+    await Notifications.cancelAllScheduledNotificationsAsync();
+  } catch {
+    /* ignore */
+  }
 };
 
 // Tag prefix so we can identify reminders we own (vs rest-timer one-shots).
@@ -112,12 +181,17 @@ const REMINDER_TAGS = {
 } as const;
 
 const cancelByTag = async (tag: string) => {
-  const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-  await Promise.all(
-    scheduled
-      .filter((n) => (n.content.data as any)?.tag === tag)
-      .map((n) => Notifications.cancelScheduledNotificationAsync(n.identifier)),
-  );
+  if (!notificationsSupported) return;
+  try {
+    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+    await Promise.all(
+      scheduled
+        .filter((n) => (n.content.data as any)?.tag === tag)
+        .map((n) => Notifications.cancelScheduledNotificationAsync(n.identifier)),
+    );
+  } catch {
+    /* ignore */
+  }
 };
 
 export interface ReminderSettings {
@@ -131,6 +205,7 @@ export interface ReminderSettings {
 // Idempotently sync all dojo-related recurring reminders to match settings.
 // Safe to call on every settings save and on app start.
 export const syncDojoReminders = async (settings: ReminderSettings): Promise<void> => {
+  if (!notificationsSupported) return;
   const granted = await ensurePermission();
   await Promise.all([
     cancelByTag(REMINDER_TAGS.daily),

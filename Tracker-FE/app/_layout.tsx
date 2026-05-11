@@ -91,6 +91,24 @@ export default function RootLayout() {
             <Stack.Screen name="dojo/settings" options={{ title: 'Workout Settings' }} />
             <Stack.Screen name="dojo/data" options={{ title: 'Data' }} />
             <Stack.Screen name="dojo/exercise-library" options={{ title: 'Exercise Library' }} />
+            <Stack.Screen name="spirit/weight-log" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/measurements" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/measurement-compare" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/composition" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/nutrition" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/nutrition-log" options={{ presentation: 'modal', title: 'Log Meal' }} />
+            <Stack.Screen name="spirit/food-database" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/sleep" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/habits" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/habit-detail" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/fasting" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/cycle" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/goals" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/goal-detail" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/energy-mood" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/wellness-score" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/tdee" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/profile" options={{ headerShown: false }} />
           </Stack>
           <XPPopupHost />
           <BadgeUnlockHost />

@@ -63,3 +63,20 @@ export const useUpdateGoal = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: weightKeys.all }),
   });
 };
+
+export const useUpdateWeight = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, body }: { id: string; body: Partial<WeightBody> }) =>
+      api.put<{ data: WeightEntry }>(`/weight/${id}`, body).then(unwrap),
+    onSuccess: () => qc.invalidateQueries({ queryKey: weightKeys.all }),
+  });
+};
+
+export const useDeleteWeight = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => api.delete(`/weight/${id}`),
+    onSuccess: () => qc.invalidateQueries({ queryKey: weightKeys.all }),
+  });
+};

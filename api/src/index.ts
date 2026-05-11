@@ -19,6 +19,7 @@ import { restRouter } from '@/routes/rest';
 import { settingsRouter } from '@/routes/settings';
 import { exportRouter } from '@/routes/export';
 import { recoveryRouter } from '@/routes/recovery';
+import { spiritRouter } from '@/routes/spirit';
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3000);
@@ -52,6 +53,7 @@ app.use('/api/rest', restRouter);
 app.use('/api/settings', settingsRouter);
 app.use('/api/export', exportRouter);
 app.use('/api/recovery', recoveryRouter);
+app.use('/api/spirit', spiritRouter);
 
 app.use((_req, res) => res.status(404).json({ data: null, error: 'Not found' }));
 app.use(errorHandler);

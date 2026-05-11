@@ -54,7 +54,6 @@ export default function TabLayout() {
         name="quests"
         options={{ title: 'Quests', tabBarIcon: tabIcon('list') }}
       />
-      <Tabs.Screen name="explore" options={{ href: null }} />
     </Tabs>
   );
 }

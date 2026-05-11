@@ -31,8 +31,9 @@ export function ThemedScene({ scene, children, dim = 0.55, style }: Props) {
         source={SCENES[scene]}
         style={StyleSheet.absoluteFillObject}
         contentFit="cover"
-        transition={300}
-        priority="high"
+        cachePolicy="memory-disk"
+        recyclingKey={scene}
+        priority="normal"
       />
       <LinearGradient
         colors={[

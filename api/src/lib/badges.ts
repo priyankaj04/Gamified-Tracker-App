@@ -25,10 +25,15 @@ export const BADGES: BadgeDef[] = [
   { id: 'hundred-hours',  name: '100 Hours',      rarity: 'Epic',      module: 'forge',  description: '100 total hours of coding logged', xpReward: 750 },
   { id: 'system-admin',   name: 'System Admin',   rarity: 'Legendary', module: 'forge',  description: '50 coding sessions logged',        xpReward: 2000 },
 
-  { id: 'first-weigh-in', name: 'First Weigh-In', rarity: 'Common',    module: 'spirit', description: 'Log your first weight entry',      xpReward: 50 },
-  { id: 'consistent',     name: 'Consistent',     rarity: 'Rare',      module: 'spirit', description: 'Log weight 7 days in a row',       xpReward: 250 },
-  { id: 'chakra-control', name: 'Chakra Control', rarity: 'Epic',      module: 'spirit', description: 'Hit your body goal',               xpReward: 1000 },
-  { id: 'transformation', name: 'Transformation', rarity: 'Legendary', module: 'spirit', description: 'Reach target weight 30+ days logged', xpReward: 3000 },
+  { id: 'first-weigh-in',     name: 'First Weigh-In',    rarity: 'Common',    module: 'spirit', description: 'Log your first weight entry',      xpReward: 50 },
+  { id: 'consistent',         name: 'Consistent',        rarity: 'Rare',      module: 'spirit', description: 'Log weight 7 days in a row',       xpReward: 250 },
+  { id: 'chakra-control',     name: 'Chakra Control',    rarity: 'Epic',      module: 'spirit', description: 'Hit your body goal',               xpReward: 1000 },
+  { id: 'transformation',     name: 'Transformation',    rarity: 'Legendary', module: 'spirit', description: 'Reach target weight 30+ days logged', xpReward: 3000 },
+  { id: 'nutritionist',       name: 'Nutritionist',      rarity: 'Epic',      module: 'spirit', description: '30-day nutrition streak',          xpReward: 750 },
+  { id: 'deep-sleep',         name: 'Deep Sleep',        rarity: 'Rare',      module: 'spirit', description: '14 nights of quality sleep',       xpReward: 400 },
+  { id: 'intermittent-master',name: 'Intermittent Master',rarity: 'Epic',     module: 'spirit', description: 'Complete 20 fasts',                xpReward: 750 },
+  { id: 'habit-stack',        name: 'Habit Stack',       rarity: 'Rare',      module: 'spirit', description: 'All habits done 7 days in a row',  xpReward: 400 },
+  { id: 'step-master',        name: 'Step Master',       rarity: 'Rare',      module: 'spirit', description: 'Hit step goal 7 days in a row',    xpReward: 300 },
 
   { id: 'ryo-earned',     name: 'Ryo Earned',     rarity: 'Common',    module: 'vault',  description: 'Log your first transaction',       xpReward: 50 },
   { id: 'budget-master',  name: 'Budget Master',  rarity: 'Rare',      module: 'vault',  description: 'Stay under budget for a month',    xpReward: 300 },
@@ -63,6 +68,11 @@ export type BadgeCheckContext = {
   sRankQuestCount?: number;
   level?: number;
   modulesUsedToday?: string[];
+  nutritionStreak?: number;
+  sleepQualityStreak?: number;
+  completedFasts?: number;
+  habitsAllDoneStreak?: number;
+  stepGoalStreak?: number;
 };
 
 export const evaluateBadges = (ctx: BadgeCheckContext): string[] => {
@@ -87,6 +97,11 @@ export const evaluateBadges = (ctx: BadgeCheckContext): string[] => {
   if ((ctx.spiritStreak ?? 0) >= 7) unlock.push('consistent');
   if (ctx.goalHit) unlock.push('chakra-control');
   if (ctx.goalHit && (ctx.weightLogCount ?? 0) >= 30) unlock.push('transformation');
+  if ((ctx.nutritionStreak ?? 0) >= 30) unlock.push('nutritionist');
+  if ((ctx.sleepQualityStreak ?? 0) >= 14) unlock.push('deep-sleep');
+  if ((ctx.completedFasts ?? 0) >= 20) unlock.push('intermittent-master');
+  if ((ctx.habitsAllDoneStreak ?? 0) >= 7) unlock.push('habit-stack');
+  if ((ctx.stepGoalStreak ?? 0) >= 7) unlock.push('step-master');
 
   if ((ctx.transactionCount ?? 0) >= 1) unlock.push('ryo-earned');
   if (ctx.budgetUnder) unlock.push('budget-master');
