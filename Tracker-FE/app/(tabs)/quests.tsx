@@ -12,6 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
 import { palette, priorityColor, screenTheme } from '@/lib/themes';
+import { ThemedScene } from '@/components/layout/ThemedScene';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
 import { EmptyState } from '@/components/layout/EmptyState';
@@ -59,7 +60,7 @@ export default function QuestsScreen() {
   const quests = data?.quests ?? [];
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
+    <ThemedScene scene="quests">
       <ScrollView
         refreshControl={
           <RefreshControl tintColor={accent} refreshing={isFetching} onRefresh={refetch} />
@@ -185,7 +186,7 @@ export default function QuestsScreen() {
           }}
         />
       </BottomSheet>
-    </View>
+    </ThemedScene>
   );
 }
 

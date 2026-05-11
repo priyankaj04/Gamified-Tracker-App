@@ -21,6 +21,18 @@ export const LEVELS: LevelDef[] = [
 export const getLevelFromXP = (xp: number): LevelDef =>
   [...LEVELS].reverse().find((l) => xp >= l.xpRequired) ?? LEVELS[0];
 
+// Detect a level transition between two XP totals. Returns the new level def
+// if a level was crossed, otherwise null.
+export const detectLevelUp = (
+  previousXp: number,
+  newXp: number,
+): { previousLevel: number; newLevel: LevelDef } | null => {
+  const prev = getLevelFromXP(previousXp);
+  const next = getLevelFromXP(newXp);
+  if (next.level > prev.level) return { previousLevel: prev.level, newLevel: next };
+  return null;
+};
+
 export const getXPProgress = (xp: number) => {
   const current = getLevelFromXP(xp);
   const next = LEVELS.find((l) => l.level === current.level + 1);

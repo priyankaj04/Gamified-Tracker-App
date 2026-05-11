@@ -11,6 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 import { palette, screenTheme } from '@/lib/themes';
+import { ThemedScene } from '@/components/layout/ThemedScene';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
 import { StatCard } from '@/components/ui/StatCard';
@@ -18,6 +19,7 @@ import { DonutChart } from '@/components/charts/DonutChart';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { GlowButton } from '@/components/ui/GlowButton';
+import { DatePicker, todayISO } from '@/components/ui/DatePicker';
 import { useTransactions, useBudget, useCreateTx } from '@/hooks/useFinance';
 import type { TxType } from '@/types';
 
@@ -61,6 +63,7 @@ export default function VaultScreen() {
   const [type, setType] = useState<TxType>('Expense');
   const [category, setCategory] = useState('Food');
   const [desc, setDesc] = useState('');
+  const [txDate, setTxDate] = useState(todayISO());
 
   const transactions = tx.data?.transactions ?? [];
 
@@ -90,7 +93,7 @@ export default function VaultScreen() {
   const savingsPct = savingsTarget ? Math.min(1, Math.max(0, netSav / savingsTarget)) : 0;
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
+    <ThemedScene scene="vault">
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -213,6 +216,9 @@ export default function VaultScreen() {
       </Pressable>
 
       <BottomSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} title="Add Transaction">
+        <Text style={styles.fieldLabel}>Date</Text>
+        <DatePicker value={txDate} onChange={setTxDate} accent={accent} />
+
         <Text style={styles.fieldLabel}>Type</Text>
         <View style={styles.tabRow}>
           {(['Expense', 'Income'] as TxType[]).map((t) => (
@@ -276,15 +282,17 @@ export default function VaultScreen() {
               amount: a,
               type,
               category,
+              date: txDate,
               description: desc || undefined,
             });
             setSheetOpen(false);
+            setTxDate(todayISO());
             setAmount('');
             setDesc('');
           }}
         />
       </BottomSheet>
-    </View>
+    </ThemedScene>
   );
 }
 

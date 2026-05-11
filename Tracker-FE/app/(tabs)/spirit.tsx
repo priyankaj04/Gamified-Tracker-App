@@ -12,6 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 
 import { palette, screenTheme } from '@/lib/themes';
+import { ThemedScene } from '@/components/layout/ThemedScene';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
 import { ProgressRing } from '@/components/ui/ProgressRing';
@@ -19,6 +20,7 @@ import { TrendLine } from '@/components/charts/TrendLine';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { GlowButton } from '@/components/ui/GlowButton';
+import { DatePicker, todayISO } from '@/components/ui/DatePicker';
 import { useWeight, useLogWeight } from '@/hooks/useWeight';
 
 export default function SpiritScreen() {
@@ -32,6 +34,7 @@ export default function SpiritScreen() {
   const [bf, setBf] = useState('');
   const [waist, setWaist] = useState('');
   const [notes, setNotes] = useState('');
+  const [entryDate, setEntryDate] = useState(todayISO());
 
   const [accordionOpen, setAccordionOpen] = useState(false);
 
@@ -45,7 +48,7 @@ export default function SpiritScreen() {
   const winW = Dimensions.get('window').width;
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
+    <ThemedScene scene="spirit">
       <ScrollView
         refreshControl={
           <RefreshControl tintColor={accent} refreshing={isFetching} onRefresh={refetch} />
@@ -170,6 +173,9 @@ export default function SpiritScreen() {
       </Pressable>
 
       <BottomSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} title="Log Weight">
+        <Field label="Date">
+          <DatePicker value={entryDate} onChange={setEntryDate} accent={accent} />
+        </Field>
         <Field label="Weight (kg)">
           <TextInput value={weight} onChangeText={setWeight} keyboardType="decimal-pad" style={styles.input} placeholderTextColor={palette.textDim} />
         </Field>
@@ -192,11 +198,13 @@ export default function SpiritScreen() {
             if (!w) return;
             await logWeight.mutateAsync({
               weightKg: w,
+              date: entryDate,
               bodyFatPct: bf ? parseFloat(bf) : undefined,
               waistCm: waist ? parseFloat(waist) : undefined,
               notes: notes || undefined,
             });
             setSheetOpen(false);
+            setEntryDate(todayISO());
             setWeight('');
             setBf('');
             setWaist('');
@@ -204,7 +212,7 @@ export default function SpiritScreen() {
           }}
         />
       </BottomSheet>
-    </View>
+    </ThemedScene>
   );
 }
 

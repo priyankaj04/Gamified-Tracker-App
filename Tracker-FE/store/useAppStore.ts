@@ -1,11 +1,17 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { Badge } from '@/types';
 
 export interface XpPopup {
   id: string;
   amount: number;
   label?: string;
+}
+
+export interface BadgeUnlock {
+  id: string;
+  badge: Badge;
 }
 
 interface AppState {
@@ -21,6 +27,24 @@ interface AppState {
   popups: XpPopup[];
   pushPopup: (amount: number, label?: string) => void;
   dismissPopup: (id: string) => void;
+
+  // Badge reveal queue
+  badgeQueue: BadgeUnlock[];
+  pushBadgeUnlock: (badge: Badge) => void;
+  dismissBadgeUnlock: (id: string) => void;
+
+  // Level-up queue
+  levelUpQueue: LevelUpEvent[];
+  pushLevelUp: (event: Omit<LevelUpEvent, 'id'>) => void;
+  dismissLevelUp: (id: string) => void;
+}
+
+export interface LevelUpEvent {
+  id: string;
+  newLevel: number;
+  newTitle: string;
+  newColor: string;
+  previousLevel: number;
 }
 
 export const useAppStore = create<AppState>()(
@@ -42,6 +66,28 @@ export const useAppStore = create<AppState>()(
           ],
         }),
       dismissPopup: (id) => set({ popups: get().popups.filter((p) => p.id !== id) }),
+
+      badgeQueue: [],
+      pushBadgeUnlock: (badge) =>
+        set({
+          badgeQueue: [
+            ...get().badgeQueue,
+            { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, badge },
+          ],
+        }),
+      dismissBadgeUnlock: (id) =>
+        set({ badgeQueue: get().badgeQueue.filter((b) => b.id !== id) }),
+
+      levelUpQueue: [],
+      pushLevelUp: (event) =>
+        set({
+          levelUpQueue: [
+            ...get().levelUpQueue,
+            { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, ...event },
+          ],
+        }),
+      dismissLevelUp: (id) =>
+        set({ levelUpQueue: get().levelUpQueue.filter((l) => l.id !== id) }),
     }),
     {
       name: 'kaizenarc-app',

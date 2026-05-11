@@ -1,6 +1,66 @@
 export type Module = 'dojo' | 'forge' | 'spirit' | 'vault' | 'quests';
 
-export type WorkoutType = 'Strength' | 'Cardio' | 'Flexibility' | 'Combat';
+export type WorkoutType =
+  | 'Strength'
+  | 'Cardio'
+  | 'Flexibility'
+  | 'Combat'
+  | 'Mixed'
+  | 'Plyometrics'
+  | 'Calisthenics'
+  | 'Sports'
+  | 'HIIT'
+  | 'Mobility';
+
+export type SetType = 'Normal' | 'Warmup' | 'DropSet' | 'Failure' | 'AMRAP';
+
+export type MoodTag = 'CrushedIt' | 'Solid' | 'Average' | 'Rough' | 'Struggled';
+
+export type ExerciseType = 'compound' | 'isolation' | 'cardio';
+
+export interface Exercise {
+  id: string;
+  name: string;
+  musclePrimary: string;
+  muscleSecondary: string[];
+  equipment: string;
+  exerciseType: ExerciseType;
+  isCustom: boolean;
+  isFavorite: boolean;
+  notes: string | null;
+}
+
+export interface TemplateSet {
+  id?: string;
+  setType?: SetType;
+  targetReps?: number | null;
+  targetWeightKg?: number | null;
+  targetDurationSeconds?: number | null;
+  orderIndex?: number;
+}
+
+export interface TemplateExercise {
+  id?: string;
+  exerciseId: string;
+  exerciseName?: string;
+  musclePrimary?: string;
+  equipment?: string;
+  supersetGroupId?: string | null;
+  orderIndex?: number;
+  notes?: string | null;
+  sets: TemplateSet[];
+}
+
+export interface WorkoutTemplate {
+  id: string;
+  name: string;
+  type: WorkoutType;
+  estimatedMinutes: number;
+  notes: string | null;
+  lastUsedAt: string | null;
+  createdAt: string;
+  exercises: TemplateExercise[];
+}
 
 export type ProjectStatus = 'Backlog' | 'In Progress' | 'Shipped';
 
@@ -30,14 +90,18 @@ export interface ExerciseSet {
   reps?: number | null;
   weightKg?: number | null;
   durationSeconds?: number | null;
+  setType?: SetType;
   isPr?: boolean;
   orderIndex?: number;
 }
 
 export interface WorkoutExercise {
   id?: string;
+  exerciseId?: string | null;
   name: string;
+  supersetGroupId?: string | null;
   orderIndex?: number;
+  notes?: string | null;
   sets: ExerciseSet[];
 }
 

@@ -1,15 +1,30 @@
 export const palette = {
-  bg: '#0b0b14',
-  bgElevated: '#13131f',
-  card: '#1a1a2a',
-  cardAlt: '#22223a',
-  border: '#2a2a44',
+  // bg stays opaque as a fallback if no scene wraps the screen
+  bg: '#070710',
+  // bgElevated stays solid for tab bar / modal headers
+  bgElevated: '#0d0d18',
+  // card surfaces are now translucent glass that floats over the themed image.
+  // Dark glass: image still bleeds through subtly, content stays legible.
+  card: 'rgba(8, 8, 16, 0.62)',
+  // cardAlt is a lighter pane used for accents (chips, set rows, etc.)
+  cardAlt: 'rgba(255, 255, 255, 0.06)',
+  border: 'rgba(255, 255, 255, 0.16)',
   text: '#f5f5fa',
-  textMuted: '#a3a3b8',
-  textDim: '#6e6e85',
+  textMuted: '#c9c9d8',
+  textDim: '#8a8aa0',
   success: '#4ade80',
   warning: '#fbbf24',
   danger: '#ef4444',
+};
+
+// Glass tokens — use these for variants beyond the default card
+export const glass = {
+  white: 'rgba(255, 255, 255, 0.08)',
+  whiteStrong: 'rgba(255, 255, 255, 0.16)',
+  black: 'rgba(0, 0, 0, 0.55)',
+  blackStrong: 'rgba(0, 0, 0, 0.78)',
+  border: 'rgba(255, 255, 255, 0.16)',
+  borderStrong: 'rgba(255, 255, 255, 0.30)',
 };
 
 export const screenTheme = {

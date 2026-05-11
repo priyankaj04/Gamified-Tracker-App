@@ -5,12 +5,14 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
 import { palette, screenTheme } from '@/lib/themes';
+import { ThemedScene } from '@/components/layout/ThemedScene';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
 import { XPBar } from '@/components/gamification/XPBar';
 import { LevelBadge } from '@/components/gamification/LevelBadge';
 import { StreakFlame } from '@/components/gamification/StreakFlame';
 import { ChallengeCard } from '@/components/gamification/ChallengeCard';
+import { TodayCard } from '@/components/workout/TodayCard';
 import { StatCard } from '@/components/ui/StatCard';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { USER_NAME } from '@/constants';
@@ -61,8 +63,10 @@ export default function Dashboard() {
   };
 
   return (
+    <ThemedScene scene="dashboard">
     <ScrollView
       style={styles.container}
+      contentContainerStyle={{ paddingBottom: 60 }}
       refreshControl={
         <RefreshControl
           tintColor={accent}
@@ -96,6 +100,9 @@ export default function Dashboard() {
         <View style={{ height: 12 }} />
         <XPBar xp={xp} />
       </View>
+
+      <SectionTitle title="Today's Workout" accent={accent} />
+      <TodayCard />
 
       <SectionTitle title="Streaks" accent={accent} />
       <View style={styles.streakRow}>
@@ -169,6 +176,7 @@ export default function Dashboard() {
 
       <View style={{ height: 60 }} />
     </ScrollView>
+    </ThemedScene>
   );
 }
 
@@ -194,7 +202,7 @@ function QuickBtn({
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: palette.bg },
+  container: { flex: 1 },
   section: { paddingHorizontal: 20, paddingTop: 6 },
   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   streakRow: {

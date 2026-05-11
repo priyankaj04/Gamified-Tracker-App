@@ -11,12 +11,14 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 
 import { palette, screenTheme } from '@/lib/themes';
+import { ThemedScene } from '@/components/layout/ThemedScene';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
 import { StatCard } from '@/components/ui/StatCard';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { GlowButton } from '@/components/ui/GlowButton';
+import { DatePicker, todayISO } from '@/components/ui/DatePicker';
 import { StarRating } from '@/components/gamification/StarRating';
 import { useProjects, useCodingSessions, useLogSession } from '@/hooks/useProjects';
 import { useGameState } from '@/hooks/useGame';
@@ -35,6 +37,7 @@ export default function ForgeScreen() {
   const [addOpen, setAddOpen] = useState(false);
   const [sessionOpen, setSessionOpen] = useState(false);
   const [sessionMinutes, setSessionMinutes] = useState<string>('30');
+  const [sessionDate, setSessionDate] = useState(todayISO());
   const [sessionNotes, setSessionNotes] = useState('');
   const [sessionStars, setSessionStars] = useState<number | null>(null);
   const logSession = useLogSession();
@@ -62,7 +65,7 @@ export default function ForgeScreen() {
     .reduce((sum, s) => sum + s.durationMinutes / 60, 0);
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
+    <ThemedScene scene="forge">
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -198,6 +201,8 @@ export default function ForgeScreen() {
       </BottomSheet>
 
       <BottomSheet visible={sessionOpen} onClose={() => setSessionOpen(false)} title="Log Session">
+        <Text style={styles.label}>Date</Text>
+        <DatePicker value={sessionDate} onChange={setSessionDate} accent={accent} />
         <Text style={styles.label}>Duration (min)</Text>
         <TextInputBox value={sessionMinutes} onChangeText={setSessionMinutes} keyboardType="numeric" />
         <Text style={styles.label}>Notes</Text>
@@ -214,17 +219,19 @@ export default function ForgeScreen() {
             if (!minutes) return;
             await logSession.mutateAsync({
               durationMinutes: minutes,
+              date: sessionDate,
               notes: sessionNotes,
               stars: sessionStars,
             });
             setSessionOpen(false);
             setSessionMinutes('30');
+            setSessionDate(todayISO());
             setSessionNotes('');
             setSessionStars(null);
           }}
         />
       </BottomSheet>
-    </View>
+    </ThemedScene>
   );
 }
 

@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { DarkTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -8,6 +9,9 @@ import 'react-native-reanimated';
 import { queryClient } from '@/lib/queryClient';
 import { palette } from '@/lib/themes';
 import { XPPopupHost } from '@/components/gamification/XPPopup';
+import { BadgeUnlockHost } from '@/components/gamification/BadgeUnlock';
+import { LevelUpHost } from '@/components/gamification/LevelUp';
+import { setupChannels } from '@/lib/notifications';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -26,6 +30,10 @@ const navTheme = {
 };
 
 export default function RootLayout() {
+  useEffect(() => {
+    setupChannels().catch(() => {});
+  }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: palette.bg }}>
       <QueryClientProvider client={queryClient}>
@@ -46,14 +54,47 @@ export default function RootLayout() {
               name="dojo/new-workout"
               options={{ presentation: 'modal', title: 'New Workout' }}
             />
+            <Stack.Screen
+              name="dojo/active-workout"
+              options={{ title: 'Active Workout' }}
+            />
             <Stack.Screen name="dojo/[id]" options={{ title: 'Workout' }} />
+            <Stack.Screen
+              name="dojo/edit-workout/[id]"
+              options={{ presentation: 'modal', title: 'Edit Workout' }}
+            />
             <Stack.Screen
               name="forge/new-project"
               options={{ presentation: 'modal', title: 'New Project' }}
             />
             <Stack.Screen name="forge/[id]" options={{ title: 'Project' }} />
+            <Stack.Screen name="dojo/templates/index" options={{ title: 'Templates' }} />
+            <Stack.Screen
+              name="dojo/templates/new"
+              options={{ presentation: 'modal', title: 'New Template' }}
+            />
+            <Stack.Screen name="dojo/templates/[id]" options={{ title: 'Template' }} />
+            <Stack.Screen name="dojo/routines/index" options={{ title: 'Routines' }} />
+            <Stack.Screen
+              name="dojo/routines/new"
+              options={{ presentation: 'modal', title: 'New Routine' }}
+            />
+            <Stack.Screen name="dojo/routines/[id]" options={{ title: 'Routine' }} />
+            <Stack.Screen name="dojo/records" options={{ title: 'Personal Records' }} />
+            <Stack.Screen name="dojo/records/[exerciseId]" options={{ title: 'Progression' }} />
+            <Stack.Screen name="dojo/cardio/index" options={{ title: 'Cardio' }} />
+            <Stack.Screen
+              name="dojo/cardio/new"
+              options={{ presentation: 'modal', title: 'Log Cardio' }}
+            />
+            <Stack.Screen name="dojo/stats" options={{ title: 'Stats' }} />
+            <Stack.Screen name="dojo/settings" options={{ title: 'Workout Settings' }} />
+            <Stack.Screen name="dojo/data" options={{ title: 'Data' }} />
+            <Stack.Screen name="dojo/exercise-library" options={{ title: 'Exercise Library' }} />
           </Stack>
           <XPPopupHost />
+          <BadgeUnlockHost />
+          <LevelUpHost />
           <StatusBar style="light" />
         </ThemeProvider>
       </QueryClientProvider>

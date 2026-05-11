@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ScrollView, View, Text, StyleSheet, Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { palette, rarityColor } from '@/lib/themes';
+import { ThemedScene } from '@/components/layout/ThemedScene';
 import { BadgeCard } from '@/components/gamification/BadgeCard';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { useBadges } from '@/hooks/useBadges';
@@ -30,11 +31,11 @@ export default function HallScreen() {
   }, [badges, filter]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
+    <ThemedScene scene="hall">
       <LinearGradient
-        colors={['#a78bfa33', '#22d3ee22', '#0b0b14']}
+        colors={['transparent', 'rgba(7,7,16,0.55)']}
         start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
+        end={{ x: 0, y: 1 }}
         style={styles.header}>
         <Text style={styles.heroLabel}>HALL OF POWER</Text>
         <Text style={styles.heroTitle}>
@@ -75,14 +76,14 @@ export default function HallScreen() {
           </View>
         )}
       </ScrollView>
-    </View>
+    </ThemedScene>
   );
 }
 
 const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 20,
-    paddingTop: 24,
+    paddingTop: 60,
     paddingBottom: 18,
     gap: 4,
   },
