@@ -3,6 +3,7 @@ import { ScrollView, View, Text, StyleSheet, RefreshControl } from 'react-native
 import { palette, screenTheme } from '@/lib/themes';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
+import { EmptyState } from '@/components/layout/EmptyState';
 import { SkillMapGrid } from '@/components/forge/SkillMapGrid';
 import { useRustySkills, useSkillMap, useUpdateSkill } from '@/hooks/useLearning';
 import type { Proficiency } from '@/types';
@@ -19,6 +20,17 @@ export default function SkillMap() {
     <View style={{ flex: 1, backgroundColor: palette.bg }}>
       <ScrollView refreshControl={<RefreshControl tintColor={accent} refreshing={map.isFetching} onRefresh={() => { map.refetch(); rusty.refetch(); }} />}>
         <PageHeader title="Skill Map" subtitle="Forge" accent={accent} accent2={screenTheme.forge.accent2} />
+
+        {(map.data?.skills?.length ?? 0) === 0 && !map.isFetching && (
+          <View style={{ paddingHorizontal: 20 }}>
+            <EmptyState
+              icon="grid-outline"
+              title="No skills yet."
+              message="Log a session against a project with a tech stack, or add learning topics — they'll show up here."
+              accent={accent}
+            />
+          </View>
+        )}
 
         {Object.entries(map.data?.categories ?? {}).map(([category, skills]) => (
           <View key={category}>

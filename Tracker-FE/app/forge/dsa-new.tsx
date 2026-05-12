@@ -61,8 +61,6 @@ export default function DsaNew() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: palette.bg }} contentContainerStyle={{ padding: 20, gap: 12 }}>
-      <Text style={styles.h1}>Log DSA Problem</Text>
-
       <Text style={styles.label}>Title</Text>
       <TextInput value={title} onChangeText={setTitle} style={styles.input} placeholder="Two Sum" placeholderTextColor={palette.textDim} />
 

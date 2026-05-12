@@ -20,8 +20,10 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { GlowButton } from '@/components/ui/GlowButton';
 import { ProjectCard } from '@/components/forge/ProjectCard';
 import { ForgeActivityGrid } from '@/components/forge/ForgeActivityGrid';
+import { LiveTimer } from '@/components/forge/LiveTimer';
+import { BuildNowCta } from '@/components/forge/BuildNowCta';
 import { useProjects } from '@/hooks/useProjects';
-import { useActiveTimer, useSessionGrid, useTodaySessions } from '@/hooks/useSessions';
+import { useActiveTimer, useSessionGrid, useSessions, useTodaySessions } from '@/hooks/useSessions';
 import { useDailyGoal, useForgeSummary } from '@/hooks/useForgeStats';
 import { useDsaStats } from '@/hooks/useDSA';
 import { useLearning } from '@/hooks/useLearning';
@@ -34,8 +36,16 @@ export default function ForgeScreen() {
 
   const projects = useProjects({});
   const pinned = (projects.data?.projects ?? []).filter((p) => p.isPinned);
+  // "In Progress" carousel — also includes Backlog projects that already have
+  // logged hours, so existing in-flight projects show up even if their status
+  // was never moved off Backlog.
   const inProgress = (projects.data?.projects ?? [])
-    .filter((p) => p.status === 'In Progress' && !p.isPinned)
+    .filter(
+      (p) =>
+        !p.isPinned &&
+        !p.isArchived &&
+        (p.status === 'In Progress' || (p.status === 'Backlog' && p.totalHours > 0)),
+    )
     .slice(0, 3);
 
   const today = useTodaySessions();
@@ -45,7 +55,9 @@ export default function ForgeScreen() {
   const learning = useLearning({ status: 'In Progress' });
   const grid = useSessionGrid(90);
   const timer = useActiveTimer();
+  const recentSessions = useSessions({ limit: 40 });
   const game = useGameState();
+  const pomodoroSessions = (recentSessions.data?.sessions ?? []).filter((s) => s.pomodoroCount > 0).slice(0, 5);
 
   const [addOpen, setAddOpen] = useState(false);
 
@@ -92,19 +104,50 @@ export default function ForgeScreen() {
           }
         />
 
-        {/* Active session banner */}
-        {timer.data?.timer && (
-          <Pressable
+        {/* Big "Build Now" CTA — only when no live session is running */}
+        {!timer.data?.timer && (
+          <BuildNowCta
+            accent={accent}
+            title={todayMin === 0 ? 'Start Today' : 'Stack Another Session'}
+            subtitle={
+              todayMin === 0
+                ? 'Open the editor. 25 min and earn XP.'
+                : `${Math.floor(todayMin / 60)}h ${todayMin % 60}m so far — go again.`
+            }
             onPress={() => router.push('/forge/active-session' as any)}
-            style={[styles.banner, { borderColor: accent, backgroundColor: accent + '14' }]}>
-            <Ionicons name="recording" size={16} color={accent} />
-            <Text style={[styles.bannerText, { color: accent }]}>
-              Live · {timer.data.timer.projectName ?? 'Session'} ·{' '}
-              {Math.floor(timer.data.timer.elapsedSec / 60)}m
-            </Text>
-            <Ionicons name="chevron-forward" size={16} color={accent} />
-          </Pressable>
+          />
         )}
+
+        {/* Active session banner — same card bg as the rest, yellow highlight */}
+        {timer.data?.timer && (() => {
+          const liveTimer = timer.data.timer;
+          const pomo = liveTimer.isPomodoro;
+          const highlight = '#fbbf24';
+          return (
+            <Pressable
+              onPress={() =>
+                router.push((pomo ? '/forge/focus' : '/forge/active-session') as any)
+              }
+              style={[styles.banner, { borderColor: highlight, shadowColor: highlight }]}>
+              <View style={[styles.bannerDot, { backgroundColor: highlight }]} />
+              <View style={{ flex: 1 }}>
+                <View style={styles.bannerHead}>
+                  <Text style={[styles.bannerLabel, { color: highlight }]}>
+                    {pomo ? '🍅 POMODORO' : '● LIVE SESSION'}
+                  </Text>
+                  <LiveTimer
+                    startedAt={liveTimer.startedAt}
+                    style={[styles.bannerTimer, { color: highlight }]}
+                  />
+                </View>
+                <Text style={styles.bannerSub} numberOfLines={1}>
+                  {liveTimer.projectName ?? 'Untitled session'}
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={18} color={highlight} />
+            </Pressable>
+          );
+        })()}
 
         {/* Daily goal bar */}
         <Pressable
@@ -175,7 +218,7 @@ export default function ForgeScreen() {
           <QuickBtn icon="play" label="Session" onPress={() => router.push('/forge/active-session' as any)} accent={accent} />
           <QuickBtn icon="add" label="Project" onPress={() => router.push('/forge/project-new' as any)} accent={accent} />
           <QuickBtn icon="code-slash" label="DSA" onPress={() => router.push('/forge/dsa-new' as any)} accent="#a78bfa" />
-          <QuickBtn icon="book" label="Learn" onPress={() => router.push('/forge/learning-new' as any)} accent="#fbbf24" />
+          <QuickBtn icon="book" label="Learn" onPress={() => router.push('/forge/learning' as any)} accent="#fbbf24" />
         </View>
 
         {/* Pinned */}
@@ -258,33 +301,85 @@ export default function ForgeScreen() {
           </View>
         </View>
 
-        {/* Learning */}
-        {(learning.data?.items.length ?? 0) > 0 && (
-          <>
-            <SectionTitle title="Learning In Progress" accent="#fbbf24" right={<Pressable onPress={() => router.push('/forge/learning' as any)}><Text style={[styles.seeAll, { color: '#fbbf24' }]}>All</Text></Pressable>} />
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.learnScroll}>
-              {(learning.data?.items ?? []).slice(0, 6).map((item) => (
-                <Pressable
-                  key={item.id}
-                  onPress={() => router.push('/forge/learning' as any)}
-                  style={styles.learnCard}>
-                  <Text style={styles.learnType}>
-                    {item.type === 'Course' ? '🎓' : item.type === 'Book' ? '📚' : '🎬'} {item.type}
-                  </Text>
-                  <Text style={styles.learnTitle} numberOfLines={2}>
-                    {item.title}
-                  </Text>
-                  <View style={styles.learnTrack}>
-                    <View style={[styles.learnFill, { width: `${item.progressPct}%`, backgroundColor: '#fbbf24' }]} />
-                  </View>
-                  <Text style={styles.learnPct}>{item.progressPct}%</Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-          </>
+        {/* Learning — always render so the "All" link is reachable even when
+            no items are In Progress (e.g. fresh adds default to Not Started). */}
+        <SectionTitle
+          title="Learning"
+          accent="#fbbf24"
+          right={
+            <Pressable onPress={() => router.push('/forge/learning' as any)} hitSlop={6}>
+              <Text style={[styles.seeAll, { color: '#fbbf24' }]}>Open</Text>
+            </Pressable>
+          }
+        />
+        {(learning.data?.items.length ?? 0) > 0 ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.learnScroll}>
+            {(learning.data?.items ?? []).slice(0, 6).map((item) => (
+              <Pressable
+                key={item.id}
+                onPress={() => router.push('/forge/learning' as any)}
+                style={styles.learnCard}>
+                <Text style={styles.learnType}>
+                  {item.type === 'Course' ? '🎓' : item.type === 'Book' ? '📚' : '🎬'} {item.type}
+                </Text>
+                <Text style={styles.learnTitle} numberOfLines={2}>
+                  {item.title}
+                </Text>
+                <View style={styles.learnTrack}>
+                  <View style={[styles.learnFill, { width: `${item.progressPct}%`, backgroundColor: '#fbbf24' }]} />
+                </View>
+                <Text style={styles.learnPct}>{item.progressPct}%</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        ) : (
+          <Pressable
+            onPress={() => router.push('/forge/learning' as any)}
+            style={styles.learnEmpty}>
+            <Ionicons name="book-outline" size={20} color="#fbbf24" />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.learnEmptyTitle}>Nothing in progress</Text>
+              <Text style={styles.learnEmptyMsg}>Tap to view your library — start anything you've added.</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={16} color="#fbbf24" />
+          </Pressable>
         )}
 
         {/* Activity grid */}
+        {/* Pomodoros — recent focused sessions */}
+        {pomodoroSessions.length > 0 && (
+          <>
+            <SectionTitle
+              title="🍅 Pomodoros"
+              accent="#fbbf24"
+              right={
+                <Pressable onPress={() => router.push('/forge/focus' as any)} hitSlop={6}>
+                  <Text style={[styles.seeAll, { color: '#fbbf24' }]}>Focus</Text>
+                </Pressable>
+              }
+            />
+            <View style={{ paddingHorizontal: 20 }}>
+              {pomodoroSessions.map((s) => (
+                <View key={s.id} style={styles.pomoCard}>
+                  <View style={[styles.pomoBadge, { borderColor: '#fbbf24', backgroundColor: '#fbbf2422' }]}>
+                    <Text style={styles.pomoCount}>{s.pomodoroCount}</Text>
+                    <Text style={styles.pomoCountLabel}>🍅</Text>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.pomoTitle} numberOfLines={1}>
+                      {s.projectName ?? 'Untitled session'}
+                    </Text>
+                    <Text style={styles.pomoMeta}>
+                      {new Date(s.date).toLocaleDateString()} · {s.durationMinutes}m
+                    </Text>
+                  </View>
+                  <Text style={styles.pomoXp}>+{s.xpEarned}</Text>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+
         <SectionTitle title="Activity (90d)" accent={accent} />
         <View style={{ paddingHorizontal: 20 }}>
           <ForgeActivityGrid data={grid.data?.grid ?? []} />
@@ -350,15 +445,24 @@ const styles = StyleSheet.create({
   banner: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    borderWidth: 1,
-    borderRadius: 12,
-    paddingVertical: 10,
+    gap: 10,
+    backgroundColor: palette.card,
+    borderWidth: 1.5,
+    borderRadius: 14,
+    paddingVertical: 12,
     paddingHorizontal: 14,
     marginHorizontal: 20,
     marginBottom: 8,
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 4,
   },
-  bannerText: { flex: 1, fontWeight: '800', fontSize: 13 },
+  bannerDot: { width: 10, height: 10, borderRadius: 5 },
+  bannerHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  bannerLabel: { fontSize: 11, fontWeight: '900', letterSpacing: 1.2 },
+  bannerTimer: { fontSize: 15, fontWeight: '900', letterSpacing: -0.3, fontVariant: ['tabular-nums'] },
+  bannerSub: { color: palette.textMuted, fontSize: 12, fontWeight: '700', marginTop: 2 },
   goalCard: {
     backgroundColor: palette.card,
     borderRadius: 14,
@@ -391,7 +495,7 @@ const styles = StyleSheet.create({
   streakChipValue: { fontSize: 14, fontWeight: '900' },
   stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 20 },
   quickRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, marginTop: 14, marginBottom: 4 },
-  quickBtn: { flex: 1, borderWidth: 1.5, borderRadius: 10, paddingVertical: 12, alignItems: 'center', gap: 4 },
+  quickBtn: { flex: 1, borderWidth: 1.5, borderRadius: 10, paddingVertical: 12, alignItems: 'center', gap: 4, backgroundColor: palette.card },
   quickLabel: { fontWeight: '800', fontSize: 11, letterSpacing: 0.4 },
   seeAll: { fontSize: 12, fontWeight: '800' },
   dsaCard: {
@@ -427,6 +531,44 @@ const styles = StyleSheet.create({
   learnTrack: { height: 5, borderRadius: 3, backgroundColor: palette.cardAlt, overflow: 'hidden' },
   learnFill: { height: '100%', borderRadius: 3 },
   learnPct: { color: palette.textMuted, fontSize: 11, fontWeight: '700' },
+  learnEmpty: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    marginHorizontal: 20,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#fbbf2455',
+    backgroundColor: palette.card,
+  },
+  learnEmptyTitle: { color: palette.text, fontWeight: '800', fontSize: 13 },
+  learnEmptyMsg: { color: palette.textMuted, fontSize: 11, fontWeight: '600', marginTop: 2 },
+  pomoCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: palette.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#fbbf2433',
+    padding: 12,
+    marginBottom: 8,
+  },
+  pomoBadge: {
+    minWidth: 44,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    alignItems: 'center',
+  },
+  pomoCount: { color: '#fbbf24', fontWeight: '900', fontSize: 16 },
+  pomoCountLabel: { fontSize: 12, marginTop: -2 },
+  pomoTitle: { color: palette.text, fontWeight: '800', fontSize: 14 },
+  pomoMeta: { color: palette.textMuted, fontWeight: '600', fontSize: 11, marginTop: 2 },
+  pomoXp: { color: '#fbbf24', fontWeight: '900', fontSize: 12 },
   fab: {
     position: 'absolute',
     bottom: 24,

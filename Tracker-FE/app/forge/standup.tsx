@@ -6,6 +6,7 @@ import * as FileSystem from 'expo-file-system';
 import { palette, screenTheme } from '@/lib/themes';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlowButton } from '@/components/ui/GlowButton';
+import { DatePicker, todayISO } from '@/components/ui/DatePicker';
 import { api } from '@/lib/api';
 import {
   useStandups,
@@ -19,21 +20,40 @@ export default function StandupScreen() {
   const history = useStandups();
   const upsert = useUpsertStandup();
 
+  const [date, setDate] = useState(todayISO());
   const [yesterday, setYesterday] = useState('');
   const [todayTxt, setTodayTxt] = useState('');
   const [blockers, setBlockers] = useState('');
 
+  // When the picked date matches today, hydrate from /standup/today.
+  // For past dates, look up the entry in history if present.
   useEffect(() => {
-    if (today.data?.standup) {
+    const isToday = date === todayISO();
+    if (isToday && today.data?.standup) {
       setYesterday(today.data.standup.yesterday ?? '');
       setTodayTxt(today.data.standup.today ?? '');
       setBlockers(today.data.standup.blockers ?? '');
+      return;
     }
-  }, [today.data]);
+    const past = history.data?.standups.find((s) => s.date === date);
+    if (past) {
+      setYesterday(past.yesterday ?? '');
+      setTodayTxt(past.today ?? '');
+      setBlockers(past.blockers ?? '');
+    } else {
+      setYesterday('');
+      setTodayTxt('');
+      setBlockers('');
+    }
+  }, [date, today.data, history.data]);
 
   const onSave = async () => {
-    await upsert.mutateAsync({ yesterday, today: todayTxt, blockers });
-    Alert.alert('Saved');
+    try {
+      await upsert.mutateAsync({ date, yesterday, today: todayTxt, blockers });
+      Alert.alert('Saved');
+    } catch (e: any) {
+      Alert.alert('Failed', e?.message ?? 'Could not save standup');
+    }
   };
 
   const onExport = async () => {
@@ -64,7 +84,11 @@ export default function StandupScreen() {
         />
 
         <View style={styles.todayCard}>
-          <Text style={styles.cardTitle}>Today · {new Date().toLocaleDateString()}</Text>
+          <Text style={styles.cardTitle}>
+            {date === todayISO() ? 'Today' : 'Backfill'} · {new Date(date).toLocaleDateString()}
+          </Text>
+          <Text style={styles.label}>Date</Text>
+          <DatePicker value={date} onChange={setDate} accent={accent} />
           <Text style={styles.label}>Yesterday</Text>
           <TextInput value={yesterday} onChangeText={setYesterday} multiline style={[styles.input, { height: 70 }]} placeholderTextColor={palette.textDim} />
           <Text style={styles.label}>Today</Text>

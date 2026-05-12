@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
-import { useAppStore } from '@/store/useAppStore';
+import { celebrate } from '@/lib/celebrate';
 import type {
   DsaDifficulty,
   DsaPlatform,
@@ -81,12 +81,12 @@ export interface DsaBody {
 
 export const useCreateDsaProblem = () => {
   const qc = useQueryClient();
-  const pushPopup = useAppStore((s) => s.pushPopup);
   return useMutation({
     mutationFn: (body: DsaBody) =>
       api.post<{ data: { problem: DsaProblem } & XpAwardResult }>('/dsa', body).then(unwrap),
-    onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'DSA Solved');
+    onSuccess: (res, vars) => {
+      const lvl = vars.difficulty === 'Hard' ? 'big' : 'normal';
+      celebrate({ xp: res.xpEarned, label: `DSA · ${vars.difficulty}`, level: lvl });
       qc.invalidateQueries({ queryKey: dsaKeys.all });
       qc.invalidateQueries({ queryKey: gameKeys.state });
     },

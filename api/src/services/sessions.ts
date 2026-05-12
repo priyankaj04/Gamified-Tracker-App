@@ -161,15 +161,22 @@ export const createSession = async (body: SessionBody) => {
   }
 
   if (body.projectId) {
-    const { data: cur } = await sb.from('projects').select('total_hours, tech_stack').eq('id', body.projectId).maybeSingle();
+    const { data: cur } = await sb
+      .from('projects')
+      .select('total_hours, tech_stack, status')
+      .eq('id', body.projectId)
+      .maybeSingle();
     if (cur) {
-      await sb
-        .from('projects')
-        .update({
-          total_hours: Number(cur.total_hours ?? 0) + body.durationMinutes / 60,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', body.projectId);
+      const update: Record<string, any> = {
+        total_hours: Number(cur.total_hours ?? 0) + body.durationMinutes / 60,
+        updated_at: new Date().toISOString(),
+      };
+      // Auto-promote to In Progress on first session, so the project actually
+      // surfaces on the Forge home's "In Progress" list.
+      if (cur.status === 'Idea' || cur.status === 'Backlog') {
+        update.status = 'In Progress';
+      }
+      await sb.from('projects').update(update).eq('id', body.projectId);
       // bump tech_skills hours/last_used for project's tech_stack
       const hoursDelta = body.durationMinutes / 60;
       for (const name of cur.tech_stack ?? []) {
@@ -320,11 +327,16 @@ export const getActiveTimer = async () => {
       startedAt: data.started_at,
       elapsedSec,
       isRunning: data.is_running,
+      isPomodoro: !!data.is_pomodoro,
     },
   };
 };
 
-export const startTimer = async (body: { projectId?: string | null; milestoneId?: string | null }) => {
+export const startTimer = async (body: {
+  projectId?: string | null;
+  milestoneId?: string | null;
+  isPomodoro?: boolean;
+}) => {
   const sb = supabase();
   // Only one active timer at a time
   await sb.from('active_timer').delete().neq('id', '00000000-0000-0000-0000-000000000000');
@@ -333,11 +345,12 @@ export const startTimer = async (body: { projectId?: string | null; milestoneId?
     .insert({
       project_id: body.projectId ?? null,
       milestone_id: body.milestoneId ?? null,
+      is_pomodoro: body.isPomodoro ?? false,
     })
     .select()
     .single();
   if (error) throw error;
-  return { timerId: data.id, startedAt: data.started_at };
+  return { timerId: data.id, startedAt: data.started_at, isPomodoro: !!data.is_pomodoro };
 };
 
 export const stopTimer = async () => {

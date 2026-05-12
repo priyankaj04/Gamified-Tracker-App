@@ -50,8 +50,6 @@ export default function LearningNew() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: palette.bg }} contentContainerStyle={{ padding: 20, gap: 12 }}>
-      <Text style={styles.h1}>New Learning</Text>
-
       <Text style={styles.label}>Title</Text>
       <TextInput value={title} onChangeText={setTitle} style={styles.input} placeholder="e.g. System Design Primer" placeholderTextColor={palette.textDim} />
 
@@ -118,8 +116,8 @@ const styles = StyleSheet.create({
   chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: palette.border, backgroundColor: palette.card },
   chipText: { color: palette.textMuted, fontSize: 12, fontWeight: '800' },
-  addBtn: { width: 44, height: 44, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  addBtn: { width: 44, height: 44, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.card },
   tagsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  topicChip: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, borderWidth: 1 },
+  topicChip: { paddingHorizontal: 10, paddingVertical: 5, borderRadius: 999, borderWidth: 1, backgroundColor: palette.card },
   topicText: { fontWeight: '800', fontSize: 12 },
 });

@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
-import { useAppStore } from '@/store/useAppStore';
+import { celebrate } from '@/lib/celebrate';
 import type { Milestone, Priority, Subtask, XpAwardResult } from '@/types';
 import { gameKeys } from './useGame';
 import { projectKeys } from './useProjects';
@@ -64,14 +64,15 @@ export const useDeleteMilestone = (projectId: string) => {
 
 export const useCompleteMilestone = (projectId: string) => {
   const qc = useQueryClient();
-  const pushPopup = useAppStore((s) => s.pushPopup);
   return useMutation({
     mutationFn: ({ id, completed }: { id: string; completed: boolean }) =>
       api
         .patch<{ data: { milestone: Milestone } & XpAwardResult }>(`/milestones/${id}/complete`, { completed })
         .then(unwrap),
-    onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'Milestone');
+    onSuccess: (res, vars) => {
+      if (vars.completed && res.xpEarned) {
+        celebrate({ xp: res.xpEarned, label: 'Milestone Done', level: 'big' });
+      }
       qc.invalidateQueries({ queryKey: milestoneKeys.list(projectId) });
       qc.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
       qc.invalidateQueries({ queryKey: gameKeys.state });

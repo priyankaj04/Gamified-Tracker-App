@@ -11,6 +11,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { GlowButton } from '@/components/ui/GlowButton';
 import { FastingClock } from '@/components/spirit/FastingClock';
 import { EmptyState } from '@/components/layout/EmptyState';
+import { XPBadge } from '@/components/gamification/XPBadge';
 import { useActiveFast, useFasts, useFastingStats, useStartFast, useEndFast } from '@/hooks/useFasting';
 import { scheduleFastTargetNotification, cancelFastNotifications } from '@/lib/notifications';
 
@@ -92,7 +93,7 @@ export default function FastingScreen() {
                   size={18}
                   color={s.completed ? accent : palette.danger}
                 />
-                <Text style={[styles.xp, { color: accent2 }]}>+{s.xpEarned}</Text>
+                <XPBadge amount={s.xpEarned} color={accent2} />
               </View>
             ))}
           </View>

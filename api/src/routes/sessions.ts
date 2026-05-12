@@ -50,6 +50,7 @@ sessionsRouter.post(
     z.object({
       projectId: z.string().uuid().nullable().optional(),
       milestoneId: z.string().uuid().nullable().optional(),
+      isPomodoro: z.boolean().optional(),
     }),
   ),
   asyncHandler(async (req, res) => ok(res, await svc.startTimer(req.body), 201)),

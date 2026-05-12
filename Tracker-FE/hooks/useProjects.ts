@@ -1,8 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
-import { useAppStore } from '@/store/useAppStore';
+import { celebrate } from '@/lib/celebrate';
 import type {
-  CodingSession,
   Project,
   ProjectStatus,
   ProjectType,
@@ -65,12 +64,11 @@ export interface ProjectCreateBody {
 
 export const useCreateProject = () => {
   const qc = useQueryClient();
-  const pushPopup = useAppStore((s) => s.pushPopup);
   return useMutation({
     mutationFn: (body: ProjectCreateBody) =>
       api.post<{ data: { project: Project } & XpAwardResult }>('/projects', body).then(unwrap),
     onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'Project Created');
+      celebrate({ xp: res.xpEarned, label: 'Project Created', level: 'big' });
       qc.invalidateQueries({ queryKey: projectKeys.all });
       qc.invalidateQueries({ queryKey: gameKeys.state });
     },
@@ -121,12 +119,11 @@ export const useToggleArchive = () => {
 
 export const useShipProject = () => {
   const qc = useQueryClient();
-  const pushPopup = useAppStore((s) => s.pushPopup);
   return useMutation({
     mutationFn: (id: string) =>
       api.patch<{ data: { project: Project } & XpAwardResult }>(`/projects/${id}/ship`).then(unwrap),
     onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'Project Shipped 🚀');
+      celebrate({ xp: res.xpEarned, label: 'Project Shipped 🚀', level: 'epic' });
       qc.invalidateQueries({ queryKey: projectKeys.all });
       qc.invalidateQueries({ queryKey: gameKeys.state });
     },
@@ -138,17 +135,6 @@ export const useDuplicateProject = () => {
   return useMutation({
     mutationFn: (id: string) => api.post<{ data: Project }>(`/projects/${id}/duplicate`).then(unwrap),
     onSuccess: () => qc.invalidateQueries({ queryKey: projectKeys.all }),
-  });
-};
-
-export const useGithubSync = () => {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) =>
-      api.patch<{ data: { cached: boolean; data: any } }>(`/projects/${id}/github-sync`).then(unwrap),
-    onSuccess: (_d, id) => {
-      qc.invalidateQueries({ queryKey: projectKeys.detail(id) });
-    },
   });
 };
 
@@ -165,53 +151,3 @@ export const useProjectTags = () =>
       api.get<{ data: { tags: { id: string; name: string; color: string }[] } }>('/projects/tags').then(unwrap),
   });
 
-// ─── Legacy convenience exports kept for backward-compat ───
-export const useCodingSessions = (params?: { projectId?: string; from?: string; to?: string }) =>
-  useQuery({
-    queryKey: ['sessions', 'list', params],
-    queryFn: () =>
-      api
-        .get<{ data: { sessions: CodingSession[] } }>('/sessions', { params })
-        .then(unwrap),
-  });
-
-interface SessionBody {
-  projectId?: string | null;
-  date?: string;
-  durationMinutes: number;
-  notes?: string;
-  stars?: number | null;
-}
-
-export const useLogSession = () => {
-  const qc = useQueryClient();
-  const pushPopup = useAppStore((s) => s.pushPopup);
-  return useMutation({
-    mutationFn: (body: SessionBody) =>
-      api.post<{ data: { session: CodingSession } & XpAwardResult }>('/sessions', body).then(unwrap),
-    onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'Session Logged');
-      qc.invalidateQueries({ queryKey: ['sessions'] });
-      qc.invalidateQueries({ queryKey: projectKeys.all });
-      qc.invalidateQueries({ queryKey: gameKeys.state });
-    },
-  });
-};
-
-// Milestone toggle now goes through /milestones/:id/complete
-export const useToggleMilestone = (projectId: string) => {
-  const qc = useQueryClient();
-  const pushPopup = useAppStore((s) => s.pushPopup);
-  return useMutation({
-    mutationFn: ({ id, completed }: { id: string; completed: boolean }) =>
-      api
-        .patch<{ data: { milestone: any } & XpAwardResult }>(`/milestones/${id}/complete`, { completed })
-        .then(unwrap),
-    onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'Milestone');
-      qc.invalidateQueries({ queryKey: projectKeys.all });
-      qc.invalidateQueries({ queryKey: projectKeys.detail(projectId) });
-      qc.invalidateQueries({ queryKey: gameKeys.state });
-    },
-  });
-};

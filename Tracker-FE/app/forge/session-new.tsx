@@ -69,8 +69,6 @@ export default function SessionNew() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: palette.bg }} contentContainerStyle={{ padding: 20, gap: 12 }}>
-      <Text style={styles.h1}>Log Session</Text>
-
       <Text style={styles.label}>Project</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
         <Pressable onPress={() => setProjectId(null)} style={[styles.projChip, projectId === null && { borderColor: accent }]}>

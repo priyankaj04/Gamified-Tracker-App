@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { palette } from '@/lib/themes';
+import { XPBadge } from '@/components/gamification/XPBadge';
 import type { DsaDifficulty, DsaProblem } from '@/types';
 
 const diffColor: Record<DsaDifficulty, string> = {
@@ -42,6 +43,7 @@ export function DSAProblemRow({ problem: p, onPress }: Props) {
       <View style={styles.right}>
         <Text style={[styles.status, p.status === 'Solved' && { color: '#4ade80' }]}>{p.status}</Text>
         <Text style={styles.date}>{new Date(p.date).toLocaleDateString()}</Text>
+        <XPBadge amount={p.xpEarned} color="#a78bfa" />
       </View>
       {p.problemUrl && <Ionicons name="open-outline" size={14} color={palette.textDim} />}
     </Pressable>

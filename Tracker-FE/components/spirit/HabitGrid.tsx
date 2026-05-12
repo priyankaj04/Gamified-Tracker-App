@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { palette , spiritText } from '@/lib/themes';
+import { palette, spiritText } from '@/lib/themes';
 import type { HabitHistoryCell } from '@/types';
 
 interface Props {
@@ -9,21 +9,19 @@ interface Props {
 }
 
 export function HabitGrid({ cells, color = '#4ade80' }: Props) {
-  // 90 cells, 13 cols × 7 rows (most recent on right)
-  const COLS = 13;
+  // Use last 91 days arranged as 13 cols × 7 rows.
   const ROWS = 7;
-  const padded = cells.slice(-COLS * ROWS);
-  const grid: HabitHistoryCell[][] = [];
-  for (let col = 0; col < COLS; col++) {
-    const c: HabitHistoryCell[] = [];
-    for (let row = 0; row < ROWS; row++) {
-      const idx = col * ROWS + row;
-      if (padded[idx]) c.push(padded[idx]);
+  const grid = useMemo(() => {
+    const padded = cells.slice(-91);
+    const out: HabitHistoryCell[][] = [];
+    for (let i = 0; i < padded.length; i += ROWS) {
+      out.push(padded.slice(i, i + ROWS));
     }
-    grid.push(c);
-  }
+    return out;
+  }, [cells]);
+
   return (
-    <View>
+    <View style={[styles.wrap, { borderColor: color + '33' }]}>
       <View style={styles.grid}>
         {grid.map((col, ci) => (
           <View key={ci} style={styles.col}>
@@ -36,14 +34,17 @@ export function HabitGrid({ cells, color = '#4ade80' }: Props) {
                 ]}
               />
             ))}
+            {Array.from({ length: ROWS - col.length }).map((_, i) => (
+              <View key={`pad-${i}`} style={[styles.cell, { opacity: 0 }]} />
+            ))}
           </View>
         ))}
       </View>
       <View style={styles.legend}>
         <Text style={styles.legendText}>Less</Text>
-        <View style={[styles.cell, { backgroundColor: palette.cardAlt, marginHorizontal: 2 }]} />
-        <View style={[styles.cell, { backgroundColor: color, opacity: 0.5, marginHorizontal: 2 }]} />
-        <View style={[styles.cell, { backgroundColor: color, marginHorizontal: 2 }]} />
+        <View style={[styles.legendCell, { backgroundColor: palette.cardAlt }]} />
+        <View style={[styles.legendCell, { backgroundColor: color, opacity: 0.5 }]} />
+        <View style={[styles.legendCell, { backgroundColor: color }]} />
         <Text style={styles.legendText}>More</Text>
       </View>
     </View>
@@ -51,9 +52,18 @@ export function HabitGrid({ cells, color = '#4ade80' }: Props) {
 }
 
 const styles = StyleSheet.create({
-  grid: { flexDirection: 'row', gap: 3 },
-  col: { gap: 3 },
-  cell: { width: 14, height: 14, borderRadius: 3 },
-  legend: { flexDirection: 'row', alignItems: 'center', marginTop: 10, justifyContent: 'flex-end' },
-  legendText: { color: spiritText.secondary, fontSize: 10, fontWeight: '700', marginHorizontal: 4 },
+  wrap: {
+    width: '100%',
+    backgroundColor: palette.card,
+    borderRadius: 14,
+    borderWidth: 1,
+    padding: 12,
+    gap: 10,
+  },
+  grid: { flexDirection: 'row', gap: 3, width: '100%' },
+  col: { flex: 1, gap: 3 },
+  cell: { width: '100%', aspectRatio: 1, borderRadius: 3 },
+  legend: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-end' },
+  legendCell: { width: 12, height: 12, borderRadius: 3, marginHorizontal: 1 },
+  legendText: { fontSize: 10, color: spiritText.secondary, fontWeight: '700' },
 });

@@ -4,7 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { palette, screenTheme, priorityColor } from '@/lib/themes';
 import { GlowButton } from '@/components/ui/GlowButton';
-import { DatePicker, todayISO } from '@/components/ui/DatePicker';
+import { todayISO } from '@/components/ui/DatePicker';
+import { CalendarPicker } from '@/components/ui/CalendarPicker';
 import { TechTag } from '@/components/forge/TechTag';
 import { useCreateProject } from '@/hooks/useProjects';
 import type { Priority, ProjectType } from '@/types';
@@ -72,8 +73,6 @@ export default function ProjectNew() {
 
   return (
     <ScrollView style={{ flex: 1, backgroundColor: palette.bg }} contentContainerStyle={{ padding: 20, gap: 12 }}>
-      <Text style={styles.h1}>New Project</Text>
-
       <Label text="Name" />
       <TextInput value={name} onChangeText={setName} style={styles.input} placeholderTextColor={palette.textDim} />
 
@@ -135,10 +134,16 @@ export default function ProjectNew() {
       </View>
 
       <Label text="Start Date" />
-      <DatePicker value={startDate} onChange={setStart} accent={accent} />
+      <CalendarPicker value={startDate} onChange={setStart} accent={accent} />
 
       <Label text="Target Ship Date" />
-      <DatePicker value={targetDate || todayISO()} onChange={setTarget} accent={accent} />
+      <CalendarPicker
+        value={targetDate}
+        onChange={setTarget}
+        accent={accent}
+        placeholder="Pick a target ship date"
+        minimumDate={new Date()}
+      />
 
       <Label text="Estimated Hours" />
       <TextInput value={estHours} onChangeText={setEstHours} keyboardType="numeric" style={styles.input} placeholder="e.g. 40" placeholderTextColor={palette.textDim} />
@@ -205,7 +210,7 @@ const styles = StyleSheet.create({
   priority: { width: 40, height: 40, borderRadius: 8, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   priorityText: { fontSize: 14, fontWeight: '900' },
   emoji: { width: 42, height: 42, borderRadius: 8, borderWidth: 1, borderColor: palette.border, backgroundColor: palette.card, alignItems: 'center', justifyContent: 'center' },
-  addBtn: { width: 44, height: 44, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  addBtn: { width: 44, height: 44, borderRadius: 10, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.card },
   tagsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   mRow: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: palette.card, padding: 10, borderRadius: 10, borderWidth: 1, borderColor: palette.border },
   mText: { color: palette.text, fontSize: 14, flex: 1 },

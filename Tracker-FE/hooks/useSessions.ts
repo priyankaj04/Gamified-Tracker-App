@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
-import { useAppStore } from '@/store/useAppStore';
+import { celebrate } from '@/lib/celebrate';
 import type { ActiveTimer, CodingSession, GridCell, SessionMood, XpAwardResult } from '@/types';
 import { gameKeys } from './useGame';
 import { projectKeys } from './useProjects';
@@ -66,12 +66,11 @@ export interface SessionBody {
 
 export const useCreateSession = () => {
   const qc = useQueryClient();
-  const pushPopup = useAppStore((s) => s.pushPopup);
   return useMutation({
     mutationFn: (body: SessionBody) =>
       api.post<{ data: { session: CodingSession } & XpAwardResult }>('/sessions', body).then(unwrap),
     onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'Session Logged');
+      celebrate({ xp: res.xpEarned, label: 'Session Logged' });
       qc.invalidateQueries({ queryKey: sessionKeys.all });
       qc.invalidateQueries({ queryKey: projectKeys.all });
       qc.invalidateQueries({ queryKey: gameKeys.state });
@@ -104,14 +103,21 @@ export const useActiveTimer = () =>
     queryKey: sessionKeys.activeTimer,
     queryFn: () =>
       api.get<{ data: { timer: ActiveTimer | null } }>('/sessions/timer/active').then(unwrap),
-    refetchInterval: 5000,
+    // Time is computed locally off startedAt — no need to poll every 5s; that
+    // was the source of the visible stutter. Keep a generous safety refetch.
+    refetchInterval: 60_000,
   });
 
 export const useStartTimer = () => {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (body: { projectId?: string | null; milestoneId?: string | null }) =>
-      api.post<{ data: { timerId: string; startedAt: string } }>('/sessions/timer/start', body).then(unwrap),
+    mutationFn: (body: { projectId?: string | null; milestoneId?: string | null; isPomodoro?: boolean }) =>
+      api
+        .post<{ data: { timerId: string; startedAt: string; isPomodoro: boolean } }>(
+          '/sessions/timer/start',
+          body,
+        )
+        .then(unwrap),
     onSuccess: () => qc.invalidateQueries({ queryKey: sessionKeys.activeTimer }),
   });
 };

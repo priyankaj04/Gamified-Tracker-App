@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, View, Text, StyleSheet, Pressable, RefreshControl } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, Pressable, RefreshControl, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { palette, screenTheme } from '@/lib/themes';
@@ -57,9 +57,12 @@ export default function SessionsList() {
               {list.map((s) => (
                 <Pressable
                   key={s.id}
-                  onLongPress={() => {
-                    if (confirm('Delete this session?')) del.mutate(s.id);
-                  }}>
+                  onLongPress={() =>
+                    Alert.alert('Delete this session?', undefined, [
+                      { text: 'Cancel', style: 'cancel' },
+                      { text: 'Delete', style: 'destructive', onPress: () => del.mutate(s.id) },
+                    ])
+                  }>
                   <SessionCard session={s} accent={accent} />
                 </Pressable>
               ))}

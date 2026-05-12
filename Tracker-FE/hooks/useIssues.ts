@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
+import { celebrate } from '@/lib/celebrate';
 import type { Issue, IssueSeverity, IssueStatus } from '@/types';
 
 export const issueKeys = {
@@ -70,6 +71,11 @@ export const useFixIssue = () => {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => api.patch<{ data: Issue }>(`/issues/${id}/fix`).then(unwrap),
-    onSuccess: () => qc.invalidateQueries({ queryKey: issueKeys.all }),
+    onSuccess: () => {
+      // No server XP for issues but the haptic + tiny confetti makes squashing
+      // a bug feel like a real win.
+      celebrate({ label: 'Bug Squashed 🐛', level: 'micro' });
+      qc.invalidateQueries({ queryKey: issueKeys.all });
+    },
   });
 };

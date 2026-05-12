@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { palette, screenTheme } from '@/lib/themes';
 import { StarRating } from '@/components/gamification/StarRating';
+import { XPBadge } from '@/components/gamification/XPBadge';
 import { Skeleton } from '@/components/layout/Skeleton';
 import {
   useWorkout,
@@ -94,7 +95,7 @@ export default function WorkoutDetail() {
       </Text>
       <View style={styles.headerRow}>
         <StarRating value={w.stars} readOnly size={18} />
-        <Text style={[styles.xp, { color: accent }]}>+{w.xpEarned} XP</Text>
+        <XPBadge amount={w.xpEarned} color={accent} size="md" />
       </View>
 
       <View style={styles.actionRow}>

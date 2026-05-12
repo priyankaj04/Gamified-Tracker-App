@@ -16,6 +16,7 @@ import { ThemedScene } from '@/components/layout/ThemedScene';
 import { SpiritHeader } from '@/components/spirit/SpiritHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
 import { EmptyState } from '@/components/layout/EmptyState';
+import { XPBadge } from '@/components/gamification/XPBadge';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { GlowButton } from '@/components/ui/GlowButton';
 import { SpiritDatePicker as DatePicker, todayISO } from '@/components/spirit/SpiritDatePicker';
@@ -186,6 +187,7 @@ export default function WeightLogScreen() {
                         </Text>
                       </View>
                     )}
+                    <XPBadge amount={e.xpEarned} color={accent} />
                     <Ionicons name="chevron-forward" size={14} color={spiritText.tertiary} />
                   </View>
                 </SwipeRow>

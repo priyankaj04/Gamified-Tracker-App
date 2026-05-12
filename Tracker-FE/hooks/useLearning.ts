@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
-import { useAppStore } from '@/store/useAppStore';
+import { celebrate } from '@/lib/celebrate';
 import type {
   LearningItem,
   LearningStatus,
@@ -86,12 +86,11 @@ export const useUpdateProgress = () => {
 
 export const useCompleteLearning = () => {
   const qc = useQueryClient();
-  const pushPopup = useAppStore((s) => s.pushPopup);
   return useMutation({
     mutationFn: (id: string) =>
       api.patch<{ data: { item: LearningItem } & XpAwardResult }>(`/learning/${id}/complete`).then(unwrap),
     onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'Learning Complete');
+      celebrate({ xp: res.xpEarned, label: 'Learning Complete', level: 'big' });
       qc.invalidateQueries({ queryKey: learningKeys.all });
       qc.invalidateQueries({ queryKey: gameKeys.state });
     },

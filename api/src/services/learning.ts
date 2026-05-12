@@ -114,6 +114,9 @@ export const createLearning = async (body: LearningBody) => {
 
 export const updateLearning = async (id: string, body: Partial<LearningBody>) => {
   const sb = supabase();
+  const { data: current } = await sb.from('learning_items').select('*').eq('id', id).single();
+  if (!current) throw new Error('Learning item not found');
+
   const upd: any = { updated_at: new Date().toISOString() };
   if (body.title !== undefined) upd.title = body.title;
   if (body.type !== undefined) upd.type = body.type;
@@ -126,6 +129,26 @@ export const updateLearning = async (id: string, body: Partial<LearningBody>) =>
   if (body.notes !== undefined) upd.notes = body.notes;
   if (body.estimatedHours !== undefined) upd.estimated_hours = body.estimatedHours;
   if (body.actualHours !== undefined) upd.actual_hours = body.actualHours;
+
+  // Auto-flip status when progress changes meaningfully.
+  // - First nudge from 0 → >0 promotes Not Started → In Progress.
+  // - Hitting 100 promotes anything → Completed.
+  const nextProgress = body.progressPct ?? current.progress_pct;
+  const nextStatus = body.status ?? current.status;
+  if (body.progressPct !== undefined && body.status === undefined) {
+    if (nextProgress >= 100 && nextStatus !== 'Completed') {
+      upd.status = 'Completed';
+      upd.completed_at = todayISO();
+    } else if (nextProgress > 0 && nextStatus === 'Not Started') {
+      upd.status = 'In Progress';
+      if (!current.started_at) upd.started_at = todayISO();
+    }
+  }
+  // If the caller explicitly moved into In Progress, stamp started_at.
+  if (body.status === 'In Progress' && !current.started_at) upd.started_at = todayISO();
+  // If the caller explicitly moved into Completed, stamp completed_at.
+  if (body.status === 'Completed' && !current.completed_at) upd.completed_at = todayISO();
+
   await sb.from('learning_items').update(upd).eq('id', id);
   if (body.progressPct !== undefined || body.status !== undefined) {
     await updateStreak('learning');

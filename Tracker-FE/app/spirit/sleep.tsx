@@ -18,6 +18,7 @@ import { SectionTitle } from '@/components/layout/SectionTitle';
 import { StatCard } from '@/components/ui/StatCard';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { GlowButton } from '@/components/ui/GlowButton';
+import { XPBadge } from '@/components/gamification/XPBadge';
 import { TrendLine } from '@/components/charts/TrendLine';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { SpiritDatePicker as DatePicker, todayISO } from '@/components/spirit/SpiritDatePicker';
@@ -97,6 +98,7 @@ export default function SleepScreen() {
                     ))}
                   </View>
                 )}
+                <XPBadge amount={s.xpEarned} color={accent} />
                 <Pressable onPress={() => del.mutate(s.id)} hitSlop={8}>
                   <Ionicons name="trash" size={14} color={spiritText.tertiary} />
                 </Pressable>

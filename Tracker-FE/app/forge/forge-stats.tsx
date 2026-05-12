@@ -29,11 +29,20 @@ export default function ForgeStats() {
   const billable = useBillable(month);
 
   const s = summary.data;
-  void goal;
+
+  const refreshAll = () => {
+    summary.refetch();
+    weekly.refetch();
+    weeklyChart.refetch();
+    byProject.refetch();
+    goal.refetch();
+    settings.refetch();
+    billable.refetch();
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: palette.bg }}>
-      <ScrollView refreshControl={<RefreshControl tintColor={accent} refreshing={summary.isFetching} onRefresh={() => { summary.refetch(); weekly.refetch(); byProject.refetch(); }} />}>
+      <ScrollView refreshControl={<RefreshControl tintColor={accent} refreshing={summary.isFetching} onRefresh={refreshAll} />}>
         <PageHeader title="Forge Stats" subtitle="Analytics" accent={accent} accent2={screenTheme.forge.accent2} />
 
         <View style={styles.stats}>

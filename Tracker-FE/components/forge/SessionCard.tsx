@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { palette } from '@/lib/themes';
 import { StarRating } from '@/components/gamification/StarRating';
+import { XPBadge } from '@/components/gamification/XPBadge';
 import type { CodingSession, SessionMood } from '@/types';
 
 const moodMeta: Record<SessionMood, { color: string; emoji: string }> = {
@@ -57,7 +58,7 @@ export function SessionCard({ session: s, accent = '#22d3ee' }: Props) {
       )}
       <View style={styles.foot}>
         <StarRating value={s.stars} readOnly size={12} />
-        {s.xpEarned > 0 && <Text style={[styles.xp, { color: accent }]}>+{s.xpEarned} XP</Text>}
+        <XPBadge amount={s.xpEarned} color={accent} />
       </View>
     </View>
   );

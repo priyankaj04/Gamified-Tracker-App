@@ -283,6 +283,7 @@ export interface ActiveTimer {
   startedAt: string;
   elapsedSec: number;
   isRunning: boolean;
+  isPomodoro: boolean;
 }
 
 export interface LearningItem {

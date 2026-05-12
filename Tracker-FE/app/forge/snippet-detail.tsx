@@ -16,10 +16,22 @@ export default function SnippetDetail() {
   const del = useDeleteSnippet();
   const s = snippets.data?.snippets.find((x) => x.id === id);
 
+  if (snippets.isLoading) {
+    return (
+      <View style={styles.center}>
+        <Text style={{ color: palette.textMuted }}>Loading…</Text>
+      </View>
+    );
+  }
+
   if (!s) {
     return (
       <View style={styles.center}>
-        <Text style={{ color: palette.textMuted }}>Snippet not found.</Text>
+        <Text style={{ color: palette.textMuted, marginBottom: 14 }}>Snippet not found.</Text>
+        <Pressable onPress={() => router.back()} style={styles.backFallback}>
+          <Ionicons name="chevron-back" size={16} color={accent} />
+          <Text style={[styles.backFallbackText, { color: accent }]}>Back to snippets</Text>
+        </Pressable>
       </View>
     );
   }
@@ -34,6 +46,9 @@ export default function SnippetDetail() {
   return (
     <ScrollView style={{ flex: 1, backgroundColor: palette.bg }} contentContainerStyle={{ padding: 20, gap: 12 }}>
       <View style={styles.head}>
+        <Pressable onPress={() => router.back()} hitSlop={8} style={styles.backBtn}>
+          <Ionicons name="chevron-back" size={20} color={accent} />
+        </Pressable>
         <View style={{ flex: 1 }}>
           <Text style={styles.title}>{s.title}</Text>
           <Text style={styles.meta}>{s.language} · {s.category}</Text>
@@ -73,10 +88,31 @@ export default function SnippetDetail() {
 
 const styles = StyleSheet.create({
   center: { flex: 1, backgroundColor: palette.bg, alignItems: 'center', justifyContent: 'center' },
+  backBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: palette.card,
+    borderWidth: 1,
+    borderColor: palette.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backFallback: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: palette.border,
+  },
+  backFallbackText: { fontWeight: '900', fontSize: 13 },
   head: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   title: { color: palette.text, fontSize: 22, fontWeight: '900' },
   meta: { color: palette.textMuted, fontWeight: '700', fontSize: 12, marginTop: 4 },
-  copyBtn: { flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderRadius: 10, padding: 12 },
+  copyBtn: { flexDirection: 'row', gap: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5, borderRadius: 10, padding: 12, backgroundColor: palette.card },
   copyText: { fontWeight: '900', fontSize: 13 },
   codeBox: { backgroundColor: '#0a0a0f', borderWidth: 1, borderColor: palette.border, borderRadius: 12, padding: 14, overflow: 'hidden' },
   code: { color: '#c9d1d9', fontFamily: 'Courier', fontSize: 12, lineHeight: 18 },

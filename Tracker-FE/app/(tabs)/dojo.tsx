@@ -19,6 +19,7 @@ import { StatCard } from '@/components/ui/StatCard';
 import { ActivityGrid } from '@/components/ui/ActivityGrid';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { StarRating } from '@/components/gamification/StarRating';
+import { XPBadge } from '@/components/gamification/XPBadge';
 import { useWorkouts, useWorkoutGrid, usePersonalRecords } from '@/hooks/useWorkouts';
 import { useGameState } from '@/hooks/useGame';
 import { loadDraft, type WorkoutDraft } from '@/lib/workoutDraft';
@@ -195,7 +196,7 @@ export default function DojoScreen() {
                 </View>
                 <View style={{ alignItems: 'flex-end', gap: 2 }}>
                   <StarRating value={w.stars} readOnly size={12} />
-                  <Text style={[styles.xp, { color: accent }]}>+{w.xpEarned} XP</Text>
+                  <XPBadge amount={w.xpEarned} color={accent} />
                 </View>
               </Pressable>
             ))}

@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
   goalTrack: { height: 6, borderRadius: 3, backgroundColor: palette.cardAlt, overflow: 'hidden' },
   goalFill: { height: '100%', borderRadius: 3 },
   topicsRow: { paddingHorizontal: 20, gap: 6 },
-  topicChip: { borderWidth: 1, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, alignItems: 'center', gap: 1 },
+  topicChip: { borderWidth: 1, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999, alignItems: 'center', gap: 1, backgroundColor: palette.card },
   topicName: { fontWeight: '800', fontSize: 12 },
   topicCount: { color: palette.textMuted, fontSize: 10, fontWeight: '700' },
   weakBox: { backgroundColor: '#fbbf2422', borderColor: '#fbbf24', borderWidth: 1, borderRadius: 10, padding: 12, marginHorizontal: 20, marginTop: 10, gap: 4 },

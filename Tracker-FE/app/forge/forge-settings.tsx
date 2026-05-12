@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, TextInput, Pressable } from 'react-native';
+import { ScrollView, View, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
 import { palette, screenTheme } from '@/lib/themes';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlowButton } from '@/components/ui/GlowButton';
@@ -36,19 +36,24 @@ export default function ForgeSettingsScreen() {
     }
   }, [data]);
 
-  const onSave = () => {
-    update.mutate({
-      dailyCodingGoalMin: Number(goalMin),
-      pomodoroWorkMin: Number(pomWork),
-      pomodoroBreakMin: Number(pomBreak),
-      githubUsername: github || null,
-      billableRate: billRate ? Number(billRate) : null,
-      billableCurrency: currency,
-      workStartHour: Number(workStart),
-      workEndHour: Number(workEnd),
-      weekStartDay: weekStart,
-      weeklyDsaGoal: Number(weeklyDsa),
-    });
+  const onSave = async () => {
+    try {
+      await update.mutateAsync({
+        dailyCodingGoalMin: Number(goalMin),
+        pomodoroWorkMin: Number(pomWork),
+        pomodoroBreakMin: Number(pomBreak),
+        githubUsername: github || null,
+        billableRate: billRate ? Number(billRate) : null,
+        billableCurrency: currency,
+        workStartHour: Number(workStart),
+        workEndHour: Number(workEnd),
+        weekStartDay: weekStart,
+        weeklyDsaGoal: Number(weeklyDsa),
+      });
+      Alert.alert('Saved');
+    } catch (e: any) {
+      Alert.alert('Failed', e?.message ?? 'Could not save settings');
+    }
   };
 
   return (

@@ -8,7 +8,12 @@ import { PomodoroTimer } from '@/components/forge/PomodoroTimer';
 import { GlowButton } from '@/components/ui/GlowButton';
 import { useForgeSettings } from '@/hooks/useForgeStats';
 import { useProjects } from '@/hooks/useProjects';
-import { useCreateSession } from '@/hooks/useSessions';
+import {
+  useActiveTimer,
+  useCreateSession,
+  useStartTimer,
+  useStopTimer,
+} from '@/hooks/useSessions';
 
 type State = 'idle' | 'work' | 'break' | 'long-break';
 
@@ -18,6 +23,9 @@ export default function Focus() {
   const settings = useForgeSettings();
   const projects = useProjects({});
   const create = useCreateSession();
+  const startTimer = useStartTimer();
+  const stopTimer = useStopTimer();
+  const activeTimer = useActiveTimer();
 
   const workMin = settings.data?.pomodoroWorkMin ?? 25;
   const breakMin = settings.data?.pomodoroBreakMin ?? 5;
@@ -67,16 +75,31 @@ export default function Focus() {
 
   const total = state === 'work' ? workMin * 60 : state === 'long-break' ? longBreakMin * 60 : breakMin * 60;
 
-  const onStart = () => {
+  const onStart = async () => {
     if (state === 'idle') setState('work');
     setRunning(true);
+    // Start a server-side timer flagged as pomodoro so the live banner picks
+    // it up on the Forge home and highlights it accordingly. If one is
+    // already running we just leave it be.
+    if (!activeTimer.data?.timer) {
+      try {
+        await startTimer.mutateAsync({ projectId, isPomodoro: true });
+      } catch {
+        /* best-effort — local pomodoro still works without server state */
+      }
+    }
   };
   const onPause = () => setRunning(false);
-  const onReset = () => {
+  const onReset = async () => {
     setRunning(false);
     setState('idle');
     setSeconds(workMin * 60);
     setCompleted(0);
+    if (activeTimer.data?.timer?.isPomodoro) {
+      try {
+        await stopTimer.mutateAsync();
+      } catch {}
+    }
   };
   const onSkip = () => {
     setSeconds(1);
@@ -85,6 +108,11 @@ export default function Focus() {
   const onSaveAsSession = async () => {
     const minutes = completed * workMin;
     if (minutes === 0) return Alert.alert('No work completed', 'Finish a pomodoro first.');
+    if (activeTimer.data?.timer?.isPomodoro) {
+      try {
+        await stopTimer.mutateAsync();
+      } catch {}
+    }
     await create.mutateAsync({
       projectId,
       durationMinutes: minutes,
@@ -92,7 +120,10 @@ export default function Focus() {
       notes: `${completed} pomodoros`,
     });
     Alert.alert('Saved!', `${minutes} min logged as a coding session.`);
-    onReset();
+    setRunning(false);
+    setState('idle');
+    setSeconds(workMin * 60);
+    setCompleted(0);
     router.back();
   };
 
@@ -147,6 +178,6 @@ const styles = StyleSheet.create({
   projChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 999, borderWidth: 1, borderColor: palette.border, backgroundColor: palette.card },
   projText: { color: palette.textMuted, fontSize: 12, fontWeight: '700' },
   controls: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: 22 },
-  control: { width: 52, height: 52, borderRadius: 26, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  control: { width: 52, height: 52, borderRadius: 26, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', backgroundColor: palette.card },
   controlMain: { width: 70, height: 70, borderRadius: 35, alignItems: 'center', justifyContent: 'center' },
 });

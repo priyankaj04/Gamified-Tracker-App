@@ -104,8 +104,12 @@ CREATE TABLE IF NOT EXISTS active_timer (
   project_id    UUID REFERENCES projects(id) ON DELETE SET NULL,
   milestone_id  UUID REFERENCES project_milestones(id) ON DELETE SET NULL,
   started_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  is_running    BOOLEAN NOT NULL DEFAULT TRUE
+  is_running    BOOLEAN NOT NULL DEFAULT TRUE,
+  is_pomodoro   BOOLEAN NOT NULL DEFAULT FALSE
 );
+
+ALTER TABLE active_timer
+  ADD COLUMN IF NOT EXISTS is_pomodoro BOOLEAN NOT NULL DEFAULT FALSE;
 
 -- ─────────────────────────────────────────────────────────────
 -- LEARNING + TECH SKILLS

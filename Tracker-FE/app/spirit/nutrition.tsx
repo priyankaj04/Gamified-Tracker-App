@@ -17,6 +17,7 @@ import { ThemedScene } from '@/components/layout/ThemedScene';
 import { SpiritHeader } from '@/components/spirit/SpiritHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
 import { ProgressRing } from '@/components/ui/ProgressRing';
+import { XPBadge } from '@/components/gamification/XPBadge';
 import { MacroDonut } from '@/components/spirit/MacroDonut';
 import { AnimatedCard } from '@/components/spirit/AnimatedCard';
 import { EmptyState } from '@/components/layout/EmptyState';
@@ -305,6 +306,7 @@ export default function NutritionScreen() {
                         </Text>
                       </View>
                       <Text style={styles.mealKcal}>{m.calories} kcal</Text>
+                      <XPBadge amount={m.xpEarned} color={accent} />
                       <Pressable onPress={() => delMeal.mutate(m.id)} hitSlop={8} style={styles.delBtn}>
                         <Ionicons name="trash" size={14} color="#ffffff" />
                       </Pressable>
