@@ -11,6 +11,8 @@ import * as cycle from '@/services/cycle';
 import * as goals from '@/services/goals';
 import * as wellness from '@/services/wellnessScore';
 import * as weight from '@/services/weight';
+import * as quests from '@/services/spiritQuests';
+import * as streaks from '@/services/spiritStreaks';
 
 export const spiritRouter = Router();
 
@@ -544,3 +546,11 @@ spiritRouter.patch(
   '/goals/:id/archive',
   asyncHandler(async (req, res) => ok(res, await goals.archiveGoal(req.params.id))),
 );
+
+// ─── Quests + Streaks (gamification) ────────────────────────
+spiritRouter.get('/quests/today', asyncHandler(async (_req, res) => ok(res, await quests.todayQuests())));
+spiritRouter.post(
+  '/quests/:id/claim',
+  asyncHandler(async (req, res) => ok(res, await quests.claimQuest(req.params.id))),
+);
+spiritRouter.get('/streaks', asyncHandler(async (_req, res) => ok(res, await streaks.allSpiritStreaks())));

@@ -101,6 +101,25 @@ export const createWeight = async (body: CreateBody) => {
   const streak = await updateStreak('spirit');
   const { count } = await sb.from('weight_entries').select('id', { count: 'exact', head: true });
 
+  // Per-feature streak for the Consistent badge: consecutive days with a weight entry.
+  const { data: recentWeights } = await sb
+    .from('weight_entries')
+    .select('date')
+    .order('date', { ascending: false })
+    .limit(30);
+  const weightDates = (recentWeights ?? []).map((r: any) => r.date);
+  let weightLogStreak = 0;
+  if (weightDates.length) {
+    const today = new Date().toISOString().slice(0, 10);
+    let cursor = new Date(today + 'T00:00:00Z');
+    for (const d of weightDates) {
+      if (d === cursor.toISOString().slice(0, 10)) {
+        weightLogStreak++;
+        cursor = new Date(cursor.getTime() - 86_400_000);
+      } else break;
+    }
+  }
+
   const { data: goalRow } = await sb.from('body_goal').select('*').limit(1).maybeSingle();
   const goal = goalFromRow(goalRow);
   let goalHit = false;
@@ -116,6 +135,7 @@ export const createWeight = async (body: CreateBody) => {
 
   const badges = await checkBadges({
     weightLogCount: count ?? 0,
+    weightLogStreak,
     spiritStreak: streak.count,
     goalHit,
   });

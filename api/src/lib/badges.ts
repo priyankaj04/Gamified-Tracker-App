@@ -59,6 +59,7 @@ export type BadgeCheckContext = {
   forgeStreak?: number;
   totalCodingHours?: number;
   weightLogCount?: number;
+  weightLogStreak?: number;
   spiritStreak?: number;
   goalHit?: boolean;
   transactionCount?: number;
@@ -94,7 +95,7 @@ export const evaluateBadges = (ctx: BadgeCheckContext): string[] => {
   if ((ctx.sessionCount ?? 0) >= 50) unlock.push('system-admin');
 
   if ((ctx.weightLogCount ?? 0) >= 1) unlock.push('first-weigh-in');
-  if ((ctx.spiritStreak ?? 0) >= 7) unlock.push('consistent');
+  if ((ctx.weightLogStreak ?? 0) >= 7) unlock.push('consistent');
   if (ctx.goalHit) unlock.push('chakra-control');
   if (ctx.goalHit && (ctx.weightLogCount ?? 0) >= 30) unlock.push('transformation');
   if ((ctx.nutritionStreak ?? 0) >= 30) unlock.push('nutritionist');

@@ -18,7 +18,7 @@ import { SectionTitle } from '@/components/layout/SectionTitle';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { GlowButton } from '@/components/ui/GlowButton';
-import { DatePicker, todayISO } from '@/components/ui/DatePicker';
+import { SpiritDatePicker as DatePicker, todayISO } from '@/components/spirit/SpiritDatePicker';
 import { StatCard } from '@/components/ui/StatCard';
 import { WeightChart } from '@/components/spirit/WeightChart';
 

@@ -42,13 +42,17 @@ export const useStartFast = () => {
 export const useEndFast = () => {
   const qc = useQueryClient();
   const pushPopup = useAppStore((s) => s.pushPopup);
+  const triggerConfetti = useAppStore((s) => s.triggerConfetti);
   return useMutation({
     mutationFn: (body: { endTime?: string; notes?: string } = {}) =>
       api
         .post<{ data: { session: FastingSession } & XpAwardResult }>('/spirit/fasting/end', body)
         .then(unwrap),
     onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'Fast Complete');
+      if (res.xpEarned) {
+        pushPopup(res.xpEarned, 'Fast Complete');
+        triggerConfetti();
+      }
       qc.invalidateQueries({ queryKey: fastingKeys.all });
       qc.invalidateQueries({ queryKey: gameKeys.state });
     },

@@ -52,6 +52,7 @@ export const useDeleteGoal = () => {
 export const useLogGoalProgress = () => {
   const qc = useQueryClient();
   const pushPopup = useAppStore((s) => s.pushPopup);
+  const triggerConfetti = useAppStore((s) => s.triggerConfetti);
   return useMutation({
     mutationFn: ({ id, body }: { id: string; body: { value: number; notes?: string; date?: string } }) =>
       api
@@ -61,7 +62,12 @@ export const useLogGoalProgress = () => {
         )
         .then(unwrap),
     onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'Goal Reached');
+      if (res.completedNow) {
+        triggerConfetti();
+        if (res.xpEarned) pushPopup(res.xpEarned, '🏆 Goal Reached!');
+      } else if (res.xpEarned) {
+        pushPopup(res.xpEarned, 'Goal Reached');
+      }
       qc.invalidateQueries({ queryKey: goalsKeys.all });
       qc.invalidateQueries({ queryKey: gameKeys.state });
     },

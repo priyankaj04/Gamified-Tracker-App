@@ -11,6 +11,10 @@ import { SectionTitle } from '@/components/layout/SectionTitle';
 import { WellnessRing } from '@/components/spirit/WellnessRing';
 import { GoalRing } from '@/components/spirit/GoalRing';
 import { AnimatedCard } from '@/components/spirit/AnimatedCard';
+import { QuestsCard } from '@/components/spirit/QuestsCard';
+import { StreaksRow } from '@/components/spirit/StreaksRow';
+import { PerfectDayBanner } from '@/components/spirit/PerfectDayBanner';
+import { NextBadgeCard } from '@/components/spirit/NextBadgeCard';
 import { useWeight } from '@/hooks/useWeight';
 import { useTodayHabits, useCompleteHabit } from '@/hooks/useHabits';
 import { useNutritionSummary } from '@/hooks/useNutrition';
@@ -81,6 +85,15 @@ export default function SpiritScreen() {
 
   // Sleep is "logged for last night" if its wake-day matches today OR yesterday
   // (the latter covers entries saved between local midnight and dawn).
+  const weightDoneToday = !!latestWeight && latestWeight.date === todayISO();
+  const mealsDoneToday = (summary.data?.caloriesConsumed ?? 0) > 0;
+  const habitsAllDone = !!habitsTotalToday && habitsDoneToday === habitsTotalToday;
+  const perfectDay =
+    weightDoneToday &&
+    mealsDoneToday &&
+    habitsAllDone &&
+    wellnessLoggedToday;
+
   const sleepLoggedForLastNight = (() => {
     if (!lastSleep) return false;
     const today = todayISO();
@@ -128,23 +141,22 @@ export default function SpiritScreen() {
           </Pressable>
         </AnimatedCard>
 
-        {/* Streak summary */}
+        {/* Perfect day celebration banner */}
+        <PerfectDayBanner visible={perfectDay} />
+
+        {/* Individual streaks */}
         <AnimatedCard index={1}>
-          <View style={styles.streakRow}>
-            <StreakChip icon="flame" count={spiritStreak} label="Spirit" accent={accent} />
-            <StreakChip
-              icon="footsteps"
-              count={stepsStats.data?.currentStreak ?? 0}
-              label="Steps"
-              accent={accent}
-            />
-            <StreakChip
-              icon="checkmark-done"
-              count={habitsDoneToday}
-              label={`/ ${habitsTotalToday} habits`}
-              accent={accent2}
-            />
-          </View>
+          <StreaksRow />
+        </AnimatedCard>
+
+        {/* Daily quests */}
+        <AnimatedCard index={2}>
+          <QuestsCard />
+        </AnimatedCard>
+
+        {/* Next badge progress */}
+        <AnimatedCard index={3}>
+          <NextBadgeCard />
         </AnimatedCard>
 
         {/* Pedometer banner */}
@@ -447,26 +459,6 @@ export default function SpiritScreen() {
         <Ionicons name="add" size={28} color="#0b0b14" />
       </Pressable>
     </ThemedScene>
-  );
-}
-
-function StreakChip({
-  icon,
-  count,
-  label,
-  accent,
-}: {
-  icon: any;
-  count: number;
-  label: string;
-  accent: string;
-}) {
-  return (
-    <View style={[styles.streakChip, { borderColor: accent + '55' }]}>
-      <Ionicons name={icon} size={14} color={accent} />
-      <Text style={[styles.streakCount, { color: accent }]}>{count}</Text>
-      <Text style={styles.streakLabel}>{label}</Text>
-    </View>
   );
 }
 

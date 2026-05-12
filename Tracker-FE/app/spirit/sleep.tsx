@@ -20,7 +20,7 @@ import { BottomSheet } from '@/components/ui/BottomSheet';
 import { GlowButton } from '@/components/ui/GlowButton';
 import { TrendLine } from '@/components/charts/TrendLine';
 import { EmptyState } from '@/components/layout/EmptyState';
-import { DatePicker, todayISO } from '@/components/ui/DatePicker';
+import { SpiritDatePicker as DatePicker, todayISO } from '@/components/spirit/SpiritDatePicker';
 import { useSleep, useSleepGoal, useSleepStats, useLogSleep, useDeleteSleep } from '@/hooks/useSleep';
 
 export default function SleepScreen() {

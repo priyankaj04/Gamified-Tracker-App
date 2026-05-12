@@ -11,6 +11,7 @@ import { palette } from '@/lib/themes';
 import { XPPopupHost } from '@/components/gamification/XPPopup';
 import { BadgeUnlockHost } from '@/components/gamification/BadgeUnlock';
 import { LevelUpHost } from '@/components/gamification/LevelUp';
+import { ConfettiHost } from '@/components/spirit/ConfettiHost';
 import { setupChannels } from '@/lib/notifications';
 
 export const unstable_settings = {
@@ -113,6 +114,7 @@ export default function RootLayout() {
           <XPPopupHost />
           <BadgeUnlockHost />
           <LevelUpHost />
+          <ConfettiHost />
           <StatusBar style="light" />
         </ThemeProvider>
       </QueryClientProvider>

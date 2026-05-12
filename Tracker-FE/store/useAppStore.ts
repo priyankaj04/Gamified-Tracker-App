@@ -18,6 +18,10 @@ interface AppState {
   hapticsEnabled: boolean;
   setHapticsEnabled: (v: boolean) => void;
 
+  // Confetti trigger — increment to replay
+  confettiTick: number;
+  triggerConfetti: () => void;
+
   // local optimistic XP display (mirrors server)
   displayXp: number;
   setDisplayXp: (xp: number) => void;
@@ -52,6 +56,9 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       hapticsEnabled: true,
       setHapticsEnabled: (v) => set({ hapticsEnabled: v }),
+
+      confettiTick: 0,
+      triggerConfetti: () => set({ confettiTick: get().confettiTick + 1 }),
 
       displayXp: 0,
       setDisplayXp: (xp) => set({ displayXp: xp }),

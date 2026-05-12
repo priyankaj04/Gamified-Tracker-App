@@ -5,7 +5,7 @@ import { useRouter } from 'expo-router';
 import { palette, screenTheme , spiritText } from '@/lib/themes';
 import { ThemedScene } from '@/components/layout/ThemedScene';
 import { GlowButton } from '@/components/ui/GlowButton';
-import { DatePicker, todayISO } from '@/components/ui/DatePicker';
+import { SpiritDatePicker as DatePicker, todayISO } from '@/components/spirit/SpiritDatePicker';
 import { useLogMeal } from '@/hooks/useNutrition';
 import type { MealType } from '@/types';
 

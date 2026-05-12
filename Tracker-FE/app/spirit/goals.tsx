@@ -12,7 +12,7 @@ import { GlowButton } from '@/components/ui/GlowButton';
 import { GoalRing } from '@/components/spirit/GoalRing';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { AnimatedCard } from '@/components/spirit/AnimatedCard';
-import { DatePicker, todayISO } from '@/components/ui/DatePicker';
+import { SpiritDatePicker as DatePicker, todayISO } from '@/components/spirit/SpiritDatePicker';
 import { useArchivedGoals, useCreateGoal, useGoals } from '@/hooks/useGoals';
 import type { SpiritGoalType } from '@/types';
 
