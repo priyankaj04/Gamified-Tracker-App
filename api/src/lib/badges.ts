@@ -18,12 +18,18 @@ export const BADGES: BadgeDef[] = [
   { id: 'century',        name: 'Century',        rarity: 'Epic',      module: 'dojo',   description: 'Log 100 workouts',                 xpReward: 1000 },
   { id: 'ultra-instinct', name: 'Ultra Instinct', rarity: 'Legendary', module: 'dojo',   description: '365 total workout sessions',       xpReward: 3000 },
 
-  { id: 'hello-world',    name: 'Hello World',    rarity: 'Common',    module: 'forge',  description: 'Create your first project',        xpReward: 50 },
-  { id: 'first-session',  name: 'In The Zone',    rarity: 'Common',    module: 'forge',  description: 'Log your first coding session',    xpReward: 50 },
-  { id: 'ghost-protocol', name: 'Ghost Protocol', rarity: 'Rare',      module: 'forge',  description: '7-day coding streak',              xpReward: 250 },
-  { id: 'full-dive',      name: 'Full Dive',      rarity: 'Rare',      module: 'forge',  description: 'Complete 3 projects (Shipped)',    xpReward: 300 },
-  { id: 'hundred-hours',  name: '100 Hours',      rarity: 'Epic',      module: 'forge',  description: '100 total hours of coding logged', xpReward: 750 },
-  { id: 'system-admin',   name: 'System Admin',   rarity: 'Legendary', module: 'forge',  description: '50 coding sessions logged',        xpReward: 2000 },
+  { id: 'hello-world',     name: 'Hello World',     rarity: 'Common',    module: 'forge',  description: 'Create your first project',        xpReward: 50 },
+  { id: 'in-the-zone',     name: 'In The Zone',     rarity: 'Common',    module: 'forge',  description: 'Log your first coding session',    xpReward: 50 },
+  { id: 'ghost-protocol',  name: 'Ghost Protocol',  rarity: 'Rare',      module: 'forge',  description: '7-day coding streak',              xpReward: 250 },
+  { id: 'full-dive',       name: 'Full Dive',       rarity: 'Rare',      module: 'forge',  description: 'Ship 3 projects',                  xpReward: 300 },
+  { id: 'the-architect',   name: 'The Architect',   rarity: 'Rare',      module: 'forge',  description: 'Complete 20 milestones',           xpReward: 400 },
+  { id: 'polyglot',        name: 'Polyglot',        rarity: 'Rare',      module: 'forge',  description: 'Use 10 different tech stacks',     xpReward: 350 },
+  { id: '100-hours',       name: '100 Hours',       rarity: 'Epic',      module: 'forge',  description: '100 total hours of coding logged', xpReward: 750 },
+  { id: 'system-admin',    name: 'System Admin',    rarity: 'Epic',      module: 'forge',  description: '50 coding sessions logged',        xpReward: 800 },
+  { id: 'algorithm-master',name: 'Algorithm Master',rarity: 'Epic',      module: 'forge',  description: 'Solve 50 DSA problems',            xpReward: 900 },
+  { id: 'nightly-coder',   name: 'Nightly Coder',   rarity: 'Epic',      module: 'forge',  description: '10 sessions after 10pm',           xpReward: 700 },
+  { id: 'open-source-hero',name: 'Open Source Hero',rarity: 'Epic',      module: 'forge',  description: 'Ship an open source project',      xpReward: 900 },
+  { id: 'speed-runner',    name: 'Speed Runner',    rarity: 'Legendary', module: 'forge',  description: 'Ship a project within 7 days',     xpReward: 2000 },
 
   { id: 'first-weigh-in',     name: 'First Weigh-In',    rarity: 'Common',    module: 'spirit', description: 'Log your first weight entry',      xpReward: 50 },
   { id: 'consistent',         name: 'Consistent',        rarity: 'Rare',      module: 'spirit', description: 'Log weight 7 days in a row',       xpReward: 250 },
@@ -74,6 +80,13 @@ export type BadgeCheckContext = {
   completedFasts?: number;
   habitsAllDoneStreak?: number;
   stepGoalStreak?: number;
+  // forge extras
+  milestonesCompleted?: number;
+  uniqueTechCount?: number;
+  nightSessionCount?: number;
+  shippedWithinSevenDays?: boolean;
+  shippedOpenSourceCount?: number;
+  dsaSolved?: number;
 };
 
 export const evaluateBadges = (ctx: BadgeCheckContext): string[] => {
@@ -88,11 +101,17 @@ export const evaluateBadges = (ctx: BadgeCheckContext): string[] => {
   if ((ctx.workoutCount ?? 0) >= 365) unlock.push('ultra-instinct');
 
   if ((ctx.projectCount ?? 0) >= 1) unlock.push('hello-world');
-  if ((ctx.sessionCount ?? 0) >= 1) unlock.push('first-session');
+  if ((ctx.sessionCount ?? 0) >= 1) unlock.push('in-the-zone');
   if ((ctx.forgeStreak ?? 0) >= 7) unlock.push('ghost-protocol');
   if ((ctx.shippedCount ?? 0) >= 3) unlock.push('full-dive');
-  if ((ctx.totalCodingHours ?? 0) >= 100) unlock.push('hundred-hours');
+  if ((ctx.totalCodingHours ?? 0) >= 100) unlock.push('100-hours');
   if ((ctx.sessionCount ?? 0) >= 50) unlock.push('system-admin');
+  if ((ctx.milestonesCompleted ?? 0) >= 20) unlock.push('the-architect');
+  if ((ctx.uniqueTechCount ?? 0) >= 10) unlock.push('polyglot');
+  if ((ctx.nightSessionCount ?? 0) >= 10) unlock.push('nightly-coder');
+  if (ctx.shippedWithinSevenDays) unlock.push('speed-runner');
+  if ((ctx.shippedOpenSourceCount ?? 0) >= 1) unlock.push('open-source-hero');
+  if ((ctx.dsaSolved ?? 0) >= 50) unlock.push('algorithm-master');
 
   if ((ctx.weightLogCount ?? 0) >= 1) unlock.push('first-weigh-in');
   if ((ctx.weightLogStreak ?? 0) >= 7) unlock.push('consistent');

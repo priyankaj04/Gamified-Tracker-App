@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   ScrollView,
   View,
@@ -18,51 +18,48 @@ import { StatCard } from '@/components/ui/StatCard';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { BottomSheet } from '@/components/ui/BottomSheet';
 import { GlowButton } from '@/components/ui/GlowButton';
-import { DatePicker, todayISO } from '@/components/ui/DatePicker';
-import { StarRating } from '@/components/gamification/StarRating';
-import { useProjects, useCodingSessions, useLogSession } from '@/hooks/useProjects';
+import { ProjectCard } from '@/components/forge/ProjectCard';
+import { ForgeActivityGrid } from '@/components/forge/ForgeActivityGrid';
+import { useProjects } from '@/hooks/useProjects';
+import { useActiveTimer, useSessionGrid, useTodaySessions } from '@/hooks/useSessions';
+import { useDailyGoal, useForgeSummary } from '@/hooks/useForgeStats';
+import { useDsaStats } from '@/hooks/useDSA';
+import { useLearning } from '@/hooks/useLearning';
 import { useGameState } from '@/hooks/useGame';
-import type { Project, ProjectStatus } from '@/types';
-
-const STATUSES: ProjectStatus[] = ['Backlog', 'In Progress', 'Shipped'];
 
 export default function ForgeScreen() {
   const router = useRouter();
   const accent = screenTheme.forge.accent;
   const accent2 = screenTheme.forge.accent2;
-  const projects = useProjects();
-  const sessions = useCodingSessions();
+
+  const projects = useProjects({});
+  const pinned = (projects.data?.projects ?? []).filter((p) => p.isPinned);
+  const inProgress = (projects.data?.projects ?? [])
+    .filter((p) => p.status === 'In Progress' && !p.isPinned)
+    .slice(0, 3);
+
+  const today = useTodaySessions();
+  const goal = useDailyGoal();
+  const summary = useForgeSummary();
+  const dsa = useDsaStats();
+  const learning = useLearning({ status: 'In Progress' });
+  const grid = useSessionGrid(90);
+  const timer = useActiveTimer();
   const game = useGameState();
 
   const [addOpen, setAddOpen] = useState(false);
-  const [sessionOpen, setSessionOpen] = useState(false);
-  const [sessionMinutes, setSessionMinutes] = useState<string>('30');
-  const [sessionDate, setSessionDate] = useState(todayISO());
-  const [sessionNotes, setSessionNotes] = useState('');
-  const [sessionStars, setSessionStars] = useState<number | null>(null);
-  const logSession = useLogSession();
 
-  const grouped = useMemo(() => {
-    const out: Record<ProjectStatus, Project[]> = {
-      Backlog: [],
-      'In Progress': [],
-      Shipped: [],
-    };
-    (projects.data?.projects ?? []).forEach((p) => {
-      out[p.status].push(p);
-    });
-    return out;
-  }, [projects.data]);
+  const forgeStreak = game.data?.streaks?.forge?.count ?? 0;
+  const dsaStreak = game.data?.streaks?.dsa?.count ?? dsa.data?.currentStreak ?? 0;
+  const learningStreak = game.data?.streaks?.learning?.count ?? 0;
 
-  const totalHours = (projects.data?.projects ?? []).reduce((s, p) => s + p.totalHours, 0);
-  const shipped = grouped['Shipped'].length;
-  const streak = game.data?.streaks?.forge?.count ?? 0;
-  const startWeek = new Date();
-  startWeek.setHours(0, 0, 0, 0);
-  startWeek.setDate(startWeek.getDate() - startWeek.getDay());
-  const weekHours = (sessions.data?.sessions ?? [])
-    .filter((s) => new Date(s.date) >= startWeek)
-    .reduce((sum, s) => sum + s.durationMinutes / 60, 0);
+  const goalPct = goal.data?.pct ?? 0;
+  const goalHit = goalPct >= 100;
+  const todayMin = goal.data?.todayMinutes ?? today.data?.totalMinutes ?? 0;
+  const goalMin = goal.data?.goalMinutes ?? 120;
+
+  const refreshing =
+    projects.isFetching || today.isFetching || goal.isFetching || summary.isFetching;
 
   return (
     <ThemedScene scene="forge">
@@ -70,105 +67,233 @@ export default function ForgeScreen() {
         refreshControl={
           <RefreshControl
             tintColor={accent}
-            refreshing={projects.isFetching}
+            refreshing={refreshing}
             onRefresh={() => {
               projects.refetch();
-              sessions.refetch();
+              today.refetch();
+              goal.refetch();
+              summary.refetch();
+              dsa.refetch();
+              learning.refetch();
+              grid.refetch();
+              timer.refetch();
             }}
           />
         }>
         <PageHeader
-          title="Forge"
+          title="Code Forge"
           subtitle="Build Loop"
           accent={accent}
           accent2={accent2}
-          right={<Ionicons name="code-slash" size={26} color={accent} />}
+          right={
+            <Pressable onPress={() => router.push('/forge/forge-settings' as any)} hitSlop={8}>
+              <Ionicons name="settings-outline" size={22} color={accent} />
+            </Pressable>
+          }
         />
 
-        <View style={styles.stats}>
-          <StatCard label="Hours" value={totalHours.toFixed(1)} icon="time" accent={accent} />
-          <StatCard label="Shipped" value={shipped} icon="rocket" accent="#a78bfa" />
-          <StatCard label="Streak" value={streak} icon="flame" accent="#f97316" />
-          <StatCard label="Week Hrs" value={weekHours.toFixed(1)} icon="calendar" accent={accent} />
-        </View>
-
-        <SectionTitle title="Kanban" accent={accent} />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.kanban}>
-          {STATUSES.map((status) => (
-            <View key={status} style={styles.column}>
-              <View style={[styles.colHead, { borderColor: accent + '55' }]}>
-                <Text style={[styles.colTitle, { color: accent }]}>{status}</Text>
-                <Text style={styles.colCount}>{grouped[status].length}</Text>
-              </View>
-              <View style={{ gap: 8 }}>
-                {grouped[status].map((p) => {
-                  const done = (p.milestones ?? []).filter((m) => m.completed).length;
-                  const totalMs = (p.milestones ?? []).length;
-                  const pct = totalMs ? done / totalMs : 0;
-                  return (
-                    <Pressable
-                      key={p.id}
-                      onPress={() => router.push(`/forge/${p.id}` as any)}
-                      style={({ pressed }) => [styles.pCard, pressed && { opacity: 0.7 }]}>
-                      <Text style={styles.pName} numberOfLines={1}>
-                        {p.name}
-                      </Text>
-                      <View style={styles.chipsRow}>
-                        {p.techStack.slice(0, 3).map((t) => (
-                          <View key={t} style={[styles.chip, { borderColor: accent + '55' }]}>
-                            <Text style={[styles.chipText, { color: accent }]} numberOfLines={1}>
-                              {t}
-                            </Text>
-                          </View>
-                        ))}
-                      </View>
-                      <View style={styles.msTrack}>
-                        <View style={[styles.msFill, { width: `${pct * 100}%`, backgroundColor: accent }]} />
-                      </View>
-                      <View style={styles.pFoot}>
-                        <Text style={styles.pHours}>{p.totalHours.toFixed(1)}h</Text>
-                        <StarRating value={p.stars} readOnly size={11} />
-                      </View>
-                    </Pressable>
-                  );
-                })}
-                {grouped[status].length === 0 && (
-                  <Text style={styles.empty}>Empty</Text>
-                )}
-              </View>
-            </View>
-          ))}
-        </ScrollView>
-
-        <SectionTitle title="Recent Sessions" accent={accent} />
-        {(sessions.data?.sessions ?? []).slice(0, 8).map((s) => (
-          <View key={s.id} style={styles.sessionRow}>
-            <View style={[styles.sDot, { backgroundColor: accent }]} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.sTitle} numberOfLines={1}>
-                {s.projectName ?? 'Untitled Session'}
-              </Text>
-              <Text style={styles.sMeta}>
-                {new Date(s.date).toLocaleDateString()} · {s.durationMinutes} min
-              </Text>
-            </View>
-            <Text style={[styles.xp, { color: accent }]}>+{s.xpEarned}</Text>
-          </View>
-        ))}
-        {(sessions.data?.sessions ?? []).length === 0 && (
-          <View style={{ paddingHorizontal: 20 }}>
-            <EmptyState
-              icon="terminal"
-              title="No sessions logged"
-              message="Use the + button to log time spent coding."
-              accent={accent}
-            />
-          </View>
+        {/* Active session banner */}
+        {timer.data?.timer && (
+          <Pressable
+            onPress={() => router.push('/forge/active-session' as any)}
+            style={[styles.banner, { borderColor: accent, backgroundColor: accent + '14' }]}>
+            <Ionicons name="recording" size={16} color={accent} />
+            <Text style={[styles.bannerText, { color: accent }]}>
+              Live · {timer.data.timer.projectName ?? 'Session'} ·{' '}
+              {Math.floor(timer.data.timer.elapsedSec / 60)}m
+            </Text>
+            <Ionicons name="chevron-forward" size={16} color={accent} />
+          </Pressable>
         )}
 
-        <View style={{ height: 100 }} />
+        {/* Daily goal bar */}
+        <Pressable
+          onPress={() => router.push('/forge/forge-settings' as any)}
+          style={styles.goalCard}>
+          <View style={styles.goalHead}>
+            <Text style={styles.goalLabel}>Daily Coding Goal</Text>
+            <Text style={[styles.goalText, { color: goalHit ? accent : palette.textMuted }]}>
+              {Math.floor(todayMin / 60)}h {todayMin % 60}m / {Math.floor(goalMin / 60)}h{' '}
+              {goalMin % 60}m {goalHit ? '✓' : ''}
+            </Text>
+          </View>
+          <View style={styles.goalTrack}>
+            <View
+              style={[
+                styles.goalFill,
+                { width: `${Math.min(100, goalPct)}%`, backgroundColor: goalHit ? accent : accent2 },
+              ]}
+            />
+          </View>
+          <View style={styles.streakRow}>
+            <Text style={styles.streak}>🔥 {goal.data?.goalStreak ?? 0} day goal streak</Text>
+            <Text style={styles.streakLong}>Best · {goal.data?.longestGoalStreak ?? 0}</Text>
+          </View>
+        </Pressable>
+
+        {/* Streaks row */}
+        <View style={styles.streakChips}>
+          <View style={[styles.streakChip, { borderColor: accent }]}>
+            <Text style={styles.streakChipLabel}>Forge</Text>
+            <Text style={[styles.streakChipValue, { color: accent }]}>🔥 {forgeStreak}</Text>
+          </View>
+          <View style={[styles.streakChip, { borderColor: '#a78bfa' }]}>
+            <Text style={styles.streakChipLabel}>DSA</Text>
+            <Text style={[styles.streakChipValue, { color: '#a78bfa' }]}>🔥 {dsaStreak}</Text>
+          </View>
+          <View style={[styles.streakChip, { borderColor: '#fbbf24' }]}>
+            <Text style={styles.streakChipLabel}>Learning</Text>
+            <Text style={[styles.streakChipValue, { color: '#fbbf24' }]}>🔥 {learningStreak}</Text>
+          </View>
+        </View>
+
+        {/* Today's stats */}
+        <View style={styles.stats}>
+          <StatCard
+            label="Sessions"
+            value={today.data?.sessions.length ?? 0}
+            icon="terminal"
+            accent={accent}
+          />
+          <StatCard
+            label="Hours"
+            value={((todayMin / 60) || 0).toFixed(1)}
+            icon="time"
+            accent={accent}
+          />
+          <StatCard
+            label="DSA Today"
+            value={dsa.data?.weeklyGoalProgress.current ?? 0}
+            icon="code-slash"
+            accent="#a78bfa"
+          />
+          <StatCard label="Shipped" value={summary.data?.totalSessions ?? 0} icon="rocket" accent="#fbbf24" />
+        </View>
+
+        {/* Quick action row */}
+        <View style={styles.quickRow}>
+          <QuickBtn icon="play" label="Session" onPress={() => router.push('/forge/active-session' as any)} accent={accent} />
+          <QuickBtn icon="add" label="Project" onPress={() => router.push('/forge/project-new' as any)} accent={accent} />
+          <QuickBtn icon="code-slash" label="DSA" onPress={() => router.push('/forge/dsa-new' as any)} accent="#a78bfa" />
+          <QuickBtn icon="book" label="Learn" onPress={() => router.push('/forge/learning-new' as any)} accent="#fbbf24" />
+        </View>
+
+        {/* Pinned */}
+        {pinned.length > 0 && (
+          <>
+            <SectionTitle title="📌 Pinned" accent={accent} />
+            <View style={{ paddingHorizontal: 20 }}>
+              {pinned.map((p, i) => (
+                <ProjectCard
+                  key={p.id}
+                  project={p}
+                  index={i}
+                  accent={accent}
+                  onPress={() => router.push(`/forge/${p.id}` as any)}
+                />
+              ))}
+            </View>
+          </>
+        )}
+
+        {/* In progress */}
+        <SectionTitle
+          title="In Progress"
+          accent={accent}
+          right={
+            <Pressable onPress={() => router.push('/forge/projects' as any)} hitSlop={6}>
+              <Text style={[styles.seeAll, { color: accent }]}>See all</Text>
+            </Pressable>
+          }
+        />
+        <View style={{ paddingHorizontal: 20 }}>
+          {inProgress.length === 0 ? (
+            <EmptyState
+              icon="rocket-outline"
+              title="No projects yet, Coder."
+              message="What are you building? Start a new project."
+              accent={accent}
+            />
+          ) : (
+            inProgress.map((p, i) => (
+              <ProjectCard
+                key={p.id}
+                project={p}
+                index={i}
+                accent={accent}
+                onPress={() => router.push(`/forge/${p.id}` as any)}
+              />
+            ))
+          )}
+        </View>
+
+        {/* Upcoming milestones */}
+        <SectionTitle title="Upcoming Milestones" accent={accent} />
+        <UpcomingMilestones accent={accent} />
+
+        {/* DSA snapshot */}
+        <SectionTitle title="DSA This Week" accent="#a78bfa" right={<Pressable onPress={() => router.push('/forge/dsa' as any)}><Text style={[styles.seeAll, { color: '#a78bfa' }]}>Open</Text></Pressable>} />
+        <View style={styles.dsaCard}>
+          <View style={styles.dsaCounts}>
+            <Stat label="Solved" value={dsa.data?.totalSolved ?? 0} color="#4ade80" />
+            <Stat label="Easy" value={dsa.data?.easy ?? 0} color="#4ade80" />
+            <Stat label="Medium" value={dsa.data?.medium ?? 0} color="#fbbf24" />
+            <Stat label="Hard" value={dsa.data?.hard ?? 0} color="#ef4444" />
+          </View>
+          <View style={styles.weekProgress}>
+            <Text style={styles.weekLabel}>
+              {dsa.data?.weeklyGoalProgress.current ?? 0}/{dsa.data?.weeklyGoalProgress.goal ?? 5} this week
+            </Text>
+            <View style={styles.weekTrack}>
+              <View
+                style={[
+                  styles.weekFill,
+                  {
+                    width: `${Math.min(100, ((dsa.data?.weeklyGoalProgress.current ?? 0) / Math.max(1, dsa.data?.weeklyGoalProgress.goal ?? 5)) * 100)}%`,
+                    backgroundColor: '#a78bfa',
+                  },
+                ]}
+              />
+            </View>
+          </View>
+        </View>
+
+        {/* Learning */}
+        {(learning.data?.items.length ?? 0) > 0 && (
+          <>
+            <SectionTitle title="Learning In Progress" accent="#fbbf24" right={<Pressable onPress={() => router.push('/forge/learning' as any)}><Text style={[styles.seeAll, { color: '#fbbf24' }]}>All</Text></Pressable>} />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.learnScroll}>
+              {(learning.data?.items ?? []).slice(0, 6).map((item) => (
+                <Pressable
+                  key={item.id}
+                  onPress={() => router.push('/forge/learning' as any)}
+                  style={styles.learnCard}>
+                  <Text style={styles.learnType}>
+                    {item.type === 'Course' ? '🎓' : item.type === 'Book' ? '📚' : '🎬'} {item.type}
+                  </Text>
+                  <Text style={styles.learnTitle} numberOfLines={2}>
+                    {item.title}
+                  </Text>
+                  <View style={styles.learnTrack}>
+                    <View style={[styles.learnFill, { width: `${item.progressPct}%`, backgroundColor: '#fbbf24' }]} />
+                  </View>
+                  <Text style={styles.learnPct}>{item.progressPct}%</Text>
+                </Pressable>
+              ))}
+            </ScrollView>
+          </>
+        )}
+
+        {/* Activity grid */}
+        <SectionTitle title="Activity (90d)" accent={accent} />
+        <View style={{ paddingHorizontal: 20 }}>
+          <ForgeActivityGrid data={grid.data?.grid ?? []} />
+        </View>
+
+        <View style={{ height: 120 }} />
       </ScrollView>
 
+      {/* FAB */}
       <Pressable
         onPress={() => setAddOpen(true)}
         style={({ pressed }) => [
@@ -179,124 +304,129 @@ export default function ForgeScreen() {
         <Ionicons name="add" size={28} color="#0b0b14" />
       </Pressable>
 
-      <BottomSheet visible={addOpen} onClose={() => setAddOpen(false)} title="Add">
-        <GlowButton
-          title="New Project"
-          color={accent}
-          onPress={() => {
-            setAddOpen(false);
-            router.push('/forge/new-project' as any);
-          }}
-          style={{ marginBottom: 10 }}
-        />
-        <GlowButton
-          title="Log Session"
-          variant="ghost"
-          color={accent}
-          onPress={() => {
-            setAddOpen(false);
-            setSessionOpen(true);
-          }}
-        />
-      </BottomSheet>
-
-      <BottomSheet visible={sessionOpen} onClose={() => setSessionOpen(false)} title="Log Session">
-        <Text style={styles.label}>Date</Text>
-        <DatePicker value={sessionDate} onChange={setSessionDate} accent={accent} />
-        <Text style={styles.label}>Duration (min)</Text>
-        <TextInputBox value={sessionMinutes} onChangeText={setSessionMinutes} keyboardType="numeric" />
-        <Text style={styles.label}>Notes</Text>
-        <TextInputBox value={sessionNotes} onChangeText={setSessionNotes} multiline />
-        <Text style={styles.label}>Quality</Text>
-        <StarRating value={sessionStars} onChange={setSessionStars} />
-        <View style={{ height: 14 }} />
-        <GlowButton
-          title="Save"
-          color={accent}
-          loading={logSession.isPending}
-          onPress={async () => {
-            const minutes = parseInt(sessionMinutes, 10);
-            if (!minutes) return;
-            await logSession.mutateAsync({
-              durationMinutes: minutes,
-              date: sessionDate,
-              notes: sessionNotes,
-              stars: sessionStars,
-            });
-            setSessionOpen(false);
-            setSessionMinutes('30');
-            setSessionDate(todayISO());
-            setSessionNotes('');
-            setSessionStars(null);
-          }}
-        />
+      <BottomSheet visible={addOpen} onClose={() => setAddOpen(false)} title="Quick Action">
+        <GlowButton title="▶ Start Session" color={accent} onPress={() => { setAddOpen(false); router.push('/forge/active-session' as any); }} style={{ marginBottom: 10 }} />
+        <GlowButton title="+ Log Session" variant="ghost" color={accent} onPress={() => { setAddOpen(false); router.push('/forge/session-new' as any); }} style={{ marginBottom: 10 }} />
+        <GlowButton title="+ New Project" variant="ghost" color={accent} onPress={() => { setAddOpen(false); router.push('/forge/project-new' as any); }} style={{ marginBottom: 10 }} />
+        <GlowButton title="+ Log DSA" variant="ghost" color="#a78bfa" onPress={() => { setAddOpen(false); router.push('/forge/dsa-new' as any); }} style={{ marginBottom: 10 }} />
+        <GlowButton title="+ Log Learning" variant="ghost" color="#fbbf24" onPress={() => { setAddOpen(false); router.push('/forge/learning-new' as any); }} style={{ marginBottom: 10 }} />
+        <GlowButton title="✍ Write Standup" variant="ghost" color={accent} onPress={() => { setAddOpen(false); router.push('/forge/standup' as any); }} />
       </BottomSheet>
     </ThemedScene>
   );
 }
 
-// Inline simple text input — saved here to avoid a separate file
-import { TextInput } from 'react-native';
-function TextInputBox(props: React.ComponentProps<typeof TextInput>) {
+function QuickBtn({ icon, label, onPress, accent }: { icon: any; label: string; onPress: () => void; accent: string }) {
   return (
-    <TextInput
-      placeholderTextColor={palette.textDim}
-      style={styles.input}
-      {...props}
-    />
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.quickBtn, { borderColor: accent + '66' }, pressed && { opacity: 0.7 }]}>
+      <Ionicons name={icon} size={18} color={accent} />
+      <Text style={[styles.quickLabel, { color: accent }]}>{label}</Text>
+    </Pressable>
+  );
+}
+
+function Stat({ label, value, color }: { label: string; value: number; color: string }) {
+  return (
+    <View style={styles.statSm}>
+      <Text style={[styles.statSmValue, { color }]}>{value}</Text>
+      <Text style={styles.statSmLabel}>{label}</Text>
+    </View>
+  );
+}
+
+function UpcomingMilestones({ accent }: { accent: string }) {
+  // Built into projects detail; for now show an inline empty state — the home
+  // dashboard intentionally keeps this concise. Detail screens own this view.
+  return (
+    <View style={{ paddingHorizontal: 20 }}>
+      <View style={[styles.upcomingCard, { borderColor: accent + '33' }]}>
+        <Text style={styles.upcomingText}>Open a project to view milestone deadlines.</Text>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, paddingHorizontal: 20 },
-  kanban: { paddingHorizontal: 16, gap: 10, paddingBottom: 8 },
-  column: { width: 220, gap: 8 },
-  colHead: {
+  banner: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 10,
+    gap: 8,
     borderWidth: 1,
-    backgroundColor: palette.cardAlt,
-  },
-  colTitle: { fontSize: 12, fontWeight: '800', letterSpacing: 0.6, textTransform: 'uppercase' },
-  colCount: { color: palette.textMuted, fontSize: 12, fontWeight: '700' },
-  pCard: {
-    backgroundColor: palette.card,
     borderRadius: 12,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: palette.border,
-    gap: 6,
-  },
-  pName: { color: palette.text, fontWeight: '700', fontSize: 14 },
-  chipsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
-  chip: { borderWidth: 1, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 },
-  chipText: { fontSize: 10, fontWeight: '700' },
-  msTrack: { height: 4, backgroundColor: palette.cardAlt, borderRadius: 2, overflow: 'hidden', marginTop: 4 },
-  msFill: { height: '100%', borderRadius: 2 },
-  pFoot: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  pHours: { color: palette.textMuted, fontSize: 11, fontWeight: '700' },
-  empty: { color: palette.textDim, fontSize: 12, paddingHorizontal: 6 },
-  sessionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    backgroundColor: palette.card,
+    paddingVertical: 10,
     paddingHorizontal: 14,
-    paddingVertical: 12,
     marginHorizontal: 20,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: palette.border,
     marginBottom: 8,
   },
-  sDot: { width: 8, height: 8, borderRadius: 4 },
-  sTitle: { color: palette.text, fontWeight: '700', fontSize: 14 },
-  sMeta: { color: palette.textMuted, fontSize: 12, marginTop: 2 },
-  xp: { fontWeight: '800', fontSize: 13 },
+  bannerText: { flex: 1, fontWeight: '800', fontSize: 13 },
+  goalCard: {
+    backgroundColor: palette.card,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: palette.border,
+    marginHorizontal: 20,
+    padding: 14,
+    gap: 8,
+    marginBottom: 10,
+  },
+  goalHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  goalLabel: { color: palette.textMuted, fontWeight: '700', fontSize: 12, letterSpacing: 0.4, textTransform: 'uppercase' },
+  goalText: { fontWeight: '900', fontSize: 13 },
+  goalTrack: { height: 8, backgroundColor: palette.cardAlt, borderRadius: 4, overflow: 'hidden' },
+  goalFill: { height: '100%', borderRadius: 4 },
+  streakRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  streak: { color: palette.text, fontWeight: '700', fontSize: 12 },
+  streakLong: { color: palette.textMuted, fontWeight: '700', fontSize: 11 },
+  streakChips: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, marginBottom: 10 },
+  streakChip: {
+    flex: 1,
+    backgroundColor: palette.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 10,
+    alignItems: 'center',
+    gap: 2,
+  },
+  streakChipLabel: { color: palette.textMuted, fontSize: 10, fontWeight: '800', letterSpacing: 0.4, textTransform: 'uppercase' },
+  streakChipValue: { fontSize: 14, fontWeight: '900' },
+  stats: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, paddingHorizontal: 20 },
+  quickRow: { flexDirection: 'row', gap: 8, paddingHorizontal: 20, marginTop: 14, marginBottom: 4 },
+  quickBtn: { flex: 1, borderWidth: 1.5, borderRadius: 10, paddingVertical: 12, alignItems: 'center', gap: 4 },
+  quickLabel: { fontWeight: '800', fontSize: 11, letterSpacing: 0.4 },
+  seeAll: { fontSize: 12, fontWeight: '800' },
+  dsaCard: {
+    backgroundColor: palette.card,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: palette.border,
+    marginHorizontal: 20,
+    padding: 14,
+    gap: 12,
+  },
+  dsaCounts: { flexDirection: 'row', justifyContent: 'space-between' },
+  statSm: { alignItems: 'center', gap: 2 },
+  statSmValue: { fontSize: 22, fontWeight: '900' },
+  statSmLabel: { color: palette.textMuted, fontSize: 10, fontWeight: '700', letterSpacing: 0.3, textTransform: 'uppercase' },
+  weekProgress: { gap: 4 },
+  weekLabel: { color: palette.text, fontSize: 12, fontWeight: '700' },
+  weekTrack: { height: 6, backgroundColor: palette.cardAlt, borderRadius: 3, overflow: 'hidden' },
+  weekFill: { height: '100%', borderRadius: 3 },
+  learnScroll: { paddingHorizontal: 20, gap: 10 },
+  learnCard: {
+    width: 200,
+    backgroundColor: palette.card,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: palette.border,
+    padding: 12,
+    gap: 6,
+    marginRight: 10,
+  },
+  learnType: { color: '#fbbf24', fontSize: 11, fontWeight: '800' },
+  learnTitle: { color: palette.text, fontWeight: '700', fontSize: 13 },
+  learnTrack: { height: 5, borderRadius: 3, backgroundColor: palette.cardAlt, overflow: 'hidden' },
+  learnFill: { height: '100%', borderRadius: 3 },
+  learnPct: { color: palette.textMuted, fontSize: 11, fontWeight: '700' },
   fab: {
     position: 'absolute',
     bottom: 24,
@@ -311,14 +441,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 8 },
     elevation: 10,
   },
-  label: { color: palette.textMuted, fontSize: 12, fontWeight: '700', marginTop: 10, marginBottom: 6, letterSpacing: 0.6, textTransform: 'uppercase' },
-  input: {
+  upcomingCard: {
     backgroundColor: palette.card,
-    borderRadius: 10,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: palette.border,
-    color: palette.text,
-    padding: 12,
-    fontSize: 14,
+    padding: 14,
   },
+  upcomingText: { color: palette.textMuted, fontSize: 13, fontWeight: '600' },
 });

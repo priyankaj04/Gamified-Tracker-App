@@ -65,10 +65,35 @@ export default function RootLayout() {
               options={{ presentation: 'modal', title: 'Edit Workout' }}
             />
             <Stack.Screen
-              name="forge/new-project"
+              name="forge/project-new"
               options={{ presentation: 'modal', title: 'New Project' }}
             />
             <Stack.Screen name="forge/[id]" options={{ title: 'Project' }} />
+            <Stack.Screen name="forge/projects" options={{ title: 'Projects' }} />
+            <Stack.Screen name="forge/sessions" options={{ title: 'Sessions' }} />
+            <Stack.Screen
+              name="forge/session-new"
+              options={{ presentation: 'modal', title: 'Log Session' }}
+            />
+            <Stack.Screen name="forge/active-session" options={{ title: 'Active Session' }} />
+            <Stack.Screen name="forge/learning" options={{ title: 'Learning' }} />
+            <Stack.Screen
+              name="forge/learning-new"
+              options={{ presentation: 'modal', title: 'Add Learning' }}
+            />
+            <Stack.Screen name="forge/skill-map" options={{ title: 'Skill Map' }} />
+            <Stack.Screen name="forge/dsa" options={{ title: 'DSA' }} />
+            <Stack.Screen
+              name="forge/dsa-new"
+              options={{ presentation: 'modal', title: 'Log Problem' }}
+            />
+            <Stack.Screen name="forge/snippets" options={{ title: 'Snippets' }} />
+            <Stack.Screen name="forge/snippet-detail" options={{ title: 'Snippet' }} />
+            <Stack.Screen name="forge/standup" options={{ title: 'Standup' }} />
+            <Stack.Screen name="forge/portfolio" options={{ title: 'Portfolio' }} />
+            <Stack.Screen name="forge/focus" options={{ title: 'Focus Mode' }} />
+            <Stack.Screen name="forge/forge-stats" options={{ title: 'Forge Stats' }} />
+            <Stack.Screen name="forge/forge-settings" options={{ title: 'Forge Settings' }} />
             <Stack.Screen name="dojo/templates/index" options={{ title: 'Templates' }} />
             <Stack.Screen
               name="dojo/templates/new"

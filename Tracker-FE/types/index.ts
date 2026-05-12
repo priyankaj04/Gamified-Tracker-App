@@ -1,4 +1,4 @@
-export type Module = 'dojo' | 'forge' | 'spirit' | 'vault' | 'quests';
+export type Module = 'dojo' | 'forge' | 'spirit' | 'vault' | 'quests' | 'dsa' | 'learning';
 
 export type WorkoutType =
   | 'Strength'
@@ -62,9 +62,54 @@ export interface WorkoutTemplate {
   exercises: TemplateExercise[];
 }
 
-export type ProjectStatus = 'Backlog' | 'In Progress' | 'Shipped';
+export type ProjectStatus =
+  | 'Idea'
+  | 'Backlog'
+  | 'In Progress'
+  | 'Review'
+  | 'Shipped'
+  | 'Archived';
+export type ProjectType = 'Personal' | 'Freelance' | 'Open Source' | 'Learning' | 'Work';
 
 export type Priority = 'S' | 'A' | 'B' | 'C';
+
+export type SessionMood = 'Deep Focus' | 'Normal' | 'Distracted' | 'Blocked' | 'Flow State';
+export type LearningType = 'Course' | 'Book' | 'Tutorial' | 'Video' | 'Documentation' | 'Paper';
+export type LearningStatus = 'Not Started' | 'In Progress' | 'Completed';
+export type Proficiency = 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+export type SkillCategory =
+  | 'Frontend'
+  | 'Backend'
+  | 'Mobile'
+  | 'ML/AI'
+  | 'DevOps'
+  | 'Database'
+  | 'CS Fundamentals'
+  | 'Other';
+export type SnippetCategory = 'Bug Fix' | 'Algorithm' | 'Config' | 'Reference' | 'Template';
+export type DeployEnvironment = 'development' | 'staging' | 'production';
+export type IssueSeverity = 'Critical' | 'High' | 'Medium' | 'Low';
+export type IssueStatus = 'Open' | 'In Progress' | 'Fixed' | 'Wont Fix';
+export type DsaPlatform = 'LeetCode' | 'HackerRank' | 'Codeforces' | 'GeeksForGeeks' | 'Custom';
+export type DsaDifficulty = 'Easy' | 'Medium' | 'Hard';
+export type DsaTopic =
+  | 'Arrays'
+  | 'Strings'
+  | 'Linked Lists'
+  | 'Trees'
+  | 'Graphs'
+  | 'Dynamic Programming'
+  | 'Backtracking'
+  | 'Sorting'
+  | 'Binary Search'
+  | 'Stacks & Queues'
+  | 'Heaps'
+  | 'Tries'
+  | 'Greedy'
+  | 'Math'
+  | 'Bit Manipulation'
+  | 'Other';
+export type DsaStatus = 'Solved' | 'Attempted' | 'Revisit';
 
 export type TxType = 'Income' | 'Expense';
 
@@ -82,7 +127,7 @@ export interface GameState {
   levelTitle: string;
   xpToNextLevel: number;
   xpProgress: number;
-  streaks: Record<Module, Streak>;
+  streaks: Partial<Record<Module, Streak>>;
 }
 
 export interface ExerciseSet {
@@ -137,40 +182,228 @@ export interface PersonalRecord {
   workoutId: string | null;
 }
 
+export interface Subtask {
+  id: string;
+  milestoneId: string;
+  title: string;
+  priority: Priority;
+  estimatedHours: number | null;
+  completed: boolean;
+  completedAt: string | null;
+  orderIndex: number;
+}
+
 export interface Milestone {
   id: string;
   projectId: string;
   title: string;
+  targetDate: string | null;
   completed: boolean;
   completedAt: string | null;
   orderIndex: number;
+  notes: string | null;
+  xpEarned: number;
+  isOverdue?: boolean;
+  subtasks?: Subtask[];
+  subtaskCount?: number;
+  subtaskCompleteCount?: number;
+}
+
+export interface Deployment {
+  id: string;
+  projectId: string;
+  version: string | null;
+  environment: DeployEnvironment;
+  deployedAt: string;
+  releaseNotes: string | null;
+  deployUrl: string | null;
+  createdAt?: string;
 }
 
 export interface Project {
   id: string;
   name: string;
   description: string | null;
+  type: ProjectType;
+  priority: Priority;
   techStack: string[];
+  coverEmoji: string;
+  coverColor: string;
+  isPinned: boolean;
+  isArchived: boolean;
+  readmeNotes: string | null;
+  startDate: string | null;
+  targetShipDate: string | null;
+  shippedDate: string | null;
+  estimatedHours: number | null;
   githubUrl: string | null;
+  demoUrl: string | null;
+  figmaUrl: string | null;
+  docsUrl: string | null;
+  isPortfolio: boolean;
   status: ProjectStatus;
   stars: number | null;
   totalHours: number;
+  githubData: Record<string, unknown> | null;
+  githubSyncedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  milestoneCompletionPct?: number;
+  openIssueCount?: number;
+  lastSessionDate?: string | null;
   milestones?: Milestone[];
   recentSessions?: CodingSession[];
+  deployments?: Deployment[];
 }
 
 export interface CodingSession {
   id: string;
   projectId: string | null;
+  projectName?: string | null;
+  milestoneId?: string | null;
   date: string;
+  startTime: string | null;
+  endTime: string | null;
   durationMinutes: number;
-  notes: string | null;
+  mood: SessionMood | null;
   stars: number | null;
+  notes: string | null;
+  isBillable: boolean;
+  pomodoroCount: number;
+  xpEarned: number;
+  tags?: string[];
+  createdAt: string;
+}
+
+export interface ActiveTimer {
+  id: string;
+  projectId: string | null;
+  projectName: string | null;
+  milestoneId: string | null;
+  startedAt: string;
+  elapsedSec: number;
+  isRunning: boolean;
+}
+
+export interface LearningItem {
+  id: string;
+  title: string;
+  type: LearningType;
+  platform: string | null;
+  sourceUrl: string | null;
+  topics: string[];
+  status: LearningStatus;
+  progressPct: number;
+  rating: number | null;
+  notes: string | null;
+  startedAt: string | null;
+  completedAt: string | null;
+  estimatedHours: number | null;
+  actualHours: number | null;
   xpEarned: number;
   createdAt: string;
-  projectName?: string | null;
+  updatedAt: string;
+}
+
+export interface TechSkill {
+  id: string;
+  name: string;
+  category: SkillCategory;
+  proficiency: Proficiency;
+  totalHours: number;
+  projectCount: number;
+  firstUsed: string | null;
+  lastUsed: string | null;
+  updatedAt: string;
+}
+
+export interface Snippet {
+  id: string;
+  projectId: string | null;
+  title: string;
+  language: string;
+  content: string;
+  category: SnippetCategory;
+  tags: string[];
+  isPinned: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Issue {
+  id: string;
+  projectId: string;
+  title: string;
+  description: string | null;
+  severity: IssueSeverity;
+  status: IssueStatus;
+  foundDate: string;
+  fixedDate: string | null;
+  sessionId: string | null;
+  daysOpen: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DsaProblem {
+  id: string;
+  title: string;
+  platform: DsaPlatform;
+  difficulty: DsaDifficulty;
+  topic: DsaTopic;
+  status: DsaStatus;
+  timeTakenMin: number | null;
+  date: string;
+  problemUrl: string | null;
+  notes: string | null;
+  solutionNotes: string | null;
+  xpEarned: number;
+  createdAt: string;
+}
+
+export interface StandupLog {
+  id: string;
+  date: string;
+  yesterday: string | null;
+  today: string | null;
+  blockers: string | null;
+  projectId: string | null;
+  createdAt: string;
+}
+
+export interface ForgeSettings {
+  id: string;
+  dailyCodingGoalMin: number;
+  defaultSessionMin: number;
+  pomodoroWorkMin: number;
+  pomodoroBreakMin: number;
+  githubUsername: string | null;
+  workStartHour: number;
+  workEndHour: number;
+  weekStartDay: number;
+  billableRate: number | null;
+  billableCurrency: string;
+  weeklyDsaGoal: number;
+  updatedAt: string;
+}
+
+export interface ForgeStats {
+  todayMinutes: number;
+  weekMinutes: number;
+  monthMinutes: number;
+  allTimeHours: number;
+  totalSessions: number;
+  avgSessionMinutes: number;
+  mostProductiveDayOfWeek: string;
+  mostProductiveHourOfDay: number;
+  codingConsistency30d: number;
+  codingConsistency90d: number;
+  personalBests: {
+    longestSession: number;
+    mostHoursInDay: number;
+    currentStreak: number;
+    longestStreak: number;
+  };
 }
 
 export interface BodyGoal {

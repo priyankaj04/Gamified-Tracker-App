@@ -35,7 +35,7 @@ export const getGameState = async () => {
   const { data: streaks } = await sb.from('streaks').select('*');
 
   const streakMap: Record<string, any> = {};
-  ['dojo', 'forge', 'spirit', 'vault', 'quests'].forEach((m) => {
+  ['dojo', 'forge', 'spirit', 'vault', 'quests', 'dsa', 'learning'].forEach((m) => {
     const s = streaks?.find((x) => x.module === m);
     streakMap[m] = {
       count: s?.count ?? 0,
