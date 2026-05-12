@@ -34,9 +34,42 @@ export const XP = {
   HIT_STEP_GOAL: 20,
   HIT_SPIRIT_GOAL: 200,
 
+  // ── VAULT (legacy keys) ────────────────────────────
   LOG_TRANSACTION: 10,
   STAY_UNDER_BUDGET: 40,
   HIT_SAVINGS_GOAL: 120,
+
+  // ── VAULT (expansion) ──────────────────────────────
+  LOG_INCOME: 15,
+  TX_RECEIPT_BONUS: 5,
+  TX_NOTE_BONUS: 2,
+  RECURRING_AUTO_CONFIRMED: 5,
+  ZERO_SPEND_DAY: 20,
+  NO_SPEND_WEEK: 100,
+  WEEK_UNDER_BUDGET: 30,
+  CATEGORY_UNDER_BUDGET: 15,
+  BUDGET_CREATED: 20,
+  CREATE_SAVINGS_GOAL: 30,
+  GOAL_CONTRIBUTION: 10,
+  SAVINGS_GOAL_BEATEN: 200,
+  ROUND_UP_SAVED: 5,
+  LOG_INVESTMENT: 25,
+  LOG_SIP_CONTRIBUTION: 30,
+  INVESTMENT_MILESTONE: 100,
+  DEBT_PAYMENT: 40,
+  DEBT_CLEARED: 1000,
+  NET_WORTH_SNAPSHOT: 25,
+  NET_WORTH_MILESTONE: 200,
+  WEEKLY_REPORT_REVIEWED: 25,
+  MONTHLY_REPORT_REVIEWED: 50,
+  ANNUAL_REVIEW_COMPLETED: 500,
+  EXPORT_REPORT: 15,
+  FULLY_CATEGORIZED_MONTH: 30,
+  SUBSCRIPTION_CANCELLED: 150,
+  BILL_PAID_ON_TIME: 20,
+  CHALLENGE_COMPLETED_SMALL: 100,
+  CHALLENGE_COMPLETED_MEDIUM: 200,
+  CHALLENGE_COMPLETED_LARGE: 400,
 
   COMPLETE_TASK_C: 20,
   COMPLETE_TASK_B: 30,
@@ -54,3 +87,19 @@ export const xpForTaskPriority = (priority: 'S' | 'A' | 'B' | 'C') => ({
   B: XP.COMPLETE_TASK_B,
   C: XP.COMPLETE_TASK_C,
 }[priority]);
+
+// Vault-specific honorific title (cosmetic, derives from total vault XP).
+export const VAULT_TITLES: { threshold: number; title: string }[] = [
+  { threshold: 0, title: 'Coin Collector' },
+  { threshold: 500, title: 'Frugal Apprentice' },
+  { threshold: 1500, title: 'Budget Genin' },
+  { threshold: 4000, title: 'Savings Chunin' },
+  { threshold: 10000, title: 'Money Jonin' },
+  { threshold: 25000, title: 'Vault Hokage' },
+];
+
+export const vaultTitleFor = (vaultXp: number) => {
+  let title = VAULT_TITLES[0].title;
+  for (const t of VAULT_TITLES) if (vaultXp >= t.threshold) title = t.title;
+  return title;
+};

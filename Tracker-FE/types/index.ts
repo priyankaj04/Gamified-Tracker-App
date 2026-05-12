@@ -735,6 +735,19 @@ export interface WellnessScore {
   label: string;
 }
 
+export type AccountType = 'Cash' | 'Bank' | 'Credit Card' | 'UPI Wallet' | 'Investment' | 'Other';
+export type DebtType = 'Loan' | 'Credit Card' | 'Personal' | 'Mortgage' | 'Other';
+export type InvestmentType = 'Stock' | 'MF' | 'FD' | 'Gold' | 'Crypto' | 'Bond' | 'Other';
+export type InvestmentAction = 'Buy' | 'Sell' | 'SIP' | 'Dividend' | 'Interest';
+export type RecurringFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly';
+export type ChallengePeriod = 'weekly' | 'monthly' | 'oneshot';
+
+export interface VaultTag {
+  id: string;
+  name: string;
+  color: string;
+}
+
 export interface Transaction {
   id: string;
   date: string;
@@ -742,6 +755,13 @@ export interface Transaction {
   type: TxType;
   category: string;
   description: string | null;
+  accountId: string | null;
+  recurringId: string | null;
+  merchant: string | null;
+  receiptUrl: string | null;
+  currency: string;
+  loggedAt: string | null;
+  tags?: VaultTag[];
   xpEarned: number;
 }
 
@@ -757,12 +777,167 @@ export interface BudgetActual {
   totalIncome: number;
   netSavings: number;
   byCategory: Record<string, number>;
+  spendVelocity?: number;
+  daysIntoMonth?: number;
+  daysInMonth?: number;
 }
 
 export interface Tag {
   id: string;
   name: string;
   color: string;
+}
+
+export interface Account {
+  id: string;
+  name: string;
+  type: AccountType;
+  openingBalance: number;
+  balance?: number;
+  currency: string;
+  color: string;
+  icon: string | null;
+  includeInNetWorth: boolean;
+  archived: boolean;
+  createdAt: string;
+}
+
+export interface SavingsGoal {
+  id: string;
+  name: string;
+  emoji: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline: string | null;
+  color: string;
+  completed: boolean;
+  completedAt: string | null;
+  archived: boolean;
+  createdAt: string;
+}
+
+export interface Debt {
+  id: string;
+  name: string;
+  type: DebtType | string;
+  principal: number;
+  balance: number;
+  interestRate: number | null;
+  emi: number | null;
+  startDate: string | null;
+  endDate: string | null;
+  dueDay: number | null;
+  cleared: boolean;
+  clearedAt: string | null;
+  createdAt: string;
+}
+
+export interface Investment {
+  id: string;
+  name: string;
+  type: InvestmentType | string;
+  symbol: string | null;
+  quantity: number;
+  costBasis: number;
+  currentValue: number;
+  firstBoughtOn: string | null;
+  platform: string | null;
+  notes: string | null;
+  archived: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface RecurringTransaction {
+  id: string;
+  name: string;
+  amount: number;
+  type: TxType;
+  category: string;
+  frequency: RecurringFrequency;
+  interval: number;
+  nextDue: string;
+  startDate: string;
+  endDate: string | null;
+  accountId: string | null;
+  description: string | null;
+  isSubscription: boolean;
+  cancelled: boolean;
+  cancelledAt: string | null;
+  paused: boolean;
+  createdAt: string;
+}
+
+export interface NetWorthSnapshot {
+  id: string;
+  date: string;
+  assets: number;
+  liabilities: number;
+  netWorth: number;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface VaultChallenge {
+  id: string;
+  key: string;
+  title: string;
+  description: string;
+  period: ChallengePeriod;
+  target: number;
+  progress: number;
+  xpReward: number;
+  completed: boolean;
+  completedAt: string | null;
+  startsOn: string;
+  endsOn: string;
+}
+
+export interface VaultStats {
+  spendingTrend: { label: string; value: number; month: string }[];
+  incomeVsExpense: { month: string; income: number; expense: number }[];
+  byCategory: { label: string; value: number }[];
+  topMerchants: { label: string; value: number }[];
+  topExpenses: { id: string; date: string; amount: number; category: string; description: string | null; merchant: string | null }[];
+  dayOfWeek: { label: string; value: number }[];
+  timeOfDay: { morning: number; afternoon: number; evening: number; night: number };
+  savingsRate: { month: string; rate: number }[];
+  burnRate: number;
+  activityGrid: { date: string; value: number }[];
+  tagSpend: { id: string; name: string; color: string; amount: number }[];
+  frugalDaysThisMonth: number;
+}
+
+export interface SubscriptionsSummary {
+  subscriptions: RecurringTransaction[];
+  monthlyTotal: number;
+}
+
+export interface VaultGame {
+  vaultXp: number;
+  title: string;
+  streak: { count: number; longestStreak: number; lastActivityDate: string | null };
+}
+
+export interface VaultSettings {
+  roundUpEnabled: boolean;
+  roundUpTo: number;
+  roundUpGoalId: string | null;
+  calculatorUsed: boolean;
+  annualReportExported: boolean;
+  weeklyReportStreak: number;
+  weeklyReportLastSeen: string | null;
+}
+
+export interface VaultTemplate {
+  id: string;
+  name: string;
+  amount: number;
+  type: TxType;
+  category: string;
+  description: string | null;
+  emoji: string | null;
+  useCount: number;
 }
 
 export interface Quest {

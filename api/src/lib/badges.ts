@@ -41,9 +41,54 @@ export const BADGES: BadgeDef[] = [
   { id: 'habit-stack',        name: 'Habit Stack',       rarity: 'Rare',      module: 'spirit', description: 'All habits done 7 days in a row',  xpReward: 400 },
   { id: 'step-master',        name: 'Step Master',       rarity: 'Rare',      module: 'spirit', description: 'Hit step goal 7 days in a row',    xpReward: 300 },
 
-  { id: 'ryo-earned',     name: 'Ryo Earned',     rarity: 'Common',    module: 'vault',  description: 'Log your first transaction',       xpReward: 50 },
-  { id: 'budget-master',  name: 'Budget Master',  rarity: 'Rare',      module: 'vault',  description: 'Stay under budget for a month',    xpReward: 300 },
-  { id: 'loid-forger',    name: 'Loid Forger',    rarity: 'Legendary', module: 'vault',  description: 'Hit a savings goal of ₹1,00,000',  xpReward: 2500 },
+  // ── VAULT BADGES ───────────────────────────────────
+  // Common
+  { id: 'ryo-earned',         name: 'Ryo Earned',         rarity: 'Common',    module: 'vault', description: 'Log your first transaction',           xpReward: 50 },
+  { id: 'penny-pincher',      name: 'Penny Pincher',      rarity: 'Common',    module: 'vault', description: 'Log 10 transactions',                  xpReward: 75 },
+  { id: 'bookkeeper',         name: 'Bookkeeper',         rarity: 'Common',    module: 'vault', description: '7-day logging streak',                 xpReward: 100 },
+  { id: 'categorizer',        name: 'Categorizer',        rarity: 'Common',    module: 'vault', description: 'Use all 8 default categories',         xpReward: 75 },
+  { id: 'frugal-friday',      name: 'Frugal Friday',      rarity: 'Common',    module: 'vault', description: 'Your first zero-spend day',            xpReward: 60 },
+  { id: 'receipt-hunter',     name: 'Receipt Hunter',     rarity: 'Common',    module: 'vault', description: 'Attach 10 receipts',                   xpReward: 80 },
+  { id: 'budgeteer',          name: 'Budgeteer',          rarity: 'Common',    module: 'vault', description: 'Set your first monthly budget',        xpReward: 100 },
+  { id: 'goal-setter',        name: 'Goal Setter',        rarity: 'Common',    module: 'vault', description: 'Create your first savings goal',       xpReward: 75 },
+  { id: 'note-taker',         name: 'Note Taker',         rarity: 'Common',    module: 'vault', description: 'Add descriptions to 25 transactions',  xpReward: 60 },
+  { id: 'tagged-up',          name: 'Tagged Up',          rarity: 'Common',    module: 'vault', description: 'Use tags on 20 transactions',          xpReward: 75 },
+  { id: 'recurring-rookie',   name: 'Recurring Rookie',   rarity: 'Common',    module: 'vault', description: 'Set up your first recurring',          xpReward: 100 },
+  { id: 'subscription-sleuth',name: 'Subscription Sleuth',rarity: 'Common',    module: 'vault', description: 'Track 5+ active subscriptions',        xpReward: 150 },
+  { id: 'calculator-kun',     name: 'Calculator-kun',     rarity: 'Common',    module: 'vault', description: 'Use the in-app calculator',            xpReward: 50 },
+  { id: 'round-up-recruit',   name: 'Round-Up Recruit',   rarity: 'Common',    module: 'vault', description: 'First round-up saved',                 xpReward: 75 },
+  // Rare
+  { id: 'budget-master',      name: 'Budget Master',      rarity: 'Rare',      module: 'vault', description: 'Stay under budget for a month',        xpReward: 300 },
+  { id: 'frugal-fortnight',   name: 'Frugal Fortnight',   rarity: 'Rare',      module: 'vault', description: '14-day no-discretionary streak',       xpReward: 300 },
+  { id: 'savers-spirit',      name: "Saver's Spirit",     rarity: 'Rare',      module: 'vault', description: 'Hit savings target 3 months total',    xpReward: 350 },
+  { id: 'streak-sage',        name: 'Streak Sage',        rarity: 'Rare',      module: 'vault', description: '30-day vault logging streak',          xpReward: 300 },
+  { id: 'investors-eye',      name: "Investor's Eye",     rarity: 'Rare',      module: 'vault', description: 'Log 5 investment transactions',        xpReward: 350 },
+  { id: 'debt-dodger',        name: 'Debt Dodger',        rarity: 'Rare',      module: 'vault', description: 'Clear a debt',                         xpReward: 300 },
+  { id: 'category-king',      name: 'Category King',      rarity: 'Rare',      module: 'vault', description: 'Under-budget in 5 categories at once', xpReward: 250 },
+  { id: 'diversifier',        name: 'Diversifier',        rarity: 'Rare',      module: 'vault', description: 'Log 5 distinct income streams',        xpReward: 300 },
+  { id: 'round-up-hero',      name: 'Round-Up Hero',      rarity: 'Rare',      module: 'vault', description: 'Save ₹500 cumulatively in round-ups',  xpReward: 250 },
+  { id: 'faithful-reviewer',  name: 'Faithful Reviewer',  rarity: 'Rare',      module: 'vault', description: 'Open weekly report 4 weeks in a row',  xpReward: 300 },
+  { id: 'tax-prep-pro',       name: 'Tax Prep Pro',       rarity: 'Rare',      module: 'vault', description: 'Export an annual report',              xpReward: 350 },
+  // Epic
+  { id: 'money-master',       name: 'Money Master',       rarity: 'Epic',      module: 'vault', description: '90-day vault logging streak',          xpReward: 800 },
+  { id: 'spartan-saver',      name: 'Spartan Saver',      rarity: 'Epic',      module: 'vault', description: '30 days with no dining-out spend',     xpReward: 1000 },
+  { id: 'wealth-wizard',      name: 'Wealth Wizard',      rarity: 'Epic',      module: 'vault', description: 'Net worth crosses ₹5L',                xpReward: 900 },
+  { id: 'compound-sage',      name: 'Compound Sage',      rarity: 'Epic',      module: 'vault', description: 'Hold an investment 1+ year logged',    xpReward: 1000 },
+  { id: 'debt-demolisher',    name: 'Debt Demolisher',    rarity: 'Epic',      module: 'vault', description: 'Pay off ₹50,000 cumulative debt',      xpReward: 900 },
+  { id: 'marathon-logger',    name: 'Marathon Logger',    rarity: 'Epic',      module: 'vault', description: '180-day vault streak',                 xpReward: 1000 },
+  { id: 'budget-black-belt',  name: 'Budget Black Belt',  rarity: 'Epic',      module: 'vault', description: '6 consecutive months under budget',    xpReward: 800 },
+  { id: 'fire-starter',       name: 'FIRE Starter',       rarity: 'Epic',      module: 'vault', description: 'Save ≥50% income 3 months running',    xpReward: 1000 },
+  { id: 'side-income-mogul',  name: 'Side Income Mogul',  rarity: 'Epic',      module: 'vault', description: '₹50,000 cumulative non-salary income', xpReward: 800 },
+  // Legendary
+  { id: 'loid-forger',        name: 'Loid Forger',        rarity: 'Legendary', module: 'vault', description: 'Hit a ₹1,00,000 savings goal',         xpReward: 2500 },
+  { id: 'money-god',          name: 'Money God',          rarity: 'Legendary', module: 'vault', description: '365-day vault streak',                 xpReward: 3000 },
+  { id: 'madaras-treasury',   name: "Madara's Treasury",  rarity: 'Legendary', module: 'vault', description: 'Savings ≥ ₹5,00,000',                  xpReward: 3500 },
+  { id: 'zero-debt-zen',      name: 'Zero Debt Zen',      rarity: 'Legendary', module: 'vault', description: 'Debt-free 6 consecutive months',       xpReward: 3000 },
+  { id: 'decade-discipline',  name: 'Decade of Discipline',rarity: 'Legendary',module: 'vault', description: 'Hit savings target 12 months running', xpReward: 5000 },
+  { id: 'millionaire-mindset',name: 'Millionaire Mindset',rarity: 'Legendary', module: 'vault', description: 'Net worth ≥ ₹10,00,000',               xpReward: 5000 },
+  { id: 'crorepati',          name: 'Crorepati',          rarity: 'Legendary', module: 'vault', description: 'Net worth ≥ ₹1 crore',                 xpReward: 5000 },
+  { id: 'financial-sensei',   name: 'Financial Sensei',   rarity: 'Legendary', module: 'vault', description: 'All Common+Rare vault badges',         xpReward: 4000 },
+  { id: 'vault-hokage',       name: 'Vault Hokage',       rarity: 'Legendary', module: 'vault', description: 'All Common+Rare+Epic vault badges',    xpReward: 5000 },
 
   { id: 'novice-hunter',  name: 'Novice Hunter',  rarity: 'Common',    module: 'quests', description: 'Complete your first quest',        xpReward: 50 },
   { id: 'hunter-exam',    name: 'Hunter Exam',    rarity: 'Rare',      module: 'quests', description: 'Complete 20 quests',               xpReward: 250 },
@@ -87,7 +132,49 @@ export type BadgeCheckContext = {
   shippedWithinSevenDays?: boolean;
   shippedOpenSourceCount?: number;
   dsaSolved?: number;
+  // vault extras
+  vaultStreak?: number;
+  uniqueVaultCategories?: number;
+  zeroSpendDays?: number;
+  receiptCount?: number;
+  budgetSetCount?: number;
+  savingsGoalCount?: number;
+  descriptionCount?: number;
+  taggedTxCount?: number;
+  recurringCount?: number;
+  activeSubscriptionsCount?: number;
+  calculatorUsed?: boolean;
+  roundUpCount?: number;
+  roundUpSavedTotal?: number;
+  noDiscretionaryStreakDays?: number;
+  savingsTargetMonthsHit?: number;
+  investmentTxnCount?: number;
+  debtsCleared?: number;
+  categoriesUnderBudgetInMonth?: number;
+  uniqueIncomeStreams?: number;
+  weeklyReportStreak?: number;
+  annualReportExported?: boolean;
+  spartanNoDiningStreak?: number;
+  netWorth?: number;
+  longHoldInvestmentCount?: number;
+  cumulativeDebtPaid?: number;
+  budgetUnderConsecutiveMonths?: number;
+  highSavingsRateMonthsConsecutive?: number;
+  nonSalaryIncomeTotal?: number;
+  totalDebt?: number;
+  debtFreeMonthsConsecutive?: number;
+  unlockedVaultBadgeIds?: string[];
 };
+
+const COMMON_VAULT_IDS = new Set([
+  'ryo-earned','penny-pincher','bookkeeper','categorizer','frugal-friday','receipt-hunter','budgeteer','goal-setter','note-taker','tagged-up','recurring-rookie','subscription-sleuth','calculator-kun','round-up-recruit',
+]);
+const RARE_VAULT_IDS = new Set([
+  'budget-master','frugal-fortnight','savers-spirit','streak-sage','investors-eye','debt-dodger','category-king','diversifier','round-up-hero','faithful-reviewer','tax-prep-pro',
+]);
+const EPIC_VAULT_IDS = new Set([
+  'money-master','spartan-saver','wealth-wizard','compound-sage','debt-demolisher','marathon-logger','budget-black-belt','fire-starter','side-income-mogul',
+]);
 
 export const evaluateBadges = (ctx: BadgeCheckContext): string[] => {
   const unlock: string[] = [];
@@ -123,9 +210,62 @@ export const evaluateBadges = (ctx: BadgeCheckContext): string[] => {
   if ((ctx.habitsAllDoneStreak ?? 0) >= 7) unlock.push('habit-stack');
   if ((ctx.stepGoalStreak ?? 0) >= 7) unlock.push('step-master');
 
+  // ── VAULT ──────────────────────────────────────────
+  // Common
   if ((ctx.transactionCount ?? 0) >= 1) unlock.push('ryo-earned');
+  if ((ctx.transactionCount ?? 0) >= 10) unlock.push('penny-pincher');
+  if ((ctx.vaultStreak ?? 0) >= 7) unlock.push('bookkeeper');
+  if ((ctx.uniqueVaultCategories ?? 0) >= 8) unlock.push('categorizer');
+  if ((ctx.zeroSpendDays ?? 0) >= 1) unlock.push('frugal-friday');
+  if ((ctx.receiptCount ?? 0) >= 10) unlock.push('receipt-hunter');
+  if ((ctx.budgetSetCount ?? 0) >= 1) unlock.push('budgeteer');
+  if ((ctx.savingsGoalCount ?? 0) >= 1) unlock.push('goal-setter');
+  if ((ctx.descriptionCount ?? 0) >= 25) unlock.push('note-taker');
+  if ((ctx.taggedTxCount ?? 0) >= 20) unlock.push('tagged-up');
+  if ((ctx.recurringCount ?? 0) >= 1) unlock.push('recurring-rookie');
+  if ((ctx.activeSubscriptionsCount ?? 0) >= 5) unlock.push('subscription-sleuth');
+  if (ctx.calculatorUsed) unlock.push('calculator-kun');
+  if ((ctx.roundUpCount ?? 0) >= 1) unlock.push('round-up-recruit');
+  // Rare
   if (ctx.budgetUnder) unlock.push('budget-master');
+  if ((ctx.noDiscretionaryStreakDays ?? 0) >= 14) unlock.push('frugal-fortnight');
+  if ((ctx.savingsTargetMonthsHit ?? 0) >= 3) unlock.push('savers-spirit');
+  if ((ctx.vaultStreak ?? 0) >= 30) unlock.push('streak-sage');
+  if ((ctx.investmentTxnCount ?? 0) >= 5) unlock.push('investors-eye');
+  if ((ctx.debtsCleared ?? 0) >= 1) unlock.push('debt-dodger');
+  if ((ctx.categoriesUnderBudgetInMonth ?? 0) >= 5) unlock.push('category-king');
+  if ((ctx.uniqueIncomeStreams ?? 0) >= 5) unlock.push('diversifier');
+  if ((ctx.roundUpSavedTotal ?? 0) >= 500) unlock.push('round-up-hero');
+  if ((ctx.weeklyReportStreak ?? 0) >= 4) unlock.push('faithful-reviewer');
+  if (ctx.annualReportExported) unlock.push('tax-prep-pro');
+  // Epic
+  if ((ctx.vaultStreak ?? 0) >= 90) unlock.push('money-master');
+  if ((ctx.spartanNoDiningStreak ?? 0) >= 30) unlock.push('spartan-saver');
+  if ((ctx.netWorth ?? 0) >= 500000) unlock.push('wealth-wizard');
+  if ((ctx.longHoldInvestmentCount ?? 0) >= 1) unlock.push('compound-sage');
+  if ((ctx.cumulativeDebtPaid ?? 0) >= 50000) unlock.push('debt-demolisher');
+  if ((ctx.vaultStreak ?? 0) >= 180) unlock.push('marathon-logger');
+  if ((ctx.budgetUnderConsecutiveMonths ?? 0) >= 6) unlock.push('budget-black-belt');
+  if ((ctx.highSavingsRateMonthsConsecutive ?? 0) >= 3) unlock.push('fire-starter');
+  if ((ctx.nonSalaryIncomeTotal ?? 0) >= 50000) unlock.push('side-income-mogul');
+  // Legendary
   if ((ctx.totalSaved ?? 0) >= 100000) unlock.push('loid-forger');
+  if ((ctx.vaultStreak ?? 0) >= 365) unlock.push('money-god');
+  if ((ctx.totalSaved ?? 0) >= 500000) unlock.push('madaras-treasury');
+  if ((ctx.totalDebt ?? -1) === 0 && (ctx.debtFreeMonthsConsecutive ?? 0) >= 6) unlock.push('zero-debt-zen');
+  if ((ctx.savingsTargetMonthsHit ?? 0) >= 12) unlock.push('decade-discipline');
+  if ((ctx.netWorth ?? 0) >= 1000000) unlock.push('millionaire-mindset');
+  if ((ctx.netWorth ?? 0) >= 10000000) unlock.push('crorepati');
+
+  // Meta-vault badges (need to know which vault badges the player already has).
+  const have = new Set(ctx.unlockedVaultBadgeIds ?? []);
+  // Include the ones we're about to unlock in this pass.
+  unlock.forEach((id) => {
+    if (COMMON_VAULT_IDS.has(id) || RARE_VAULT_IDS.has(id) || EPIC_VAULT_IDS.has(id)) have.add(id);
+  });
+  const hasAll = (set: Set<string>) => Array.from(set).every((id) => have.has(id));
+  if (hasAll(COMMON_VAULT_IDS) && hasAll(RARE_VAULT_IDS)) unlock.push('financial-sensei');
+  if (hasAll(COMMON_VAULT_IDS) && hasAll(RARE_VAULT_IDS) && hasAll(EPIC_VAULT_IDS)) unlock.push('vault-hokage');
 
   if ((ctx.questCount ?? 0) >= 1) unlock.push('novice-hunter');
   if ((ctx.questCount ?? 0) >= 20) unlock.push('hunter-exam');
@@ -138,8 +278,9 @@ export const evaluateBadges = (ctx: BadgeCheckContext): string[] => {
     ctx.workoutStreak ?? 0,
     ctx.forgeStreak ?? 0,
     ctx.spiritStreak ?? 0,
+    ctx.vaultStreak ?? 0,
   );
   if (anyStreak >= 7) unlock.push('week-warrior');
 
-  return unlock;
+  return Array.from(new Set(unlock));
 };

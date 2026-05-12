@@ -11,9 +11,9 @@ const SCENES: Record<ScreenKey, ImageSource> = {
   dojo:      require('@/assets/backgrounds/dojo.jpeg'),
   forge:     require('@/assets/backgrounds/forge.jpeg'),
   spirit:    require('@/assets/backgrounds/spirit.jpeg'),
-  vault:     require('@/assets/backgrounds/vault.jpeg'),
+  vault:     require('@/assets/backgrounds/vault.png'),
   quests:    require('@/assets/backgrounds/quests.webp'),
-  hall:      require('@/assets/backgrounds/hall.jpeg'),
+  hall:      require('@/assets/backgrounds/hall.png'),
 };
 
 interface Props {

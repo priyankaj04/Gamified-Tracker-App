@@ -135,6 +135,16 @@ export default function RootLayout() {
             <Stack.Screen name="spirit/wellness-score" options={{ headerShown: false }} />
             <Stack.Screen name="spirit/tdee" options={{ headerShown: false }} />
             <Stack.Screen name="spirit/profile" options={{ headerShown: false }} />
+            <Stack.Screen name="vault/stats" options={{ headerShown: false }} />
+            <Stack.Screen name="vault/accounts" options={{ headerShown: false }} />
+            <Stack.Screen name="vault/goals" options={{ headerShown: false }} />
+            <Stack.Screen name="vault/debts" options={{ headerShown: false }} />
+            <Stack.Screen name="vault/investments" options={{ headerShown: false }} />
+            <Stack.Screen name="vault/recurring" options={{ headerShown: false }} />
+            <Stack.Screen name="vault/subscriptions" options={{ headerShown: false }} />
+            <Stack.Screen name="vault/search" options={{ headerShown: false }} />
+            <Stack.Screen name="vault/tags" options={{ headerShown: false }} />
+            <Stack.Screen name="vault/challenges" options={{ headerShown: false }} />
           </Stack>
           <XPPopupHost />
           <BadgeUnlockHost />
