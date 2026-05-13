@@ -82,3 +82,5 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`⚡ KaizenArc API listening on http://0.0.0.0:${PORT} (LAN-accessible)`);
   console.log(`   Module routes mounted under /api`);
 });
+
+export default app;
