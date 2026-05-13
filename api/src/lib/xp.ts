@@ -183,20 +183,30 @@ export const BLUE_LOCK_RANKS: ModuleRank[] = [
   { key: 'no1',        title: "World's #1 Striker", min: 750, color: '#facc15' },
 ];
 
-// Spirit — Naruto chakra path. Distinct from global level titles by leaning
-// into the *spiritual* journey (Awakened Chakra, ANBU Mind, Sage of Six Paths).
+// Spirit — Naruto power ranking. Climb from Shisui (#20, entry rank) to
+// Naruto Uzumaki (#1, apex). Colors stay inside the green spirit palette,
+// with the final three legendary ranks shining in gold.
 export const CHAKRA_RANKS: ModuleRank[] = [
-  { key: 'civilian',   title: 'Untrained Spirit',  min: 0,    color: '#94a3b8' },
-  { key: 'awakened',   title: 'Awakened Chakra',   min: 10,   color: '#86efac' },
-  { key: 'genin',      title: 'Genin Path',        min: 30,   color: '#4ade80' },
-  { key: 'chunin',     title: 'Chunin Path',       min: 75,   color: '#22d3ee' },
-  { key: 'special',    title: 'Special Jonin',     min: 150,  color: '#38bdf8' },
-  { key: 'jonin',      title: 'Jonin Path',        min: 250,  color: '#818cf8' },
-  { key: 'anbu',       title: 'ANBU Mind',         min: 400,  color: '#a78bfa' },
-  { key: 'sannin',     title: 'Sannin',            min: 600,  color: '#f472b6' },
-  { key: 'sage',       title: 'Sage Mode',         min: 850,  color: '#fbbf24' },
-  { key: 'sixpaths',   title: 'Six Paths Sage',    min: 1200, color: '#f97316' },
-  { key: 'otsutsuki',  title: 'Ōtsutsuki',         min: 1750, color: '#e879f9' },
+  { key: 'shisui',     title: 'Shisui Uchiha',     min: 0,    color: '#86efac' },
+  { key: 'sakura',     title: 'Sakura Haruno',     min: 5,    color: '#86efac' },
+  { key: 'gaara',      title: 'Gaara of the Sand', min: 15,   color: '#6ee7b7' },
+  { key: 'raikage3',   title: 'Third Raikage',     min: 30,   color: '#6ee7b7' },
+  { key: 'hiruzen',    title: 'Hiruzen Sarutobi',  min: 50,   color: '#4ade80' },
+  { key: 'killerb',    title: 'Killer B',          min: 80,   color: '#4ade80' },
+  { key: 'orochimaru', title: 'Orochimaru',        min: 120,  color: '#22c55e' },
+  { key: 'jiraiya',    title: 'Jiraiya',           min: 170,  color: '#22c55e' },
+  { key: 'kabuto',     title: 'Kabuto Yakushi',    min: 230,  color: '#16a34a' },
+  { key: 'tobirama',   title: 'Tobirama Senju',    min: 300,  color: '#16a34a' },
+  { key: 'minato',     title: 'Minato Namikaze',   min: 400,  color: '#15803d' },
+  { key: 'nagato',     title: 'Nagato',            min: 520,  color: '#15803d' },
+  { key: 'itachi',     title: 'Itachi Uchiha',     min: 660,  color: '#10b981' },
+  { key: 'kakashi',    title: 'Kakashi Hatake',    min: 820,  color: '#10b981' },
+  { key: 'obito',      title: 'Obito Uchiha',      min: 1000, color: '#059669' },
+  { key: 'guy',        title: 'Might Guy',         min: 1200, color: '#047857' },
+  { key: 'hashirama',  title: 'Hashirama Senju',   min: 1450, color: '#065f46' },
+  { key: 'madara',     title: 'Madara Uchiha',     min: 1750, color: '#fbbf24' },
+  { key: 'sasuke',     title: 'Sasuke Uchiha',     min: 2100, color: '#f59e0b' },
+  { key: 'naruto',     title: 'Naruto Uzumaki',    min: 2500, color: '#fbbf24' },
 ];
 
 // Vault — Mashle: Magic and Muscles. Lines on the wand mark progression.
