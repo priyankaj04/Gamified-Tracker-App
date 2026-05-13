@@ -78,9 +78,13 @@ app.use('/api/forge-settings', forgeSettingsRouter);
 app.use((_req, res) => res.status(404).json({ data: null, error: 'Not found' }));
 app.use(errorHandler);
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`⚡ KaizenArc API listening on http://0.0.0.0:${PORT} (LAN-accessible)`);
-  console.log(`   Module routes mounted under /api`);
-});
+// Skip listen() on Vercel — the serverless function imports `app` as a handler
+// directly, so spinning up a port would error in that environment.
+if (!process.env.VERCEL) {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`⚡ KaizenArc API listening on http://0.0.0.0:${PORT} (LAN-accessible)`);
+    console.log(`   Module routes mounted under /api`);
+  });
+}
 
 export default app;

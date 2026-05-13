@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit",
     "migrate": "tsx ./node_modules/knex/bin/cli.js --knexfile knexfile.ts migrate:latest",
@@ -26,6 +26,7 @@
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.0",
     "@types/pg": "^8.20.0",
+    "tsc-alias": "^1.8.17",
     "tsx": "^4.19.0",
     "typescript": "^5.5.0"
   }
