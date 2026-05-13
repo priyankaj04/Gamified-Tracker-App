@@ -49,6 +49,11 @@ workoutsRouter.get(
 );
 
 workoutsRouter.get(
+  '/rank',
+  asyncHandler(async (_req, res) => ok(res, await svc.getDojoRank())),
+);
+
+workoutsRouter.get(
   '/records/history',
   asyncHandler(async (req, res) =>
     ok(

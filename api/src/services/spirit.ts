@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import { awardXp, checkBadges, updateStreak } from './gamification';
-import { XP } from '@/lib/xp';
+import { XP, getSpiritRank as computeSpiritRank } from '@/lib/xp';
 import { todayISO } from '@/lib/date';
 
 // ─── Profile ────────────────────────────────────────────────
@@ -651,5 +651,46 @@ export const stepsStats = async () => {
     currentStreak: streak?.count ?? 0,
     longestStreak: streak?.longest_streak ?? 0,
     daysGoalHit,
+  };
+};
+
+// Chakra rank: total wellness activity count across the major spirit logs.
+// Weight (1pt), sleep (1pt), wellness check-ins (1pt), habit completions (1pt
+// each), fasting completions (3pt — rare and meaningful), step-goal days (1pt).
+export const getSpiritRank = async () => {
+  const sb = supabase();
+  const [
+    { count: weightCount },
+    { count: sleepCount },
+    { count: wellnessCount },
+    { count: habitCount },
+    { count: fastCount },
+    { data: stepRows },
+  ] = await Promise.all([
+    sb.from('weight_entries').select('id', { count: 'exact', head: true }),
+    sb.from('sleep_logs').select('id', { count: 'exact', head: true }),
+    sb.from('wellness_daily').select('id', { count: 'exact', head: true }),
+    sb.from('habit_logs').select('id', { count: 'exact', head: true }).eq('completed', true),
+    sb
+      .from('fasting_sessions')
+      .select('id', { count: 'exact', head: true })
+      .not('end_time', 'is', null),
+    sb.from('step_logs').select('goal_hit').eq('goal_hit', true),
+  ]);
+  const weights = weightCount ?? 0;
+  const sleeps = sleepCount ?? 0;
+  const wellness = wellnessCount ?? 0;
+  const habits = habitCount ?? 0;
+  const fasts = fastCount ?? 0;
+  const stepDays = (stepRows ?? []).length;
+  const score = weights + sleeps + wellness + habits + fasts * 3 + stepDays;
+  return {
+    ...computeSpiritRank(score),
+    weightCount: weights,
+    sleepCount: sleeps,
+    wellnessCount: wellness,
+    habitCount: habits,
+    fastCount: fasts,
+    stepGoalDays: stepDays,
   };
 };

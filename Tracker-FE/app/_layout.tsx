@@ -12,7 +12,9 @@ import { XPPopupHost } from '@/components/gamification/XPPopup';
 import { BadgeUnlockHost } from '@/components/gamification/BadgeUnlock';
 import { LevelUpHost } from '@/components/gamification/LevelUp';
 import { ConfettiHost } from '@/components/spirit/ConfettiHost';
+import { QuestStampHost } from '@/components/quests/QuestStamp';
 import { setupChannels } from '@/lib/notifications';
+import { runQuestStartupTasks } from '@/lib/questStartup';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -33,6 +35,7 @@ const navTheme = {
 export default function RootLayout() {
   useEffect(() => {
     setupChannels().catch(() => {});
+    runQuestStartupTasks().catch(() => {});
   }, []);
 
   return (
@@ -145,11 +148,20 @@ export default function RootLayout() {
             <Stack.Screen name="vault/search" options={{ headerShown: false }} />
             <Stack.Screen name="vault/tags" options={{ headerShown: false }} />
             <Stack.Screen name="vault/challenges" options={{ headerShown: false }} />
+            <Stack.Screen name="quest/[id]" options={{ headerShown: false }} />
+            <Stack.Screen name="quest/insights" options={{ headerShown: false }} />
+            <Stack.Screen name="quest/shadow-army" options={{ headerShown: false }} />
+            <Stack.Screen name="quest/templates" options={{ headerShown: false }} />
+            <Stack.Screen name="quest/archived" options={{ headerShown: false }} />
+            <Stack.Screen name="quest/calendar" options={{ headerShown: false }} />
+            <Stack.Screen name="quest/challenges" options={{ headerShown: false }} />
+            <Stack.Screen name="quest/settings" options={{ headerShown: false }} />
           </Stack>
           <XPPopupHost />
           <BadgeUnlockHost />
           <LevelUpHost />
           <ConfettiHost />
+          <QuestStampHost />
           <StatusBar style="light" />
         </ThemeProvider>
       </QueryClientProvider>

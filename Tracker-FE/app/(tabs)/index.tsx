@@ -13,6 +13,7 @@ import { LevelBadge } from '@/components/gamification/LevelBadge';
 import { StreakFlame } from '@/components/gamification/StreakFlame';
 import { ChallengeCard } from '@/components/gamification/ChallengeCard';
 import { TodayCard } from '@/components/workout/TodayCard';
+import { DashboardQuestWidget } from '@/components/quests/DashboardQuestWidget';
 import { StatCard } from '@/components/ui/StatCard';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { USER_NAME } from '@/constants';
@@ -100,6 +101,9 @@ export default function Dashboard() {
         <View style={{ height: 12 }} />
         <XPBar xp={xp} />
       </View>
+
+      <SectionTitle title="Today's Hunt" accent={screenTheme.quests.accent} />
+      <DashboardQuestWidget />
 
       <SectionTitle title="Today's Workout" accent={accent} />
       <TodayCard />

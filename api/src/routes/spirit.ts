@@ -554,3 +554,6 @@ spiritRouter.post(
   asyncHandler(async (req, res) => ok(res, await quests.claimQuest(req.params.id))),
 );
 spiritRouter.get('/streaks', asyncHandler(async (_req, res) => ok(res, await streaks.allSpiritStreaks())));
+
+// ─── Chakra rank ────────────────────────────────────────────
+spiritRouter.get('/rank', asyncHandler(async (_req, res) => ok(res, await svc.getSpiritRank())));

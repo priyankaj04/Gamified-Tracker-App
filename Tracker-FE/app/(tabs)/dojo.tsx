@@ -20,7 +20,8 @@ import { ActivityGrid } from '@/components/ui/ActivityGrid';
 import { EmptyState } from '@/components/layout/EmptyState';
 import { StarRating } from '@/components/gamification/StarRating';
 import { XPBadge } from '@/components/gamification/XPBadge';
-import { useWorkouts, useWorkoutGrid, usePersonalRecords } from '@/hooks/useWorkouts';
+import { useDojoRank, useWorkouts, useWorkoutGrid, usePersonalRecords } from '@/hooks/useWorkouts';
+import { ModuleRankCard } from '@/components/gamification/ModuleRankCard';
 import { useGameState } from '@/hooks/useGame';
 import { loadDraft, type WorkoutDraft } from '@/lib/workoutDraft';
 import { RecoverySheet } from '@/components/workout/RecoverySheet';
@@ -42,6 +43,7 @@ export default function DojoScreen() {
   const workouts = useWorkouts({ limit: 50 });
   const grid = useWorkoutGrid();
   const records = usePersonalRecords();
+  const rank = useDojoRank();
   const game = useGameState();
   const [prOpen, setPrOpen] = useState(false);
   const [resumeDraft, setResumeDraft] = useState<WorkoutDraft | null>(null);
@@ -144,6 +146,23 @@ export default function DojoScreen() {
             <Ionicons name="chevron-forward" size={18} color={accent} />
           </Pressable>
         )}
+
+        <ModuleRankCard
+          kicker="DEMON SLAYER RANK"
+          rank={rank.data?.rank}
+          nextRank={rank.data?.nextRank}
+          progressPct={rank.data?.progressPct ?? 0}
+          toNext={rank.data?.toNext ?? 0}
+          unitLabel="strikes"
+          subtitle={
+            rank.data
+              ? `${rank.data.workoutCount} workouts · ${rank.data.prCount} PRs`
+              : undefined
+          }
+          accent={accent}
+          icon="flame"
+          onPress={() => router.push('/dojo/ranks' as any)}
+        />
 
         <View style={styles.stats}>
           <StatCard label="Total" value={total} icon="barbell" accent={accent} />

@@ -20,7 +20,8 @@ import { useTodayHabits, useCompleteHabit } from '@/hooks/useHabits';
 import { useNutritionSummary } from '@/hooks/useNutrition';
 import { useSleep, useSleepGoal } from '@/hooks/useSleep';
 import { useActiveFast } from '@/hooks/useFasting';
-import { useStepsStats, useWellnessScore, useWellnessToday } from '@/hooks/useSpirit';
+import { useSpiritRank, useStepsStats, useWellnessScore, useWellnessToday } from '@/hooks/useSpirit';
+import { ModuleRankCard } from '@/components/gamification/ModuleRankCard';
 import { useGoals } from '@/hooks/useGoals';
 import { useGameState } from '@/hooks/useGame';
 import { useDevicePedometer } from '@/hooks/usePedometer';
@@ -45,6 +46,7 @@ export default function SpiritScreen() {
   const game = useGameState();
   const pedometer = useDevicePedometer();
   const wellnessToday = useWellnessToday();
+  const rank = useSpiritRank();
   const cycleSettings = useCycleSettings();
   const cyclePrediction = useCyclePrediction();
 
@@ -121,6 +123,23 @@ export default function SpiritScreen() {
               <Ionicons name="person-circle" size={28} color={accent} />
             </Pressable>
           }
+        />
+
+        <ModuleRankCard
+          kicker="CHAKRA PATH"
+          rank={rank.data?.rank}
+          nextRank={rank.data?.nextRank}
+          progressPct={rank.data?.progressPct ?? 0}
+          toNext={rank.data?.toNext ?? 0}
+          unitLabel="logs"
+          subtitle={
+            rank.data
+              ? `${rank.data.habitCount} habits · ${rank.data.sleepCount} sleep · ${rank.data.weightCount} weigh-ins`
+              : undefined
+          }
+          accent={accent}
+          icon="sparkles"
+          onPress={() => router.push('/spirit/ranks' as any)}
         />
 
         {/* Wellness composite score */}

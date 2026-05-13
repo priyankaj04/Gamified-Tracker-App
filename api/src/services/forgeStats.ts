@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { todayISO } from '@/lib/date';
+import { getForgeRank as computeForgeRank } from '@/lib/xp';
 
 const dayMs = 86400000;
 const startOfWeek = () => {
@@ -239,4 +240,18 @@ export const billable = async (month: string) => {
   const totalHours = rows.reduce((s, r) => s + r.hours, 0);
   const totalEarnings = rows.reduce((s, r) => s + r.earnings, 0);
   return { month, currency, rate, projects: rows, totalHours, totalEarnings };
+};
+
+// Blue-Lock rank: built off coding session count + shipped project count.
+// Shipped projects matter far more than sessions, so each is worth 10.
+export const rank = async () => {
+  const sb = supabase();
+  const [{ count: sessionCount }, { count: shippedCount }] = await Promise.all([
+    sb.from('coding_sessions').select('id', { count: 'exact', head: true }),
+    sb.from('projects').select('id', { count: 'exact', head: true }).eq('status', 'Shipped'),
+  ]);
+  const sessions = sessionCount ?? 0;
+  const shipped = shippedCount ?? 0;
+  const score = sessions + shipped * 10;
+  return { ...computeForgeRank(score), sessionCount: sessions, shippedCount: shipped };
 };

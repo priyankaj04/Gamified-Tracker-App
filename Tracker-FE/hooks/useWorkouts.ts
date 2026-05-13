@@ -2,7 +2,14 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
 import { useAppStore } from '@/store/useAppStore';
 import { detectLevelUp } from '@/lib/levels';
-import type { GridCell, PersonalRecord, Workout, WorkoutSummary, XpAwardResult } from '@/types';
+import type {
+  DojoRank,
+  GridCell,
+  PersonalRecord,
+  Workout,
+  WorkoutSummary,
+  XpAwardResult,
+} from '@/types';
 import { gameKeys } from './useGame';
 
 export const workoutKeys = {
@@ -11,7 +18,14 @@ export const workoutKeys = {
   detail: (id: string) => ['workouts', id] as const,
   grid: ['workouts', 'grid'] as const,
   records: ['workouts', 'records'] as const,
+  rank: ['workouts', 'rank'] as const,
 };
+
+export const useDojoRank = () =>
+  useQuery({
+    queryKey: workoutKeys.rank,
+    queryFn: () => api.get<{ data: DojoRank }>('/workouts/rank').then(unwrap),
+  });
 
 export const useWorkouts = (params?: { page?: number; limit?: number; from?: string; to?: string }) =>
   useQuery({

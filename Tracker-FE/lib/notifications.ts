@@ -194,6 +194,58 @@ const cancelByTag = async (tag: string) => {
   }
 };
 
+// ─── Quest reminders ────────────────────────────────────────
+const QUEST_TAG = 'kaizenarc:quest-reminder';
+
+export const scheduleQuestReminder = async (
+  questId: string,
+  remindAt: string,
+  title: string,
+): Promise<string | null> => {
+  const at = new Date(remindAt);
+  const seconds = Math.floor((at.getTime() - Date.now()) / 1000);
+  if (seconds <= 0) return null;
+  const ok = await ensurePermission();
+  if (!ok) return null;
+  // Cancel any pre-existing reminder for this quest first
+  await cancelQuestReminder(questId);
+  return safe(
+    () =>
+      Notifications.scheduleNotificationAsync({
+        content: {
+          title: 'Quest waiting',
+          body: title,
+          sound: 'default',
+          data: { tag: QUEST_TAG, questId },
+        },
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+          seconds,
+          channelId: 'reminders',
+        },
+      }),
+    null,
+  );
+};
+
+export const cancelQuestReminder = async (questId: string) => {
+  if (!notificationsSupported) return;
+  try {
+    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+    await Promise.all(
+      scheduled
+        .filter(
+          (n) =>
+            (n.content.data as any)?.tag === QUEST_TAG &&
+            (n.content.data as any)?.questId === questId,
+        )
+        .map((n) => Notifications.cancelScheduledNotificationAsync(n.identifier)),
+    );
+  } catch {
+    /* ignore */
+  }
+};
+
 export interface ReminderSettings {
   workoutReminderEnabled: boolean;
   reminderHour: number;

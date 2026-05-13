@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
-import type { ForgeSettings, ForgeStats } from '@/types';
+import type { ForgeRank, ForgeSettings, ForgeStats } from '@/types';
 
 export const forgeStatsKeys = {
   summary: ['forge-stats', 'summary'] as const,
@@ -10,7 +10,14 @@ export const forgeStatsKeys = {
   dailyGoal: ['forge-stats', 'daily-goal'] as const,
   billable: (month: string) => ['forge-stats', 'billable', month] as const,
   settings: ['forge-settings'] as const,
+  rank: ['forge-stats', 'rank'] as const,
 };
+
+export const useForgeRank = () =>
+  useQuery({
+    queryKey: forgeStatsKeys.rank,
+    queryFn: () => api.get<{ data: ForgeRank }>('/forge-stats/rank').then(unwrap),
+  });
 
 export const useForgeSummary = () =>
   useQuery({

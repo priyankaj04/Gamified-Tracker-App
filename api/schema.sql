@@ -165,18 +165,36 @@ CREATE TABLE IF NOT EXISTS monthly_budgets (
 -- ─────────────────────────────────────────
 
 CREATE TABLE IF NOT EXISTS quests (
-  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  title        TEXT    NOT NULL,
-  priority     TEXT    NOT NULL DEFAULT 'C' CHECK (priority IN ('S', 'A', 'B', 'C')),
-  is_daily     BOOLEAN NOT NULL DEFAULT FALSE,
-  completed    BOOLEAN NOT NULL DEFAULT FALSE,
-  completed_at TIMESTAMPTZ,
-  due_date     DATE,
-  stars        INTEGER CHECK (stars BETWEEN 1 AND 5),
-  notes        TEXT,
-  xp_earned    INTEGER NOT NULL DEFAULT 0,
-  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title               TEXT    NOT NULL,
+  description         TEXT,
+  priority            TEXT    NOT NULL DEFAULT 'C' CHECK (priority IN ('S', 'A', 'B', 'C')),
+  difficulty          TEXT    CHECK (difficulty IS NULL OR difficulty IN ('Trivial','Normal','Hard','Boss')),
+  is_daily            BOOLEAN NOT NULL DEFAULT FALSE,
+  is_boss             BOOLEAN NOT NULL DEFAULT FALSE,
+  completed           BOOLEAN NOT NULL DEFAULT FALSE,
+  completed_at        TIMESTAMPTZ,
+  due_date            DATE,
+  remind_at           TIMESTAMPTZ,
+  stars               INTEGER CHECK (stars BETWEEN 1 AND 5),
+  notes               TEXT,
+  estimated_minutes   INTEGER,
+  actual_minutes      INTEGER,
+  xp_earned           INTEGER NOT NULL DEFAULT 0,
+  display_order       INTEGER NOT NULL DEFAULT 0,
+  parent_quest_id     UUID REFERENCES quests(id) ON DELETE SET NULL,
+  recurrence          JSONB,
+  last_rollover_date  DATE,
+  archived_at         TIMESTAMPTZ,
+  template_id         UUID,
+  linked_module       TEXT,
+  linked_module_id    UUID,
+  created_at          TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+CREATE INDEX IF NOT EXISTS quests_archived_idx  ON quests(archived_at);
+CREATE INDEX IF NOT EXISTS quests_due_idx       ON quests(due_date);
+CREATE INDEX IF NOT EXISTS quests_parent_idx    ON quests(parent_quest_id);
+CREATE INDEX IF NOT EXISTS quests_completed_idx ON quests(completed);
 
 CREATE TABLE IF NOT EXISTS tags (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -189,6 +207,81 @@ CREATE TABLE IF NOT EXISTS quest_tags (
   quest_id UUID NOT NULL REFERENCES quests(id) ON DELETE CASCADE,
   tag_id   UUID NOT NULL REFERENCES tags(id)   ON DELETE CASCADE,
   PRIMARY KEY (quest_id, tag_id)
+);
+
+CREATE TABLE IF NOT EXISTS quest_steps (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  quest_id     UUID NOT NULL REFERENCES quests(id) ON DELETE CASCADE,
+  label        TEXT NOT NULL,
+  done         BOOLEAN NOT NULL DEFAULT FALSE,
+  done_at      TIMESTAMPTZ,
+  order_index  INTEGER NOT NULL DEFAULT 0,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS quest_steps_quest_idx ON quest_steps(quest_id);
+
+CREATE TABLE IF NOT EXISTS quest_templates (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name              TEXT NOT NULL,
+  title             TEXT NOT NULL,
+  priority          TEXT NOT NULL DEFAULT 'C',
+  difficulty        TEXT,
+  is_daily          BOOLEAN NOT NULL DEFAULT FALSE,
+  is_boss           BOOLEAN NOT NULL DEFAULT FALSE,
+  recurrence        JSONB,
+  estimated_minutes INTEGER,
+  notes             TEXT,
+  tag_ids           JSONB NOT NULL DEFAULT '[]'::jsonb,
+  step_labels       JSONB NOT NULL DEFAULT '[]'::jsonb,
+  use_count         INTEGER NOT NULL DEFAULT 0,
+  last_used_at      TIMESTAMPTZ,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS quest_active_timer (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  quest_id    UUID NOT NULL REFERENCES quests(id) ON DELETE CASCADE,
+  started_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  elapsed_sec INTEGER NOT NULL DEFAULT 0,
+  is_running  BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE IF NOT EXISTS quest_combo (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  count             INTEGER NOT NULL DEFAULT 0,
+  last_complete_at  TIMESTAMPTZ,
+  window_ends_at    TIMESTAMPTZ
+);
+INSERT INTO quest_combo (count) SELECT 0 WHERE NOT EXISTS (SELECT 1 FROM quest_combo);
+
+CREATE TABLE IF NOT EXISTS quest_settings (
+  id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  default_priority         TEXT NOT NULL DEFAULT 'C',
+  default_tab              TEXT NOT NULL DEFAULT 'Active',
+  auto_archive_days        INTEGER NOT NULL DEFAULT 30,
+  reminder_offset_minutes  INTEGER NOT NULL DEFAULT 60,
+  sounds_enabled           BOOLEAN NOT NULL DEFAULT TRUE,
+  combo_enabled            BOOLEAN NOT NULL DEFAULT TRUE,
+  penalty_enabled          BOOLEAN NOT NULL DEFAULT FALSE,
+  updated_at               TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+INSERT INTO quest_settings (id) SELECT gen_random_uuid() WHERE NOT EXISTS (SELECT 1 FROM quest_settings);
+
+CREATE TABLE IF NOT EXISTS quest_challenges (
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  key           TEXT NOT NULL,
+  title         TEXT NOT NULL,
+  description   TEXT,
+  period        TEXT NOT NULL,
+  target        INTEGER NOT NULL,
+  progress      INTEGER NOT NULL DEFAULT 0,
+  completed     BOOLEAN NOT NULL DEFAULT FALSE,
+  completed_at  TIMESTAMPTZ,
+  xp_reward     INTEGER NOT NULL DEFAULT 100,
+  starts_on     DATE NOT NULL,
+  ends_on       DATE NOT NULL,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  UNIQUE(key, starts_on)
 );
 
 -- ─────────────────────────────────────────

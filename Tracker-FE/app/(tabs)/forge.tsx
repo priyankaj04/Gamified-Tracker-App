@@ -24,7 +24,8 @@ import { LiveTimer } from '@/components/forge/LiveTimer';
 import { BuildNowCta } from '@/components/forge/BuildNowCta';
 import { useProjects } from '@/hooks/useProjects';
 import { useActiveTimer, useSessionGrid, useSessions, useTodaySessions } from '@/hooks/useSessions';
-import { useDailyGoal, useForgeSummary } from '@/hooks/useForgeStats';
+import { useDailyGoal, useForgeRank, useForgeSummary } from '@/hooks/useForgeStats';
+import { ModuleRankCard } from '@/components/gamification/ModuleRankCard';
 import { useDsaStats } from '@/hooks/useDSA';
 import { useLearning } from '@/hooks/useLearning';
 import { useGameState } from '@/hooks/useGame';
@@ -51,6 +52,7 @@ export default function ForgeScreen() {
   const today = useTodaySessions();
   const goal = useDailyGoal();
   const summary = useForgeSummary();
+  const rank = useForgeRank();
   const dsa = useDsaStats();
   const learning = useLearning({ status: 'In Progress' });
   const grid = useSessionGrid(90);
@@ -102,6 +104,23 @@ export default function ForgeScreen() {
               <Ionicons name="settings-outline" size={22} color={accent} />
             </Pressable>
           }
+        />
+
+        <ModuleRankCard
+          kicker="BLUE LOCK RANK"
+          rank={rank.data?.rank}
+          nextRank={rank.data?.nextRank}
+          progressPct={rank.data?.progressPct ?? 0}
+          toNext={rank.data?.toNext ?? 0}
+          unitLabel="goals"
+          subtitle={
+            rank.data
+              ? `${rank.data.sessionCount} sessions · ${rank.data.shippedCount} shipped`
+              : undefined
+          }
+          accent={accent}
+          icon="football"
+          onPress={() => router.push('/forge/ranks' as any)}
         />
 
         {/* Big "Build Now" CTA — only when no live session is running */}

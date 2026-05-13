@@ -52,6 +52,7 @@ import {
   ColoredPill,
   VAULT_COLORS,
 } from '../vault/_components';
+import { ModuleRankCard } from '@/components/gamification/ModuleRankCard';
 
 const HUB_TILES: {
   key: string;
@@ -181,25 +182,23 @@ export default function VaultScreen() {
           right={<Ionicons name="wallet" size={26} color={accent} />}
         />
 
-        {/* Hero rank card */}
-        {game.data && (
-          <View style={{ marginHorizontal: 20, marginBottom: 12 }}>
-            <GradientCard accent={accent} accent2={accent2}>
-              <View style={styles.rankRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.rankLabel}>VAULT RANK</Text>
-                  <Text style={styles.rankTitle}>{game.data.title}</Text>
-                  <Text style={styles.rankXp}>{game.data.vaultXp.toLocaleString()} Vault XP</Text>
-                </View>
-                <View style={[styles.streakOrb, { backgroundColor: accent + '22', borderColor: accent }]}>
-                  <Ionicons name="flame" size={20} color={accent} />
-                  <Text style={[styles.streakNum, { color: accent }]}>{game.data.streak.count}</Text>
-                  <Text style={styles.streakLabel}>day streak</Text>
-                </View>
-              </View>
-            </GradientCard>
-          </View>
-        )}
+        {/* Hero rank card — Mashle mage lines */}
+        <ModuleRankCard
+          kicker="MAGE RANK"
+          rank={game.data?.rank}
+          nextRank={game.data?.nextRank}
+          progressPct={game.data?.progressPct ?? 0}
+          toNext={game.data?.toNext ?? 0}
+          unitLabel="vault XP"
+          subtitle={
+            game.data
+              ? `${game.data.vaultXp.toLocaleString()} Vault XP · 🔥 ${game.data.streak.count} day streak`
+              : undefined
+          }
+          accent={accent}
+          icon="flash"
+          onPress={() => router.push('/vault/ranks' as any)}
+        />
 
         {/* Hero month card */}
         <View style={{ marginHorizontal: 20 }}>

@@ -916,7 +916,38 @@ export interface SubscriptionsSummary {
 export interface VaultGame {
   vaultXp: number;
   title: string;
+  rank: { key: string; title: string; min: number; color: string };
+  nextRank: { key: string; title: string; min: number; color: string } | null;
+  progressPct: number;
+  toNext: number;
   streak: { count: number; longestStreak: number; lastActivityDate: string | null };
+}
+
+export interface ModuleRankInfo {
+  rank: { key: string; title: string; min: number; color: string };
+  nextRank: { key: string; title: string; min: number; color: string } | null;
+  score: number;
+  progressPct: number;
+  toNext: number;
+}
+
+export interface DojoRank extends ModuleRankInfo {
+  workoutCount: number;
+  prCount: number;
+}
+
+export interface ForgeRank extends ModuleRankInfo {
+  sessionCount: number;
+  shippedCount: number;
+}
+
+export interface SpiritRank extends ModuleRankInfo {
+  weightCount: number;
+  sleepCount: number;
+  wellnessCount: number;
+  habitCount: number;
+  fastCount: number;
+  stepGoalDays: number;
 }
 
 export interface VaultSettings {
@@ -940,19 +971,140 @@ export interface VaultTemplate {
   useCount: number;
 }
 
+export type QuestDifficulty = 'Trivial' | 'Normal' | 'Hard' | 'Boss';
+
+export type Recurrence =
+  | { kind: 'daily' }
+  | { kind: 'weekly'; daysOfWeek: number[] }
+  | { kind: 'monthly'; dayOfMonth: number }
+  | null;
+
+export interface QuestStep {
+  id: string;
+  questId: string;
+  label: string;
+  done: boolean;
+  doneAt: string | null;
+  orderIndex: number;
+}
+
 export interface Quest {
   id: string;
   title: string;
+  description: string | null;
   priority: Priority;
+  difficulty: QuestDifficulty | null;
   isDaily: boolean;
+  isBoss: boolean;
   completed: boolean;
   completedAt: string | null;
   dueDate: string | null;
+  remindAt: string | null;
   stars: number | null;
   notes: string | null;
+  estimatedMinutes: number | null;
+  actualMinutes: number | null;
   xpEarned: number;
+  displayOrder: number;
+  parentQuestId: string | null;
+  recurrence: Recurrence;
+  lastRolloverDate: string | null;
+  archivedAt: string | null;
+  templateId: string | null;
+  linkedModule: string | null;
+  linkedModuleId: string | null;
   createdAt: string;
   tags: Tag[];
+  steps?: QuestStep[];
+  stepCount?: number;
+  stepDoneCount?: number;
+}
+
+export interface QuestTemplate {
+  id: string;
+  name: string;
+  title: string;
+  priority: Priority;
+  difficulty: QuestDifficulty | null;
+  isDaily: boolean;
+  isBoss: boolean;
+  recurrence: Recurrence;
+  estimatedMinutes: number | null;
+  notes: string | null;
+  tagIds: string[];
+  stepLabels: string[];
+  useCount: number;
+  lastUsedAt: string | null;
+  createdAt: string;
+}
+
+export interface QuestActiveTimer {
+  id: string;
+  questId: string;
+  startedAt: string;
+  elapsedSec: number;
+  isRunning: boolean;
+}
+
+export interface QuestRank {
+  rank: { key: string; title: string; min: number; color: string };
+  nextRank: { key: string; title: string; min: number; color: string } | null;
+  completedCount: number;
+  sRankCount: number;
+  progressPct: number;
+  toNext: number;
+}
+
+export interface QuestCombo {
+  count: number;
+  comboActive: boolean;
+  windowEndsAt: string | null;
+}
+
+export interface QuestSettings {
+  id: string;
+  defaultPriority: Priority;
+  defaultTab: string;
+  autoArchiveDays: number;
+  reminderOffsetMinutes: number;
+  soundsEnabled: boolean;
+  comboEnabled: boolean;
+  penaltyEnabled: boolean;
+}
+
+export interface QuestChallenge {
+  id: string;
+  key: string;
+  title: string;
+  description: string | null;
+  period: 'weekly' | 'monthly';
+  target: number;
+  progress: number;
+  completed: boolean;
+  completedAt: string | null;
+  xpReward: number;
+  startsOn: string;
+  endsOn: string;
+}
+
+export interface QuestTodaysHunt {
+  items: Quest[];
+  perfectDayProgress: { total: number; done: number };
+}
+
+export interface QuestInsights {
+  heatmap: { date: string; value: number }[];
+  priorityMix: { label: string; value: number }[];
+  xpTrend: { date: string; value: number }[];
+  tagRates: { id: string; name: string; color: string; completed: number; created: number; rate: number }[];
+  hourMap: number[][];
+  accuracy: { estimated: number; actual: number }[];
+  weeklyReview: {
+    totalCompleted: number;
+    totalXp: number;
+    sRankCompleted: number;
+    topTag: { id: string; name: string; color: string; completed: number; created: number; rate: number } | null;
+  };
 }
 
 export interface Badge {

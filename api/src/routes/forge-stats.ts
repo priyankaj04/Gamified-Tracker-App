@@ -9,6 +9,7 @@ forgeStatsRouter.get('/weekly', asyncHandler(async (_req, res) => ok(res, await 
 forgeStatsRouter.get('/weekly-chart', asyncHandler(async (_req, res) => ok(res, await svc.weeklyChart())));
 forgeStatsRouter.get('/by-project', asyncHandler(async (_req, res) => ok(res, await svc.byProject())));
 forgeStatsRouter.get('/daily-goal', asyncHandler(async (_req, res) => ok(res, await svc.dailyGoal())));
+forgeStatsRouter.get('/rank', asyncHandler(async (_req, res) => ok(res, await svc.rank())));
 forgeStatsRouter.get(
   '/billable',
   asyncHandler(async (req, res) => {

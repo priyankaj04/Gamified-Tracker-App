@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import { awardXp, checkBadges, updateStreak } from './gamification';
-import { XP, vaultTitleFor } from '@/lib/xp';
+import { XP, getVaultRank as computeVaultRank } from '@/lib/xp';
 import { monthRange, todayISO, previousISO } from '@/lib/date';
 import type { TxType } from '@/types';
 
@@ -1592,9 +1592,14 @@ export const getVaultGame = async () => {
   vaultXp += (vaultBadges ?? [])
     .filter((b: any) => VAULT_BADGE_PREFIX.has(b.badge_id))
     .reduce((s: number, b: any) => s + (Number(b.xp_awarded) || 0), 0);
+  const prog = computeVaultRank(vaultXp);
   return {
     vaultXp,
-    title: vaultTitleFor(vaultXp),
+    title: prog.rank.title,
+    rank: prog.rank,
+    nextRank: prog.nextRank,
+    progressPct: prog.progressPct,
+    toNext: prog.toNext,
     streak: {
       count: streak?.count ?? 0,
       longestStreak: streak?.longest_streak ?? 0,

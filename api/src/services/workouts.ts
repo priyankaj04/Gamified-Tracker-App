@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import { awardXp, checkBadges, updateStreak } from './gamification';
-import { XP } from '@/lib/xp';
+import { XP, getDojoRank as computeDojoRank } from '@/lib/xp';
 import { todayISO } from '@/lib/date';
 import { getSettings, estimateOneRm } from './settings';
 import type { WorkoutType } from '@/types';
@@ -830,6 +830,19 @@ export const muscleStats = async (weeks = 4) => {
     volumePerWeek: s.volume / weeks,
   })).sort((a, b) => b.setsPerWeek - a.setsPerWeek);
   return { weeks, muscles };
+};
+
+export const getDojoRank = async () => {
+  const sb = supabase();
+  const [{ count: workoutCount }, { count: prCount }] = await Promise.all([
+    sb.from('workouts').select('id', { count: 'exact', head: true }),
+    sb.from('personal_records').select('id', { count: 'exact', head: true }),
+  ]);
+  const workouts = workoutCount ?? 0;
+  const prs = prCount ?? 0;
+  // PRs are rare and meaningful — count each as worth 3 workouts toward rank.
+  const score = workouts + prs * 3;
+  return { ...computeDojoRank(score), workoutCount: workouts, prCount: prs };
 };
 
 export const allTimeStats = async () => {

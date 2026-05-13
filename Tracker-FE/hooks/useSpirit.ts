@@ -7,6 +7,7 @@ import type {
   CompositionStats,
   DailyWellness,
   MeasurementsStats,
+  SpiritRank,
   StepLog,
   StepsStats,
   UserProfile,
@@ -35,7 +36,14 @@ export const spiritKeys = {
   stepsStats: ['spirit', 'steps', 'stats'] as const,
   score: ['spirit', 'wellness-score'] as const,
   scoreHistory: ['spirit', 'wellness-score', 'history'] as const,
+  rank: ['spirit', 'rank'] as const,
 };
+
+export const useSpiritRank = () =>
+  useQuery({
+    queryKey: spiritKeys.rank,
+    queryFn: () => api.get<{ data: SpiritRank }>('/spirit/rank').then(unwrap),
+  });
 
 // ─── Profile ────────────────────────────────────────────────
 export const useProfile = () =>
