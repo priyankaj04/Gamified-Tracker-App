@@ -18,6 +18,11 @@ interface AppState {
   hapticsEnabled: boolean;
   setHapticsEnabled: (v: boolean) => void;
 
+  bgmEnabled: boolean;
+  setBgmEnabled: (v: boolean) => void;
+  bgmVolume: number;
+  setBgmVolume: (v: number) => void;
+
   // Confetti trigger — increment to replay
   confettiTick: number;
   triggerConfetti: () => void;
@@ -56,6 +61,11 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       hapticsEnabled: true,
       setHapticsEnabled: (v) => set({ hapticsEnabled: v }),
+
+      bgmEnabled: true,
+      setBgmEnabled: (v) => set({ bgmEnabled: v }),
+      bgmVolume: 0.2,
+      setBgmVolume: (v) => set({ bgmVolume: Math.max(0, Math.min(1, v)) }),
 
       confettiTick: 0,
       triggerConfetti: () => set({ confettiTick: get().confettiTick + 1 }),
@@ -102,6 +112,8 @@ export const useAppStore = create<AppState>()(
       partialize: (s) => ({
         hapticsEnabled: s.hapticsEnabled,
         displayXp: s.displayXp,
+        bgmEnabled: s.bgmEnabled,
+        bgmVolume: s.bgmVolume,
       }),
     },
   ),

@@ -15,6 +15,8 @@ import { ConfettiHost } from '@/components/spirit/ConfettiHost';
 import { QuestStampHost } from '@/components/quests/QuestStamp';
 import { setupChannels } from '@/lib/notifications';
 import { runQuestStartupTasks } from '@/lib/questStartup';
+import { startBgm, stopBgm, setBgmEnabled, setBgmVolume } from '@/lib/bgm';
+import { useAppStore } from '@/store/useAppStore';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -33,10 +35,26 @@ const navTheme = {
 };
 
 export default function RootLayout() {
+  const bgmEnabled = useAppStore((s) => s.bgmEnabled);
+  const bgmVolume = useAppStore((s) => s.bgmVolume);
+
   useEffect(() => {
     setupChannels().catch(() => {});
     runQuestStartupTasks().catch(() => {});
+    startBgm({ enabled: bgmEnabled, volume: bgmVolume }).catch(() => {});
+    return () => {
+      stopBgm().catch(() => {});
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    setBgmEnabled(bgmEnabled).catch(() => {});
+  }, [bgmEnabled]);
+
+  useEffect(() => {
+    setBgmVolume(bgmVolume).catch(() => {});
+  }, [bgmVolume]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: palette.bg }}>
