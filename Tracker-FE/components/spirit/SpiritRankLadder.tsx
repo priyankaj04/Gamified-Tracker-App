@@ -1,8 +1,9 @@
 import React from 'react';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Platform, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { palette } from '@/lib/themes';
-import { CHAKRA_BADGE_IMAGES } from '@/lib/spiritBadges';
+import { palette, screenTheme, spiritText } from '@/lib/themes';
+import { SPIRIT_CHARACTER_BY_KEY } from '@/lib/spiritBadges';
 import type { ModuleRank } from '@/lib/xp';
 
 interface Props {
@@ -12,58 +13,124 @@ interface Props {
   unitLabel: string;
 }
 
+const SPIRIT_GREEN = screenTheme.spirit.accent;
+const DISPLAY_FONT = Platform.select({
+  ios: 'Avenir Next',
+  android: 'sans-serif-condensed',
+  default: 'System',
+});
+
 export function SpiritRankLadder({ ladder, score, currentKey, unitLabel }: Props) {
   return (
-    <View style={styles.grid}>
+    <View style={styles.list}>
       {ladder.map((r, idx) => {
         const unlocked = score >= r.min;
         const isCurrent = currentKey === r.key;
         const level = idx + 1;
-        const badge = CHAKRA_BADGE_IMAGES[r.key];
+        const character = SPIRIT_CHARACTER_BY_KEY[r.key];
+        const color = r.color;
+
         return (
           <View
             key={r.key}
             style={[
-              styles.tile,
-              { borderColor: unlocked ? r.color + '55' : palette.border },
+              styles.card,
+              { borderColor: unlocked ? SPIRIT_GREEN + '55' : palette.border },
               isCurrent && {
-                borderColor: r.color,
-                backgroundColor: r.color + '14',
-                shadowColor: r.color,
+                borderColor: color,
+                shadowColor: color,
                 shadowOpacity: 0.55,
               },
             ]}>
-            <View style={styles.badgeWrap}>
-              <Image
-                source={badge}
-                resizeMode="contain"
-                style={[
-                  styles.badgeImg,
-                  !unlocked && styles.badgeLocked,
-                ]}
-              />
-              {!unlocked && (
-                <View style={styles.lockOverlay}>
-                  <Ionicons name="lock-closed" size={18} color={palette.textDim} />
+            <LinearGradient
+              colors={
+                unlocked
+                  ? ['rgba(7,30,18,0.95)', 'rgba(7,16,12,0.95)']
+                  : ['rgba(20,20,28,0.85)', 'rgba(12,12,18,0.92)']
+              }
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={StyleSheet.absoluteFillObject}
+            />
+
+            <View style={styles.row}>
+              {/* LEFT — info */}
+              <View style={styles.info}>
+                <Text
+                  style={[styles.level, { color: unlocked ? color : spiritText.tertiary }]}>
+                  LEVEL {String(level).padStart(2, '0')}
+                </Text>
+                <Text
+                  style={[
+                    styles.name,
+                    { color: unlocked ? color : spiritText.secondary },
+                  ]}
+                  numberOfLines={2}>
+                  {character?.name ?? r.title}
+                </Text>
+                {character?.tagline ? (
+                  <Text style={styles.tagline} numberOfLines={1}>
+                    {character.tagline}
+                  </Text>
+                ) : null}
+
+                {character?.points ? (
+                  <View style={styles.points}>
+                    {character.points.map((p) => (
+                      <View key={p} style={styles.pointRow}>
+                        <View
+                          style={[
+                            styles.dot,
+                            { backgroundColor: unlocked ? color : spiritText.faint },
+                          ]}
+                        />
+                        <Text
+                          style={[
+                            styles.pointTxt,
+                            !unlocked && { color: spiritText.tertiary },
+                          ]}
+                          numberOfLines={1}>
+                          {p}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
+
+                <View style={styles.metaRow}>
+                  <Text style={styles.meta}>
+                    {r.min} {unitLabel}
+                  </Text>
+                  {isCurrent && (
+                    <View style={[styles.hereTag, { backgroundColor: color }]}>
+                      <Text style={styles.hereTxt}>YOU ARE HERE</Text>
+                    </View>
+                  )}
                 </View>
-              )}
-            </View>
-            <Text style={[styles.level, { color: isCurrent ? r.color : palette.textMuted }]}>
-              LEVEL {String(level).padStart(2, '0')}
-            </Text>
-            <Text
-              numberOfLines={1}
-              style={[styles.title, { color: unlocked ? r.color : palette.textMuted }]}>
-              {r.title}
-            </Text>
-            <Text style={styles.sub}>
-              {r.min} {unitLabel}
-            </Text>
-            {isCurrent && (
-              <View style={[styles.hereTag, { backgroundColor: r.color }]}>
-                <Text style={styles.hereTxt}>YOU ARE HERE</Text>
               </View>
-            )}
+
+              {/* RIGHT — character art, flush */}
+              <View style={styles.artWrap}>
+                <LinearGradient
+                  colors={[SPIRIT_GREEN + '22', 'transparent']}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
+                  style={StyleSheet.absoluteFillObject}
+                />
+                {character?.image ? (
+                  <Image
+                    source={character.image}
+                    resizeMode="cover"
+                    style={[styles.art, !unlocked && styles.artLocked]}
+                  />
+                ) : null}
+                {!unlocked && (
+                  <View style={styles.lockOverlay}>
+                    <Ionicons name="lock-closed" size={22} color={palette.textDim} />
+                  </View>
+                )}
+              </View>
+            </View>
           </View>
         );
       })}
@@ -72,72 +139,125 @@ export function SpiritRankLadder({ ladder, score, currentKey, unitLabel }: Props
 }
 
 const styles = StyleSheet.create({
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 16,
+  list: {
+    paddingHorizontal: 20,
     gap: 10,
   },
-  tile: {
-    width: '47.5%',
+  card: {
     backgroundColor: palette.card,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    paddingTop: 10,
-    paddingBottom: 12,
-    paddingHorizontal: 10,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.4,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
-  },
-  badgeWrap: {
-    width: 96,
-    height: 96,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badgeImg: { width: '100%', height: '100%' },
-  badgeLocked: { opacity: 0.25 },
-  lockOverlay: {
-    position: 'absolute',
-    width: 32,
-    height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(7,7,16,0.85)',
-    alignItems: 'center',
+    borderWidth: 1.5,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.45,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 5,
+  },
+  row: {
+    flexDirection: 'row',
+    minHeight: 140,
+    alignItems: 'stretch',
+  },
+  info: {
+    flex: 1,
+    paddingTop: 14,
+    paddingBottom: 14,
+    paddingLeft: 14,
+    paddingRight: 8,
     justifyContent: 'center',
+    gap: 3,
   },
   level: {
     fontSize: 10,
     fontWeight: '900',
-    letterSpacing: 1.4,
-    marginTop: 4,
+    letterSpacing: 2.2,
   },
-  title: {
-    fontSize: 13,
+  name: {
+    fontFamily: DISPLAY_FONT,
+    fontSize: 18,
     fontWeight: '900',
+    fontStyle: 'italic',
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
     marginTop: 2,
-    textAlign: 'center',
+    textShadowColor: 'rgba(0,0,0,0.85)',
+    textShadowRadius: 6,
+    textShadowOffset: { width: 0, height: 1 },
   },
-  sub: {
-    color: palette.textMuted,
+  tagline: {
+    color: spiritText.secondary,
+    fontFamily: DISPLAY_FONT,
+    fontStyle: 'italic',
     fontSize: 10,
     fontWeight: '700',
+    letterSpacing: 0.3,
+    marginTop: 2,
+    marginBottom: 4,
+  },
+  points: {
+    gap: 3,
     marginTop: 2,
   },
-  hereTag: {
+  pointRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 7,
+  },
+  dot: {
+    width: 4,
+    height: 4,
+    borderRadius: 2,
+  },
+  pointTxt: {
+    color: spiritText.primary,
+    fontSize: 10.5,
+    fontWeight: '700',
+    flexShrink: 1,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
     marginTop: 8,
+  },
+  meta: {
+    color: spiritText.tertiary,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  hereTag: {
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 999,
   },
   hereTxt: {
     color: '#0b0b14',
-    fontSize: 9,
+    fontSize: 8.5,
     fontWeight: '900',
     letterSpacing: 1,
+  },
+  artWrap: {
+    width: 120,
+    alignSelf: 'stretch',
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  art: {
+    width: '100%',
+    height: '100%',
+  },
+  artLocked: { opacity: 0.25 },
+  lockOverlay: {
+    position: 'absolute',
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: 'rgba(7,7,16,0.85)',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

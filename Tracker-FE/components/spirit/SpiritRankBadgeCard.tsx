@@ -1,9 +1,9 @@
 import React from 'react';
-import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
-import { palette } from '@/lib/themes';
-import { CHAKRA_BADGE_IMAGES } from '@/lib/spiritBadges';
+import { palette, screenTheme, spiritText } from '@/lib/themes';
+import { SPIRIT_CHARACTER_BY_KEY } from '@/lib/spiritBadges';
 import { CHAKRA_RANKS, type ModuleRank } from '@/lib/xp';
 
 interface Props {
@@ -18,6 +18,13 @@ interface Props {
   right?: React.ReactNode;
 }
 
+const SPIRIT_GREEN = screenTheme.spirit.accent;
+const DISPLAY_FONT = Platform.select({
+  ios: 'Avenir Next',
+  android: 'sans-serif-condensed',
+  default: 'System',
+});
+
 export function SpiritRankBadgeCard({
   rank,
   nextRank,
@@ -30,33 +37,65 @@ export function SpiritRankBadgeCard({
   right,
 }: Props) {
   const color = rank?.color ?? accent;
-  const badge = rank?.key ? CHAKRA_BADGE_IMAGES[rank.key] : undefined;
+  const character = rank?.key ? SPIRIT_CHARACTER_BY_KEY[rank.key] : undefined;
+  console.log('Rendering SpiritRankBadgeCard with rank:', rank?.key, 'character:', rank);
   const levelIdx = rank ? CHAKRA_RANKS.findIndex((r) => r.key === rank.key) : -1;
   const level = levelIdx >= 0 ? levelIdx + 1 : null;
   const Wrap: any = onPress ? Pressable : View;
 
   return (
-    <Wrap onPress={onPress} style={[styles.card]}>
-      <ImageBackground
-        source={badge}
-        resizeMode="contain"
-        style={styles.hero}
-        imageStyle={styles.heroImg}>
-        <LinearGradient
-          colors={['rgba(7,7,16,0)', 'rgba(7,7,16,0.35)', 'rgba(7,7,16,0.95)']}
-          locations={[0, 0.55, 1]}
-          style={StyleSheet.absoluteFillObject}
-        />
-        {right ? <View style={styles.heroRight}>{right}</View> : null}
-        <View style={styles.heroFoot}>
+    <Wrap onPress={onPress} style={[styles.card, { borderColor: SPIRIT_GREEN + '55' }]}>
+      <LinearGradient
+        colors={['rgba(7,30,18,0.95)', 'rgba(7,16,12,0.95)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFillObject}
+      />
+
+      <View style={styles.hero}>
+        {/* LEFT — info */}
+        <View style={styles.info}>
           {level != null && (
             <Text style={[styles.level, { color }]}>LEVEL {String(level).padStart(2, '0')}</Text>
           )}
-          <Text style={[styles.title, { color }]} numberOfLines={1}>
-            {rank?.title ?? '—'}
+          <Text style={[styles.name, { color }]} numberOfLines={2}>
+            {character?.name ?? rank?.title ?? '—'}
           </Text>
+          {character?.tagline ? (
+            <Text style={styles.tagline} numberOfLines={1}>
+              {character.tagline}
+            </Text>
+          ) : null}
+
+          {character?.points ? (
+            <View style={styles.points}>
+              {character.points.map((p) => (
+                <View key={p} style={styles.pointRow}>
+                  <View style={[styles.dot, { backgroundColor: color }]} />
+                  <Text style={styles.pointTxt} numberOfLines={1}>
+                    {p}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ) : null}
         </View>
-      </ImageBackground>
+
+        {/* RIGHT — character art, flush to the edge */}
+        <View style={styles.artWrap}>
+          <LinearGradient
+            colors={[SPIRIT_GREEN + '22', 'transparent']}
+            start={{ x: 0, y: 0.5 }}
+            end={{ x: 1, y: 0.5 }}
+            style={StyleSheet.absoluteFillObject}
+          />
+          {character?.image ? (
+            <Image source={character.image} resizeMode="cover" style={styles.art} />
+          ) : null}
+        </View>
+
+        {right ? <View style={styles.heroRight}>{right}</View> : null}
+      </View>
 
       <View style={styles.body}>
         {subtitle ? <Text style={styles.sub}>{subtitle}</Text> : null}
@@ -68,10 +107,8 @@ export function SpiritRankBadgeCard({
           </View>
           <View style={[styles.divider, { backgroundColor: color + '33' }]} />
           <View style={styles.metaCol}>
-            <Text style={styles.metaLabel}>
-              {nextRank ? 'To Next Rank' : 'Status'}
-            </Text>
-            <Text style={[styles.metaValue, { color: nextRank ? color : color }]}>
+            <Text style={styles.metaLabel}>{nextRank ? 'To Next Rank' : 'Status'}</Text>
+            <Text style={[styles.metaValue, { color }]}>
               {nextRank ? `${toNext} logs` : 'MAXED'}
             </Text>
           </View>
@@ -110,8 +147,7 @@ export function SpiritRankBadgeCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: palette.card,
-    borderBottomLeftRadius: 18,
-    borderBottomRightRadius: 18,
+    borderRadius: 18,
     borderWidth: 1.5,
     marginHorizontal: 20,
     marginBottom: 12,
@@ -123,49 +159,93 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   hero: {
-    height: 90,
-    width: '100%',
-    justifyContent: 'flex-end',
-    backgroundColor: 'rgba(7,7,16,0.55)',
+    flexDirection: 'row',
+    minHeight: 160,
+    alignItems: 'stretch',
   },
-  heroImg: {
-    opacity: 0.95,
-    alignSelf: 'center',
+  info: {
+    flex: 1,
+    paddingTop: 16,
+    paddingBottom: 16,
+    paddingLeft: 16,
+    paddingRight: 8,
+    justifyContent: 'center',
+    gap: 4,
+  },
+  level: {
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 2.4,
+    textShadowColor: 'rgba(0,0,0,0.85)',
+    textShadowRadius: 6,
+    textShadowOffset: { width: 0, height: 1 },
+  },
+  name: {
+    fontFamily: DISPLAY_FONT,
+    fontSize: 22,
+    fontWeight: '900',
+    fontStyle: 'italic',
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    marginTop: 2,
+    textShadowColor: 'rgba(0,0,0,0.85)',
+    textShadowRadius: 8,
+    textShadowOffset: { width: 0, height: 2 },
+  },
+  tagline: {
+    color: spiritText.secondary,
+    fontFamily: DISPLAY_FONT,
+    fontStyle: 'italic',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 0.4,
+    marginTop: 2,
+    marginBottom: 6,
+  },
+  points: {
+    gap: 4,
+    marginTop: 4,
+  },
+  pointRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+  },
+  pointTxt: {
+    color: spiritText.primary,
+    fontSize: 11,
+    fontWeight: '700',
+    flexShrink: 1,
+  },
+  artWrap: {
+    width: 140,
+    alignSelf: 'stretch',
+    overflow: 'hidden',
+  },
+  art: {
+    width: '100%',
+    height: '100%',
   },
   heroRight: {
     position: 'absolute',
     top: 12,
     right: 12,
   },
-  heroFoot: {
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-  },
-  level: {
-    fontSize: 10,
-    fontWeight: '900',
-    letterSpacing: 2,
-    textShadowColor: 'rgba(0,0,0,0.85)',
-    textShadowRadius: 6,
-    textShadowOffset: { width: 0, height: 1 },
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '900',
-    letterSpacing: -0.3,
-    marginTop: 2,
-    textShadowColor: 'rgba(0,0,0,0.85)',
-    textShadowRadius: 8,
-    textShadowOffset: { width: 0, height: 2 },
-  },
   body: {
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 14,
     gap: 10,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255,255,255,0.06)',
   },
   sub: {
-    color: palette.textMuted,
+    color: spiritText.secondary,
     fontSize: 11,
     fontWeight: '700',
   },
@@ -175,7 +255,7 @@ const styles = StyleSheet.create({
   },
   metaCol: { flex: 1 },
   metaLabel: {
-    color: palette.textMuted,
+    color: spiritText.secondary,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 1,
@@ -200,7 +280,7 @@ const styles = StyleSheet.create({
   },
   barFill: { height: '100%', borderRadius: 3 },
   barTxt: {
-    color: palette.textMuted,
+    color: spiritText.secondary,
     fontSize: 11,
     fontWeight: '800',
   },
