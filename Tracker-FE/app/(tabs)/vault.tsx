@@ -52,7 +52,7 @@ import {
   ColoredPill,
   VAULT_COLORS,
 } from '../vault/_components';
-import { ModuleRankCard } from '@/components/gamification/ModuleRankCard';
+import { VaultRankBadgeCard } from '@/components/vault/VaultRankBadgeCard';
 
 const HUB_TILES: {
   key: string;
@@ -182,21 +182,19 @@ export default function VaultScreen() {
           right={<Ionicons name="wallet" size={26} color={accent} />}
         />
 
-        {/* Hero rank card — Mashle mage lines */}
-        <ModuleRankCard
-          kicker="MAGE RANK"
+        {/* Hero rank card — Mashle character ladder */}
+        <VaultRankBadgeCard
           rank={game.data?.rank}
           nextRank={game.data?.nextRank}
+          score={game.data?.vaultXp ?? 0}
           progressPct={game.data?.progressPct ?? 0}
           toNext={game.data?.toNext ?? 0}
-          unitLabel="vault XP"
           subtitle={
             game.data
               ? `${game.data.vaultXp.toLocaleString()} Vault XP · 🔥 ${game.data.streak.count} day streak`
               : undefined
           }
           accent={accent}
-          icon="flash"
           onPress={() => router.push('/vault/ranks' as any)}
         />
 

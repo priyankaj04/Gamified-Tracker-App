@@ -46,7 +46,7 @@ export default function SpiritRanksScreen() {
           }
         />
 
-        <View style={styles.formula}>
+        <View style={{...styles.formula, ...styles.card}}>
           <Text style={styles.formulaTxt}>
             Score = habits + sleep + weigh-ins + check-ins + step-goal days + completed fasts × 3.
           </Text>
@@ -75,4 +75,18 @@ const styles = StyleSheet.create({
   },
   formula: { paddingHorizontal: 20, marginTop: 16 },
   formulaTxt: { color: palette.textMuted, fontSize: 12, fontStyle: 'italic' },
+  card: {
+    backgroundColor: palette.bg + 'aa',
+    borderRadius: 5,
+    borderWidth: 1.5,
+    marginHorizontal: 20,
+    marginBottom: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOpacity: 0.5,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
+    padding: 4
+  },
 });

@@ -77,6 +77,14 @@ export const spiritText = {
   faint: 'rgba(255, 255, 255, 0.38)',
 };
 
+// Vault text tokens — white-on-amber, same descending-opacity ladder as Spirit.
+export const vaultText = {
+  primary: '#ffffff',
+  secondary: 'rgba(255, 255, 255, 0.78)',
+  tertiary: 'rgba(255, 255, 255, 0.58)',
+  faint: 'rgba(255, 255, 255, 0.38)',
+};
+
 export const rarityColor = {
   Common: '#94a3b8',
   Rare: '#22d3ee',

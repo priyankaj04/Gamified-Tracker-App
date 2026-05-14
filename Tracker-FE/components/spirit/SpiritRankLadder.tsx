@@ -111,12 +111,6 @@ export function SpiritRankLadder({ ladder, score, currentKey, unitLabel }: Props
 
               {/* RIGHT — character art, flush */}
               <View style={styles.artWrap}>
-                <LinearGradient
-                  colors={[SPIRIT_GREEN + '22', 'transparent']}
-                  start={{ x: 0, y: 0.5 }}
-                  end={{ x: 1, y: 0.5 }}
-                  style={StyleSheet.absoluteFillObject}
-                />
                 {character?.image ? (
                   <Image
                     source={character.image}
@@ -144,7 +138,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   card: {
-    backgroundColor: palette.card,
+    backgroundColor: palette.bg + 'aa',
+    height: 200,
     borderRadius: 16,
     borderWidth: 1.5,
     overflow: 'hidden',
@@ -240,7 +235,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   artWrap: {
-    width: 120,
+    width: 180,
     alignSelf: 'stretch',
     overflow: 'hidden',
     alignItems: 'center',

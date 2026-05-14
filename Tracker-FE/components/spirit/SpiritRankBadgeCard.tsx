@@ -44,7 +44,7 @@ export function SpiritRankBadgeCard({
   const Wrap: any = onPress ? Pressable : View;
 
   return (
-    <Wrap onPress={onPress} style={[styles.card, { borderColor: SPIRIT_GREEN + '55' }]}>
+    <Wrap onPress={onPress} style={[styles.card, { borderColor: SPIRIT_GREEN + '55', height: 210 }]}>
       <LinearGradient
         colors={['rgba(7,30,18,0.95)', 'rgba(7,16,12,0.95)']}
         start={{ x: 0, y: 0 }}
@@ -83,12 +83,6 @@ export function SpiritRankBadgeCard({
 
         {/* RIGHT — character art, flush to the edge */}
         <View style={styles.artWrap}>
-          <LinearGradient
-            colors={[SPIRIT_GREEN + '22', 'transparent']}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
-            style={StyleSheet.absoluteFillObject}
-          />
           {character?.image ? (
             <Image source={character.image} resizeMode="cover" style={styles.art} />
           ) : null}
@@ -146,7 +140,7 @@ export function SpiritRankBadgeCard({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: palette.card,
+    backgroundColor: palette.bg + 'aa',
     borderRadius: 18,
     borderWidth: 1.5,
     marginHorizontal: 20,
@@ -223,7 +217,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   artWrap: {
-    width: 140,
+    width: 180,
     alignSelf: 'stretch',
     overflow: 'hidden',
   },

@@ -156,13 +156,18 @@ export const CHAKRA_RANKS: ModuleRank[] = [
   { key: 'naruto',     title: 'Naruto Uzumaki',    min: 2500, color: '#fbbf24' },
 ];
 
+// Vault ladder — Mashle: Muscle and Magic top-tier list. Climb from Adam Jobs
+// (#10, entry) to Mash Burnedead (#1, apex). Colors lean into the vault gold
+// palette, with the final ranks shining in legendary gold/fuchsia.
 export const MAGE_RANKS: ModuleRank[] = [
-  { key: 'wandless',   title: 'Wandless',          min: 0,     color: '#94a3b8' },
-  { key: 'apprentice', title: 'Wand Apprentice',   min: 250,   color: '#a3a3a3' },
-  { key: 'one_line',   title: 'One-Line Mage',     min: 1000,  color: '#86efac' },
-  { key: 'two_line',   title: 'Two-Line Mage',     min: 2500,  color: '#22d3ee' },
-  { key: 'three_line', title: 'Three-Line Mage',   min: 6000,  color: '#a78bfa' },
-  { key: 'four_line',  title: 'Magia Lupus',       min: 12000, color: '#f59e0b' },
-  { key: 'five_line',  title: 'Divine Visionary',  min: 25000, color: '#fb7185' },
-  { key: 'mash',       title: 'Magic Realm Boss',  min: 60000, color: '#facc15' },
+  { key: 'adam',          title: 'Adam Jobs',        min: 0,      color: '#fffd9c' },
+  { key: 'kaldo',         title: 'Kaldo Gehenna',    min: 250,    color: '#ffea95' },
+  { key: 'orter',         title: 'Orter Mádl',       min: 750,    color: '#fcd34d' },
+  { key: 'ryoh',          title: 'Ryoh Grantz',      min: 1500,   color: '#fbbf24' },
+  { key: 'wahlberg',      title: 'Wahlberg Baigan',  min: 3000,   color: '#f59e0b' },
+  { key: 'lance',         title: 'Lance Crown',      min: 6000,   color: '#f97316' },
+  { key: 'rayne',         title: 'Rayne Ames',       min: 12000,  color: '#fb7185' },
+  { key: 'doom',          title: 'Doom',             min: 25000,  color: '#ef4444' },
+  { key: 'innocent_zero', title: 'Innocent Zero',    min: 50000,  color: '#a855f7' },
+  { key: 'mash',          title: 'Mash Burnedead',   min: 100000, color: '#facc15' },
 ];

@@ -212,7 +212,7 @@ export const CHAKRA_RANKS: ModuleRank[] = [
 // Vault — Mashle: Muscle and Magic. Climb the top-10 power list from Adam Jobs
 // (#10, entry) to Mash Burnedead (#1, apex). Kept in sync with the FE ladder.
 export const MAGE_RANKS: ModuleRank[] = [
-  { key: 'adam',          title: 'Adam Jobs',        min: 0,      color: '#d4d4d8' },
+  { key: 'adam',          title: 'Adam Jobs',        min: 0,      color: '#fffd9c' },
   { key: 'kaldo',         title: 'Kaldo Gehenna',    min: 250,    color: '#fde68a' },
   { key: 'orter',         title: 'Orter Mádl',       min: 750,    color: '#fcd34d' },
   { key: 'ryoh',          title: 'Ryoh Grantz',      min: 1500,   color: '#fbbf24' },
