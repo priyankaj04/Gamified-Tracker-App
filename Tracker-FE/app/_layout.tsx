@@ -174,6 +174,10 @@ export default function RootLayout() {
             <Stack.Screen name="quest/calendar" options={{ headerShown: false }} />
             <Stack.Screen name="quest/challenges" options={{ headerShown: false }} />
             <Stack.Screen name="quest/settings" options={{ headerShown: false }} />
+            <Stack.Screen name="dashboard/ranks" options={{ headerShown: false }} />
+            <Stack.Screen name="spirit/ranks" options={{ headerShown: false }} />
+            <Stack.Screen name="vault/ranks" options={{ headerShown: false }} />
+            <Stack.Screen name="forge/ranks" options={{ headerShown: false }} />
           </Stack>
           <XPPopupHost />
           <BadgeUnlockHost />

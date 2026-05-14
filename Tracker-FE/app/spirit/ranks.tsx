@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 
 import { palette, screenTheme } from '@/lib/themes';
 import { ThemedScene } from '@/components/layout/ThemedScene';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
 import { SpiritRankBadgeCard } from '@/components/spirit/SpiritRankBadgeCard';
 import { SpiritRankLadder } from '@/components/spirit/SpiritRankLadder';
@@ -14,16 +15,29 @@ import { CHAKRA_RANKS } from '@/lib/xp';
 export default function SpiritRanksScreen() {
   const router = useRouter();
   const accent = screenTheme.spirit.accent;
+  const accent2 = screenTheme.spirit.accent2;
   const rankQ = useSpiritRank();
   const rank = rankQ.data;
 
   return (
     <ThemedScene scene="spirit">
       <ScrollView
-        contentContainerStyle={{ paddingTop: 48, paddingBottom: 60 }}
+        contentContainerStyle={{ paddingBottom: 60 }}
         refreshControl={
           <RefreshControl tintColor={accent} refreshing={rankQ.isFetching} onRefresh={() => rankQ.refetch()} />
         }>
+        <PageHeader
+          title="Hidden Leaf"
+          subtitle="Train. Endure. Awaken."
+          accent={accent}
+          accent2={accent2}
+          right={
+            <Pressable hitSlop={8} onPress={() => router.back()}>
+              <Ionicons name="close" size={26} color={accent} />
+            </Pressable>
+          }
+        />
+
         <SpiritRankBadgeCard
           rank={rank?.rank}
           nextRank={rank?.nextRank}
@@ -36,17 +50,9 @@ export default function SpiritRanksScreen() {
               : undefined
           }
           accent={accent}
-          right={
-            <Pressable
-              hitSlop={8}
-              onPress={() => router.back()}
-              style={styles.closeBtn}>
-              <Ionicons name="close" size={20} color="#fff" />
-            </Pressable>
-          }
         />
 
-        <View style={{...styles.formula, ...styles.card}}>
+        <View style={{ ...styles.formula, ...styles.card }}>
           <Text style={styles.formulaTxt}>
             Score = habits + sleep + weigh-ins + check-ins + step-goal days + completed fasts × 3.
           </Text>
@@ -65,14 +71,6 @@ export default function SpiritRanksScreen() {
 }
 
 const styles = StyleSheet.create({
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(7,7,16,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   formula: { paddingHorizontal: 20, marginTop: 16 },
   formulaTxt: { color: palette.textMuted, fontSize: 12, fontStyle: 'italic' },
   card: {
@@ -87,6 +85,6 @@ const styles = StyleSheet.create({
     shadowRadius: 14,
     shadowOffset: { width: 0, height: 6 },
     elevation: 6,
-    padding: 4
+    padding: 4,
   },
 });

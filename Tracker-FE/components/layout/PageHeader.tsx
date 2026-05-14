@@ -18,16 +18,7 @@ interface Props {
 export function PageHeader({ title, subtitle, accent, accent2, right, style, tall = true }: Props) {
   return (
     <View style={[styles.wrap, tall && styles.tall, style]}>
-      <LinearGradient
-        colors={[
-          'transparent',
-          'transparent',
-          'rgba(7, 7, 16, 0.35)',
-          (accent2 ?? accent) + '33',
-        ]}
-        locations={[0, 0.55, 0.85, 1]}
-        style={StyleSheet.absoluteFillObject}
-      />
+      
       <View style={styles.row}>
         <View style={{ flex: 1 }}>
           {subtitle && (
@@ -65,7 +56,7 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 0 },
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '900',
     color: palette.text,
     letterSpacing: -0.5,

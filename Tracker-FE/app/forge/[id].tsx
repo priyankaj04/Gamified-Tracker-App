@@ -14,6 +14,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { palette, priorityColor, screenTheme } from '@/lib/themes';
 import { ThemedScene } from '@/components/layout/ThemedScene';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { StarRating } from '@/components/gamification/StarRating';
 import { TechTag } from '@/components/forge/TechTag';
 import { MilestoneRow } from '@/components/forge/MilestoneRow';
@@ -130,17 +131,22 @@ export default function ProjectDetail() {
   return (
     <ThemedScene scene="forge" dim={0.78}>
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* Top bar */}
-        <View style={styles.topBar}>
-          <Pressable onPress={() => router.back()} hitSlop={8} style={styles.iconBtn}>
-            <Ionicons name="chevron-back" size={22} color={accent} />
-          </Pressable>
-          <View style={styles.subRow}>
-            <Pressable onPress={() => togglePin.mutate(p.id)} hitSlop={6} style={styles.iconBtn}>
-              <Ionicons name={p.isPinned ? 'pin' : 'pin-outline'} size={18} color={accent} />
-            </Pressable>
-          </View>
-        </View>
+        <PageHeader
+          title="Project"
+          subtitle="Forge Build"
+          accent={accent}
+          accent2={accent2}
+          right={
+            <View style={styles.subRow}>
+              <Pressable onPress={() => togglePin.mutate(p.id)} hitSlop={8}>
+                <Ionicons name={p.isPinned ? 'pin' : 'pin-outline'} size={22} color={accent} />
+              </Pressable>
+              <Pressable onPress={() => router.back()} hitSlop={8}>
+                <Ionicons name="close" size={26} color={accent} />
+              </Pressable>
+            </View>
+          }
+        />
 
         {/* Hero card */}
         <View style={[styles.hero, { borderColor: cardAccent + '66' }]}>
@@ -720,25 +726,7 @@ function LinkPill({
 
 const styles = StyleSheet.create({
   center: { flex: 1, backgroundColor: palette.bg, alignItems: 'center', justifyContent: 'center' },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 6,
-  },
-  subRow: { flexDirection: 'row', gap: 6 },
-  iconBtn: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: palette.card,
-    borderWidth: 1,
-    borderColor: palette.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  subRow: { flexDirection: 'row', alignItems: 'center', gap: 14 },
 
   // Hero
   hero: {

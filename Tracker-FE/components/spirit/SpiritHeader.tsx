@@ -34,16 +34,6 @@ export function SpiritHeader({
   const router = useRouter();
   return (
     <View style={[styles.wrap, compact && styles.wrapCompact, style]}>
-      <LinearGradient
-        colors={[
-          'rgba(7, 7, 16, 0.55)',
-          'rgba(7, 7, 16, 0.35)',
-          (accent2 ?? accent) + '22',
-          (accent2 ?? accent) + '55',
-        ]}
-        locations={[0, 0.4, 0.8, 1]}
-        style={StyleSheet.absoluteFillObject}
-      />
       {particles && <ParticleField color={accent} count={particleCount} height={compact ? 160 : 220} />}
       <View style={styles.row}>
         {back && (

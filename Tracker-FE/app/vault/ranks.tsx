@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 
 import { palette, screenTheme } from '@/lib/themes';
 import { ThemedScene } from '@/components/layout/ThemedScene';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
 import { VaultRankBadgeCard } from '@/components/vault/VaultRankBadgeCard';
 import { VaultRankLadder } from '@/components/vault/VaultRankLadder';
@@ -14,16 +15,29 @@ import { MAGE_RANKS } from '@/lib/xp';
 export default function VaultRanksScreen() {
   const router = useRouter();
   const accent = screenTheme.vault.accent;
+  const accent2 = screenTheme.vault.accent2;
   const gameQ = useVaultGame();
   const game = gameQ.data;
 
   return (
     <ThemedScene scene="vault">
       <ScrollView
-        contentContainerStyle={{ paddingTop: 48, paddingBottom: 60 }}
+        contentContainerStyle={{ paddingBottom: 60 }}
         refreshControl={
           <RefreshControl tintColor={accent} refreshing={gameQ.isFetching} onRefresh={() => gameQ.refetch()} />
         }>
+        <PageHeader
+          title="Mage's Ledger"
+          subtitle="Save. Stack. Etch the lines."
+          accent={accent}
+          accent2={accent2}
+          right={
+            <Pressable hitSlop={8} onPress={() => router.back()}>
+              <Ionicons name="close" size={26} color={accent} />
+            </Pressable>
+          }
+        />
+
         <VaultRankBadgeCard
           rank={game?.rank}
           nextRank={game?.nextRank}
@@ -36,14 +50,6 @@ export default function VaultRanksScreen() {
               : undefined
           }
           accent={accent}
-          right={
-            <Pressable
-              hitSlop={8}
-              onPress={() => router.back()}
-              style={styles.closeBtn}>
-              <Ionicons name="close" size={20} color="#fff" />
-            </Pressable>
-          }
         />
 
         <View style={{ ...styles.formula, ...styles.card }}>
@@ -65,14 +71,6 @@ export default function VaultRanksScreen() {
 }
 
 const styles = StyleSheet.create({
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(7,7,16,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   formula: { paddingHorizontal: 20, marginTop: 16 },
   formulaTxt: { color: palette.textMuted, fontSize: 12, fontStyle: 'italic' },
   card: {

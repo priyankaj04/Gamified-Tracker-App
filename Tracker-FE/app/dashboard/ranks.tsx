@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 
 import { palette, screenTheme } from '@/lib/themes';
 import { ThemedScene } from '@/components/layout/ThemedScene';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
 import { DashboardRankBadgeCard } from '@/components/dashboard/DashboardRankBadgeCard';
 import { DashboardRankLadder } from '@/components/dashboard/DashboardRankLadder';
@@ -14,6 +15,7 @@ import { getDashboardRank, SOLO_LEVELING_RANKS } from '@/lib/xp';
 export default function DashboardRanksScreen() {
   const router = useRouter();
   const accent = screenTheme.dashboard.accent;
+  const accent2 = screenTheme.dashboard.accent2;
   const gameQ = useGameState();
   const totalXp = gameQ.data?.totalXp ?? 0;
   const rank = getDashboardRank(totalXp);
@@ -21,7 +23,7 @@ export default function DashboardRanksScreen() {
   return (
     <ThemedScene scene="dashboard">
       <ScrollView
-        contentContainerStyle={{ paddingTop: 48, paddingBottom: 60 }}
+        contentContainerStyle={{ paddingBottom: 60 }}
         refreshControl={
           <RefreshControl
             tintColor={accent}
@@ -29,6 +31,18 @@ export default function DashboardRanksScreen() {
             onRefresh={() => gameQ.refetch()}
           />
         }>
+        <PageHeader
+          title="Shadow Monarch"
+          subtitle="Arise. Stack. Ascend."
+          accent={accent}
+          accent2={accent2}
+          right={
+            <Pressable hitSlop={8} onPress={() => router.back()}>
+              <Ionicons name="close" size={26} color={accent} />
+            </Pressable>
+          }
+        />
+
         <DashboardRankBadgeCard
           totalXp={totalXp}
           subtitle={
@@ -37,11 +51,6 @@ export default function DashboardRanksScreen() {
               : undefined
           }
           accent={accent}
-          right={
-            <Pressable hitSlop={8} onPress={() => router.back()} style={styles.closeBtn}>
-              <Ionicons name="close" size={20} color="#fff" />
-            </Pressable>
-          }
         />
 
         <View style={{ ...styles.formula, ...styles.card }}>
@@ -63,14 +72,6 @@ export default function DashboardRanksScreen() {
 }
 
 const styles = StyleSheet.create({
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(7,7,16,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   formula: { paddingHorizontal: 20, marginTop: 16 },
   formulaTxt: { color: palette.textMuted, fontSize: 12, fontStyle: 'italic' },
   card: {

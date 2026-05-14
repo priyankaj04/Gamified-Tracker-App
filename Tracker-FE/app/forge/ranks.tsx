@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 
 import { palette, screenTheme } from '@/lib/themes';
 import { ThemedScene } from '@/components/layout/ThemedScene';
+import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
 import { ForgeRankBadgeCard } from '@/components/forge/ForgeRankBadgeCard';
 import { ForgeRankLadder } from '@/components/forge/ForgeRankLadder';
@@ -14,16 +15,29 @@ import { BLUE_LOCK_RANKS } from '@/lib/xp';
 export default function ForgeRanksScreen() {
   const router = useRouter();
   const accent = screenTheme.forge.accent;
+  const accent2 = screenTheme.forge.accent2;
   const rankQ = useForgeRank();
   const rank = rankQ.data;
 
   return (
     <ThemedScene scene="forge">
       <ScrollView
-        contentContainerStyle={{ paddingTop: 48, paddingBottom: 60 }}
+        contentContainerStyle={{ paddingBottom: 60 }}
         refreshControl={
           <RefreshControl tintColor={accent} refreshing={rankQ.isFetching} onRefresh={() => rankQ.refetch()} />
         }>
+        <PageHeader
+          title="Blue Lock"
+          subtitle="Devour. Ship. Dominate."
+          accent={accent}
+          accent2={accent2}
+          right={
+            <Pressable hitSlop={8} onPress={() => router.back()}>
+              <Ionicons name="close" size={26} color={accent} />
+            </Pressable>
+          }
+        />
+
         <ForgeRankBadgeCard
           rank={rank?.rank}
           nextRank={rank?.nextRank}
@@ -36,14 +50,6 @@ export default function ForgeRanksScreen() {
               : undefined
           }
           accent={accent}
-          right={
-            <Pressable
-              hitSlop={8}
-              onPress={() => router.back()}
-              style={styles.closeBtn}>
-              <Ionicons name="close" size={20} color="#fff" />
-            </Pressable>
-          }
         />
 
         <View style={{ ...styles.formula, ...styles.card }}>
@@ -65,14 +71,6 @@ export default function ForgeRanksScreen() {
 }
 
 const styles = StyleSheet.create({
-  closeBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(7,7,16,0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   formula: { paddingHorizontal: 20, marginTop: 16 },
   formulaTxt: { color: palette.textMuted, fontSize: 12, fontStyle: 'italic' },
   card: {

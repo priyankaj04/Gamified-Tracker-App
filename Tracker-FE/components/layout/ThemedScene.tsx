@@ -9,7 +9,7 @@ import type { ScreenKey } from '@/lib/themes';
 const SCENES: Record<ScreenKey, ImageSource> = {
   dashboard: require('@/assets/backgrounds/dashboard.jpeg'),
   dojo:      require('@/assets/backgrounds/dojo.jpeg'),
-  forge:     require('@/assets/backgrounds/forge.jpeg'),
+  forge:     require('@/assets/backgrounds/forge.png'),
   spirit:    require('@/assets/backgrounds/spirit.jpeg'),
   vault:     require('@/assets/backgrounds/vault.png'),
   quests:    require('@/assets/backgrounds/quests.webp'),
@@ -34,6 +34,15 @@ export function ThemedScene({ scene, children, dim = 0.55, style }: Props) {
         cachePolicy="memory-disk"
         recyclingKey={scene}
         priority="normal"
+      />
+      <LinearGradient
+        colors={[
+          `rgba(7, 7, 16, ${Math.min(1, dim + 0.35)})`,
+          `rgba(7, 7, 16, ${dim})`,
+          `rgba(7, 7, 16, ${dim * 0.55})`,
+          `rgba(7, 7, 16, ${dim * 0.25})`
+        ]}
+        style={StyleSheet.absoluteFillObject}
       />
       <LinearGradient
         colors={[
