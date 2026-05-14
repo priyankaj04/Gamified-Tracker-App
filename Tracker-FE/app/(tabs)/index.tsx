@@ -11,12 +11,15 @@ import { SectionTitle } from '@/components/layout/SectionTitle';
 import { EmptyState } from '@/components/layout/EmptyState';
 
 // Gamification primitives
-import { XPBar } from '@/components/gamification/XPBar';
-import { LevelBadge } from '@/components/gamification/LevelBadge';
 import { StreakFlame } from '@/components/gamification/StreakFlame';
 import { ChallengeCard } from '@/components/gamification/ChallengeCard';
-import { ModuleRankCard } from '@/components/gamification/ModuleRankCard';
 import { BadgeCard } from '@/components/gamification/BadgeCard';
+import { DashboardRankBadgeCard } from '@/components/dashboard/DashboardRankBadgeCard';
+import { DojoRankBadgeCard } from '@/components/dojo/DojoRankBadgeCard';
+import { ForgeRankBadgeCard } from '@/components/forge/ForgeRankBadgeCard';
+import { SpiritRankBadgeCard } from '@/components/spirit/SpiritRankBadgeCard';
+import { VaultRankBadgeCard } from '@/components/vault/VaultRankBadgeCard';
+import { QuestRankBadgeCard } from '@/components/quests/QuestRankBadgeCard';
 
 // Module-specific widgets being reused
 import { TodayCard } from '@/components/workout/TodayCard';
@@ -41,7 +44,6 @@ import { useChallenges, useBadges } from '@/hooks/useBadges';
 import { useQuestRank } from '@/hooks/useQuests';
 import {
   useWellnessScore,
-  useProfile,
   useSpiritRank,
   useLatestMeasurement,
 } from '@/hooks/useSpirit';
@@ -97,7 +99,37 @@ const QUOTES = [
   'Cleared the easy. Now the bosses.',
   'Skill is a habit you forgot quitting.',
   'Iron sharpens iron — log the rep.',
+  'Arise. The Monarch builds.',
+  "Today's rep is tomorrow's PR.",
+  'The shadow grows only with use.',
+  "Boss fights aren't won — they're earned.",
+  'Even Jinwoo started at E-rank.',
+  'Skip a day, lose a step.',
+  'The system rewards what you log.',
+  'Stack the day. Stack the year.',
+  'Mid-fight is when monarchs are made.',
+  'Sleep. Lift. Log. Repeat.',
+  'Your future self is watching today.',
+  'Quiet reps build loud arcs.',
+  'Show up before motivation does.',
+  'One more set is one more level.',
+  'Streaks compound. Don’t break them.',
+  'The dungeon clears itself, slowly.',
+  'Train like the system is watching.',
+  'Hunters move first. Excuses follow.',
+  'You can rest — just not yet.',
+  'Strong is a side effect of consistent.',
+  'The arc rewards the patient.',
+  'Log it or it didn’t happen.',
+  'Today is one more page of the arc.',
 ];
+
+// Deterministic day-of-year rotation: same quote all day, rotates at midnight.
+const dayOfYear = (d: Date) => {
+  const start = Date.UTC(d.getUTCFullYear(), 0, 0);
+  const now = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  return Math.floor((now - start) / 86_400_000);
+};
 
 const fmtElapsed = (sec: number) => {
   if (!sec || sec < 0) return '0:00';
@@ -127,7 +159,6 @@ export default function Dashboard() {
   const game = useGameState();
   const challenges = useChallenges();
   const badges = useBadges();
-  const profile = useProfile();
 
   // Quest
   const questRank = useQuestRank();
@@ -177,13 +208,7 @@ export default function Dashboard() {
   const activeStreaks = streaks ? Object.values(streaks).filter((s) => s.count > 0).length : 0;
   const unlocked = badges.data?.summary?.unlocked ?? 0;
 
-  // Derived values
-  const profileCreatedAt = (profile.data as any)?.createdAt;
-  const journeyDay = profileCreatedAt
-    ? Math.max(1, daysBetween(new Date(profileCreatedAt), new Date()) + 1)
-    : null;
-
-  const quote = useMemo(() => QUOTES[new Date().getDate() % QUOTES.length], []);
+  const quote = useMemo(() => QUOTES[dayOfYear(new Date()) % QUOTES.length], []);
 
   const fastElapsedSec = activeFast.data
     ? Math.floor((Date.now() - new Date(activeFast.data.startTime).getTime()) / 1000)
@@ -288,29 +313,41 @@ export default function Dashboard() {
           accent={accent}
           accent2={screenTheme.dashboard.accent2}
           right={
-            <Pressable onPress={() => router.push('/hall' as any)} hitSlop={8}>
-              <Ionicons name="trophy" size={22} color={accent} />
-            </Pressable>
+            <View style={styles.headerActions}>
+              <Pressable onPress={() => router.push('/hall' as any)} hitSlop={8}>
+                <Ionicons name="trophy" size={22} color={accent} />
+              </Pressable>
+              <Pressable onPress={() => router.push('/settings' as any)} hitSlop={8}>
+                <Ionicons name="settings-outline" size={22} color={accent} />
+              </Pressable>
+            </View>
           }
         />
 
-        {/* Identity row: level + journey + settings */}
+        {/* Quote of the day — rotates daily */}
         <View style={styles.section}>
-          <View style={styles.identityRow}>
-            <LevelBadge xp={xp} />
-            <View style={{ flex: 1 }}>
-              {journeyDay && (
-                <Text style={styles.journey}>Day {journeyDay} of your arc</Text>
-              )}
-              <Text style={styles.quote} numberOfLines={1}>“{quote}”</Text>
+          <View style={[styles.quoteCard, { borderColor: accent + '55' }]}>
+            <View style={[styles.quoteIcon, { backgroundColor: accent + '22' }]}>
+              <Ionicons name="sparkles" size={18} color={accent} />
             </View>
-            <Pressable onPress={() => router.push('/settings' as any)} hitSlop={8}>
-              <Ionicons name="settings-outline" size={20} color={palette.textMuted} />
-            </Pressable>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.quoteKicker, { color: accent }]}>QUOTE OF THE DAY</Text>
+              <Text style={styles.quoteText}>“{quote}”</Text>
+            </View>
           </View>
-          <View style={{ height: 12 }} />
-          <XPBar xp={xp} />
         </View>
+
+        {/* ── Solo Leveling Monarch rank — global XP hero ──── */}
+        <DashboardRankBadgeCard
+          totalXp={xp}
+          subtitle={
+            game.data
+              ? `Level ${game.data.level} · ${xp.toLocaleString()} total XP`
+              : undefined
+          }
+          accent={accent}
+          onPress={() => router.push('/dashboard/ranks' as any)}
+        />
 
         {/* ── Active now banner ─────────────────────────────── */}
         {(activeTimer.data?.timer || activeFast.data) && (
@@ -338,14 +375,6 @@ export default function Dashboard() {
           </View>
         )}
 
-        {/* ── Today's Hunt ──────────────────────────────────── */}
-        <SectionTitle title="Today's Hunt" accent={screenTheme.quests.accent} />
-        <DashboardQuestWidget />
-
-        {/* ── Today's Workout ───────────────────────────────── */}
-        <SectionTitle title="Today's Workout" accent={screenTheme.dojo.accent} />
-        <TodayCard />
-
         {/* ── Streaks across modules ────────────────────────── */}
         <SectionTitle title="Streaks" accent={accent} />
         <View style={styles.streakRow}>
@@ -363,6 +392,36 @@ export default function Dashboard() {
             );
           })}
         </View>
+
+        {/* ── DAILY CHALLENGES ──────────────────────────────── */}
+        <SectionTitle title="Daily Challenges" accent={accent} />
+        {challenges.data?.challenges?.length ? (
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.hScroll}>
+            {challenges.data.challenges.map((c: any) => (
+              <ChallengeCard key={c.id} challenge={c} />
+            ))}
+          </ScrollView>
+        ) : (
+          <View style={{ paddingHorizontal: 20 }}>
+            <EmptyState
+              icon="rocket"
+              title="No challenges yet"
+              message="Connect the API to fetch today's daily quests."
+              accent={accent}
+            />
+          </View>
+        )}
+
+        {/* ── Today's Hunt ──────────────────────────────────── */}
+        <SectionTitle title="Today's Hunt" accent={screenTheme.quests.accent} />
+        <DashboardQuestWidget />
+
+        {/* ── Today's Workout ───────────────────────────────── */}
+        <SectionTitle title="Today's Workout" accent={screenTheme.dojo.accent} />
+        <TodayCard />
 
         {/* ── SPIRIT ────────────────────────────────────────── */}
         <SectionTitle
@@ -849,84 +908,74 @@ export default function Dashboard() {
 
         {/* ── MODULE RANKS ─────────────────────────────────── */}
         <SectionTitle title="Ranks" accent={screenTheme.hall.accent} />
-        <ModuleRankCard
-          kicker="HUNTER RANK"
+        <QuestRankBadgeCard
           rank={questRank.data?.rank}
           nextRank={questRank.data?.nextRank}
+          score={(questRank.data?.completedCount ?? 0) + (questRank.data?.sRankCount ?? 0)}
           progressPct={questRank.data?.progressPct ?? 0}
           toNext={questRank.data?.toNext ?? 0}
-          unitLabel="clears"
           subtitle={
             questRank.data
               ? `${questRank.data.completedCount} cleared · ${questRank.data.sRankCount} S-rank`
               : undefined
           }
           accent={screenTheme.quests.accent}
-          icon="trophy"
           onPress={() => router.push('/quest/shadow-army' as any)}
         />
-        <ModuleRankCard
-          kicker="DEMON SLAYER RANK"
+        <DojoRankBadgeCard
           rank={dojoRank.data?.rank}
           nextRank={dojoRank.data?.nextRank}
+          score={dojoRank.data?.score ?? 0}
           progressPct={dojoRank.data?.progressPct ?? 0}
           toNext={dojoRank.data?.toNext ?? 0}
-          unitLabel="strikes"
           subtitle={
             dojoRank.data
               ? `${dojoRank.data.workoutCount} workouts · ${dojoRank.data.prCount} PRs`
               : undefined
           }
           accent={screenTheme.dojo.accent}
-          icon="flame"
           onPress={() => router.push('/dojo/ranks' as any)}
         />
-        <ModuleRankCard
-          kicker="BLUE LOCK RANK"
+        <ForgeRankBadgeCard
           rank={forgeRank.data?.rank}
           nextRank={forgeRank.data?.nextRank}
+          score={forgeRank.data?.score ?? 0}
           progressPct={forgeRank.data?.progressPct ?? 0}
           toNext={forgeRank.data?.toNext ?? 0}
-          unitLabel="goals"
           subtitle={
             forgeRank.data
               ? `${forgeRank.data.sessionCount} sessions · ${forgeRank.data.shippedCount} shipped`
               : undefined
           }
           accent={screenTheme.forge.accent}
-          icon="football"
           onPress={() => router.push('/forge/ranks' as any)}
         />
-        <ModuleRankCard
-          kicker="CHAKRA PATH"
+        <SpiritRankBadgeCard
           rank={spiritRank.data?.rank}
           nextRank={spiritRank.data?.nextRank}
+          score={spiritRank.data?.score ?? 0}
           progressPct={spiritRank.data?.progressPct ?? 0}
           toNext={spiritRank.data?.toNext ?? 0}
-          unitLabel="logs"
           subtitle={
             spiritRank.data
               ? `${spiritRank.data.habitCount} habits · ${spiritRank.data.sleepCount} sleep`
               : undefined
           }
           accent={screenTheme.spirit.accent}
-          icon="sparkles"
           onPress={() => router.push('/spirit/ranks' as any)}
         />
-        <ModuleRankCard
-          kicker="MAGE RANK"
+        <VaultRankBadgeCard
           rank={vaultGame.data?.rank}
           nextRank={vaultGame.data?.nextRank}
+          score={vaultGame.data?.vaultXp ?? 0}
           progressPct={vaultGame.data?.progressPct ?? 0}
           toNext={vaultGame.data?.toNext ?? 0}
-          unitLabel="vault XP"
           subtitle={
             vaultGame.data
               ? `${vaultGame.data.vaultXp.toLocaleString()} Vault XP · 🔥 ${vaultGame.data.streak.count}d`
               : undefined
           }
           accent={screenTheme.vault.accent}
-          icon="flash"
           onPress={() => router.push('/vault/ranks' as any)}
         />
 
@@ -944,28 +993,6 @@ export default function Dashboard() {
               </View>
             ))}
           </ScrollView>
-        )}
-
-        {/* ── DAILY CHALLENGES ──────────────────────────────── */}
-        <SectionTitle title="Daily Challenges" accent={accent} />
-        {challenges.data?.challenges?.length ? (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.hScroll}>
-            {challenges.data.challenges.map((c: any) => (
-              <ChallengeCard key={c.id} challenge={c} />
-            ))}
-          </ScrollView>
-        ) : (
-          <View style={{ paddingHorizontal: 20 }}>
-            <EmptyState
-              icon="rocket"
-              title="No challenges yet"
-              message="Connect the API to fetch today's daily quests."
-              accent={accent}
-            />
-          </View>
         )}
 
         {/* ── STATS ─────────────────────────────────────────── */}
@@ -1158,9 +1185,36 @@ function QuickBtn({
 const styles = StyleSheet.create({
   container: { flex: 1 },
   section: { paddingHorizontal: 20, paddingTop: 6 },
-  identityRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  journey: { color: palette.text, fontSize: 12, fontWeight: '800', letterSpacing: 0.4 },
-  quote: { color: palette.textMuted, fontSize: 11, fontStyle: 'italic', marginTop: 2 },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  quoteCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    backgroundColor: palette.card,
+    borderRadius: 14,
+    borderWidth: 1.5,
+    padding: 14,
+  },
+  quoteIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quoteKicker: {
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 1.2,
+    marginBottom: 4,
+  },
+  quoteText: {
+    color: palette.text,
+    fontSize: 14,
+    fontStyle: 'italic',
+    fontWeight: '700',
+    lineHeight: 19,
+  },
 
   streakRow: { flexDirection: 'row', paddingHorizontal: 16, gap: 8 },
   streakCell: {

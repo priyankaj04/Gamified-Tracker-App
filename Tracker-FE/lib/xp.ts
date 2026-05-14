@@ -104,6 +104,32 @@ export interface ModuleRank {
   color: string;
 }
 
+// Dashboard ladder — Solo Leveling top-10 power list. Climb from Igris (#10,
+// entry) to Sung Jinwoo (#1, apex). Score = totalXp.
+export const SOLO_LEVELING_RANKS: ModuleRank[] = [
+  { key: 'igris',   title: 'Igris',        min: 0,      color: '#a78bfa' },
+  { key: 'cha',     title: 'Cha Hae-In',   min: 1000,   color: '#c4b5fd' },
+  { key: 'gunhee',  title: 'Go Gunhee',    min: 4000,   color: '#818cf8' },
+  { key: 'liu',     title: 'Liu Zhigang',  min: 10000,  color: '#60a5fa' },
+  { key: 'thomas',  title: 'Thomas Andre', min: 20000,  color: '#e879f9' },
+  { key: 'beru',    title: 'Beru',         min: 40000,  color: '#7c3aed' },
+  { key: 'bellion', title: 'Bellion',      min: 70000,  color: '#6d28d9' },
+  { key: 'antares', title: 'Antares',      min: 120000, color: '#ef4444' },
+  { key: 'ashborn', title: 'Ashborn',      min: 200000, color: '#0ea5e9' },
+  { key: 'jinwoo',  title: 'Sung Jinwoo',  min: 350000, color: '#facc15' },
+];
+
+export const getDashboardRank = (totalXp: number): ModuleRank => {
+  let cur = SOLO_LEVELING_RANKS[0];
+  for (const r of SOLO_LEVELING_RANKS) if (totalXp >= r.min) cur = r;
+  return cur;
+};
+
+export const nextDashboardRank = (totalXp: number): ModuleRank | null => {
+  for (const r of SOLO_LEVELING_RANKS) if (totalXp < r.min) return r;
+  return null;
+};
+
 // Dojo ladder — Demon Slayer top-tier list. Climb from Nezuko (#15, entry) to
 // Yoriichi Tsugikuni (#1, apex). Colors progress through pink → flame orange →
 // crimson → legendary gold.

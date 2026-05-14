@@ -4,13 +4,13 @@ const ART = {
   silva: require('@/assets/images/hunterxhunter/SilvaZoldyck.png'),
   youpi: require('@/assets/images/hunterxhunter/Youpi.png'),
   kurapika: require('@/assets/images/hunterxhunter/Kurapika.png'),
-  hisoka: require('@/assets/images/hunterxhunter/Hisoka.png'),
-  chrollo: require('@/assets/images/hunterxhunter/Chrollo.png'),
+  hisoka: require('@/assets/images/hunterxhunter/HisokaMorow.png'),
+  chrollo: require('@/assets/images/hunterxhunter/ChrolloLucilfer.png'),
   pitou: require('@/assets/images/hunterxhunter/Neferpitou.png'),
-  killua: require('@/assets/images/hunterxhunter/Killua.png'),
-  gon: require('@/assets/images/hunterxhunter/Gon.png'),
-  netero: require('@/assets/images/hunterxhunter/Netero.png'),
-  meruem: require('@/assets/images/hunterxhunter/Meruem.png'),
+  killua: require('@/assets/images/hunterxhunter/KilluaZoldyck.png'),
+  gon: require('@/assets/images/hunterxhunter/GonFreecss.png'),
+  netero: require('@/assets/images/hunterxhunter/IsaacNetero.png'),
+  meruem: require('@/assets/images/hunterxhunter/45.png'),
 } as const;
 
 export interface HunterCharacterBadge {

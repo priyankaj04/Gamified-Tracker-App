@@ -31,4 +31,4 @@ const resolveApiBaseUrl = (): string => {
 export const API_BASE_URL = resolveApiBaseUrl();
 
 export const APP_NAME = 'KaizenArc';
-export const USER_NAME = 'Priyanka';
+export const USER_NAME = 'Anya';

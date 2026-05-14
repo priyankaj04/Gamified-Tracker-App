@@ -109,6 +109,14 @@ export const dojoText = {
   faint: 'rgba(255, 255, 255, 0.38)',
 };
 
+// Dashboard text tokens — white-on-shadow-purple, same descending-opacity.
+export const dashboardText = {
+  primary: '#ffffff',
+  secondary: 'rgba(255, 255, 255, 0.78)',
+  tertiary: 'rgba(255, 255, 255, 0.58)',
+  faint: 'rgba(255, 255, 255, 0.38)',
+};
+
 export const rarityColor = {
   Common: '#94a3b8',
   Rare: '#22d3ee',

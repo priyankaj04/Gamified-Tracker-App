@@ -1,21 +1,21 @@
 import type { ImageSourcePropType } from 'react-native';
 
 const ART = {
-  nezuko: require('@/assets/images/demonslayer/Nezuko.png'),
-  tengen: require('@/assets/images/demonslayer/Tengen.png'),
-  zenitsu: require('@/assets/images/demonslayer/Zenitsu.png'),
-  rengoku: require('@/assets/images/demonslayer/Rengoku.png'),
-  muichiro: require('@/assets/images/demonslayer/Muichiro.png'),
-  obanai: require('@/assets/images/demonslayer/Obanai.png'),
-  giyu: require('@/assets/images/demonslayer/Giyu.png'),
-  sanemi: require('@/assets/images/demonslayer/Sanemi.png'),
-  gyomei: require('@/assets/images/demonslayer/Gyomei.png'),
+  nezuko: require('@/assets/images/demonslayer/NezukoKamado.png'),
+  tengen: require('@/assets/images/demonslayer/TengenUzui.png'),
+  zenitsu: require('@/assets/images/demonslayer/ZenitsuAgatsuma.png'),
+  rengoku: require('@/assets/images/demonslayer/KyojuroRengoku.png'),
+  muichiro: require('@/assets/images/demonslayer/MuichiroTokito.png'),
+  obanai: require('@/assets/images/demonslayer/ObanaiIguro.png'),
+  giyu: require('@/assets/images/demonslayer/GiyuTomioka.png'),
+  sanemi: require('@/assets/images/demonslayer/SanemiShinazugawa.png'),
+  gyomei: require('@/assets/images/demonslayer/GyomeiHimejima.png'),
   akaza: require('@/assets/images/demonslayer/Akaza.png'),
   doma: require('@/assets/images/demonslayer/Doma.png'),
-  tanjiro: require('@/assets/images/demonslayer/Tanjiro.png'),
+  tanjiro: require('@/assets/images/demonslayer/TanjiroKamado.png'),
   kokushibo: require('@/assets/images/demonslayer/Kokushibo.png'),
-  muzan: require('@/assets/images/demonslayer/Muzan.png'),
-  yoriichi: require('@/assets/images/demonslayer/Yoriichi.png'),
+  muzan: require('@/assets/images/demonslayer/MuzanKibutsuji.png'),
+  yoriichi: require('@/assets/images/demonslayer/YoriichiTsugikuni.png'),
 } as const;
 
 export interface DemonSlayerCharacterBadge {
