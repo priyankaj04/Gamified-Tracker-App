@@ -104,19 +104,25 @@ export interface ModuleRank {
   color: string;
 }
 
+// Dojo ladder — Demon Slayer top-tier list. Climb from Nezuko (#15, entry) to
+// Yoriichi Tsugikuni (#1, apex). Colors progress through pink → flame orange →
+// crimson → legendary gold.
 export const DEMON_SLAYER_RANKS: ModuleRank[] = [
-  { key: 'mizunoto',   title: 'Mizunoto',          min: 0,   color: '#94a3b8' },
-  { key: 'mizunoe',    title: 'Mizunoe',           min: 3,   color: '#a3a3a3' },
-  { key: 'kanoto',     title: 'Kanoto',            min: 10,  color: '#86efac' },
-  { key: 'kanoe',      title: 'Kanoe',             min: 20,  color: '#38bdf8' },
-  { key: 'tsuchinoto', title: 'Tsuchinoto',        min: 35,  color: '#22d3ee' },
-  { key: 'tsuchinoe',  title: 'Tsuchinoe',         min: 55,  color: '#a78bfa' },
-  { key: 'hinoto',     title: 'Hinoto',            min: 80,  color: '#f59e0b' },
-  { key: 'hinoe',      title: 'Hinoe',             min: 115, color: '#fb7185' },
-  { key: 'kinoto',     title: 'Kinoto',            min: 160, color: '#f472b6' },
-  { key: 'kinoe',      title: 'Kinoe',             min: 220, color: '#fbbf24' },
-  { key: 'hashira',    title: 'Hashira',           min: 300, color: '#e879f9' },
-  { key: 'sun',        title: 'Sun Breathing Master', min: 500, color: '#facc15' },
+  { key: 'nezuko',    title: 'Nezuko Kamado',      min: 0,   color: '#f9a8d4' },
+  { key: 'tengen',    title: 'Tengen Uzui',        min: 3,   color: '#fbcfe8' },
+  { key: 'zenitsu',   title: 'Zenitsu Agatsuma',   min: 8,   color: '#fde68a' },
+  { key: 'rengoku',   title: 'Kyojuro Rengoku',    min: 15,  color: '#fbbf24' },
+  { key: 'muichiro',  title: 'Muichiro Tokito',    min: 25,  color: '#bae6fd' },
+  { key: 'obanai',    title: 'Obanai Iguro',       min: 40,  color: '#86efac' },
+  { key: 'giyu',      title: 'Giyu Tomioka',       min: 60,  color: '#22d3ee' },
+  { key: 'sanemi',    title: 'Sanemi Shinazugawa', min: 85,  color: '#fb7185' },
+  { key: 'gyomei',    title: 'Gyomei Himejima',    min: 115, color: '#f59e0b' },
+  { key: 'akaza',     title: 'Akaza',              min: 155, color: '#f472b6' },
+  { key: 'doma',      title: 'Doma',               min: 200, color: '#a78bfa' },
+  { key: 'tanjiro',   title: 'Tanjiro Kamado',     min: 260, color: '#f97316' },
+  { key: 'kokushibo', title: 'Kokushibo',          min: 330, color: '#818cf8' },
+  { key: 'muzan',     title: 'Muzan Kibutsuji',    min: 410, color: '#ef4444' },
+  { key: 'yoriichi',  title: 'Yoriichi Tsugikuni', min: 500, color: '#facc15' },
 ];
 
 // Forge ladder — Blue Lock top-tier striker list. Climb from Reo Mikage (#10,
