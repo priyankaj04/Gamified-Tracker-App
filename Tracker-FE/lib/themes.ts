@@ -93,6 +93,14 @@ export const questText = {
   faint: 'rgba(255, 255, 255, 0.38)',
 };
 
+// Forge text tokens — white-on-cyan/indigo, same descending-opacity ladder.
+export const forgeText = {
+  primary: '#ffffff',
+  secondary: 'rgba(255, 255, 255, 0.78)',
+  tertiary: 'rgba(255, 255, 255, 0.58)',
+  faint: 'rgba(255, 255, 255, 0.38)',
+};
+
 export const rarityColor = {
   Common: '#94a3b8',
   Rare: '#22d3ee',

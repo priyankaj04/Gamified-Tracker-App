@@ -63,7 +63,7 @@ export interface HunterRank {
 // Quests ladder — Hunter x Hunter top-tier list. Climb from Silva (#10, entry)
 // to Meruem (#1, apex). Colors progress through cool→magenta→legendary gold.
 export const HUNTER_RANKS: HunterRank[] = [
-  { key: 'silva',    title: 'Silva Zoldyck',    min: 0,    color: '#d9cfaa' },
+  { key: 'silva',    title: 'Silva Zoldyck',    min: 0,    color: '#e4b7ff' },
   { key: 'youpi',    title: 'Menthuthuyoupi',   min: 5,    color: '#86efac' },
   { key: 'kurapika', title: 'Kurapika',         min: 15,   color: '#38bdf8' },
   { key: 'hisoka',   title: 'Hisoka Morow',     min: 30,   color: '#f472b6' },
@@ -119,18 +119,20 @@ export const DEMON_SLAYER_RANKS: ModuleRank[] = [
   { key: 'sun',        title: 'Sun Breathing Master', min: 500, color: '#facc15' },
 ];
 
+// Forge ladder — Blue Lock top-tier striker list. Climb from Reo Mikage (#10,
+// entry) to Yoichi Isagi (#1, apex). Colors progress through forge cyan→indigo
+// →legendary gold.
 export const BLUE_LOCK_RANKS: ModuleRank[] = [
-  { key: 'reject',     title: 'Reject Striker',    min: 0,    color: '#94a3b8' },
-  { key: 'top300',     title: 'Top 300',           min: 5,    color: '#a3a3a3' },
-  { key: 'top100',     title: 'Top 100',           min: 15,   color: '#86efac' },
-  { key: 'top23',      title: 'Top 23',            min: 35,   color: '#38bdf8' },
-  { key: 'wildcard',   title: 'Wild Card',         min: 60,   color: '#a78bfa' },
-  { key: 'starter',    title: '1st Stage Striker', min: 100,  color: '#f59e0b' },
-  { key: 'egoist',     title: 'Egoist Striker',    min: 160,  color: '#fb7185' },
-  { key: 'second',     title: '2nd Stage Player',  min: 240,  color: '#f472b6' },
-  { key: 'neo',        title: 'Neo Egoist',        min: 350,  color: '#fbbf24' },
-  { key: 'world',      title: 'World Class',       min: 500,  color: '#e879f9' },
-  { key: 'no1',        title: "World's #1 Striker", min: 750, color: '#facc15' },
+  { key: 'reo',     title: 'Reo Mikage',     min: 0,    color: '#7dc1fb' },
+  { key: 'chigiri', title: 'Hyoma Chigiri',  min: 5,    color: '#86efac' },
+  { key: 'bachira', title: 'Meguru Bachira', min: 15,   color: '#38bdf8' },
+  { key: 'shidou',  title: 'Ryusei Shidou',  min: 35,   color: '#22d3ee' },
+  { key: 'nagi',    title: 'Seishiro Nagi',  min: 60,   color: '#a78bfa' },
+  { key: 'barou',   title: 'Shouei Barou',   min: 100,  color: '#fb7185' },
+  { key: 'sae',     title: 'Sae Itoshi',     min: 160,  color: '#f472b6' },
+  { key: 'kaiser',  title: 'Michael Kaiser', min: 240,  color: '#818cf8' },
+  { key: 'rin',     title: 'Rin Itoshi',     min: 350,  color: '#e879f9' },
+  { key: 'isagi',   title: 'Yoichi Isagi',   min: 500,  color: '#facc15' },
 ];
 
 // Spirit ladder — Naruto power ranking. Climb from Shisui (#20, entry) to

@@ -25,7 +25,7 @@ import { BuildNowCta } from '@/components/forge/BuildNowCta';
 import { useProjects } from '@/hooks/useProjects';
 import { useActiveTimer, useSessionGrid, useSessions, useTodaySessions } from '@/hooks/useSessions';
 import { useDailyGoal, useForgeRank, useForgeSummary } from '@/hooks/useForgeStats';
-import { ModuleRankCard } from '@/components/gamification/ModuleRankCard';
+import { ForgeRankBadgeCard } from '@/components/forge/ForgeRankBadgeCard';
 import { useDsaStats } from '@/hooks/useDSA';
 import { useLearning } from '@/hooks/useLearning';
 import { useGameState } from '@/hooks/useGame';
@@ -106,20 +106,18 @@ export default function ForgeScreen() {
           }
         />
 
-        <ModuleRankCard
-          kicker="BLUE LOCK RANK"
+        <ForgeRankBadgeCard
           rank={rank.data?.rank}
           nextRank={rank.data?.nextRank}
+          score={rank.data?.score ?? 0}
           progressPct={rank.data?.progressPct ?? 0}
           toNext={rank.data?.toNext ?? 0}
-          unitLabel="goals"
           subtitle={
             rank.data
               ? `${rank.data.sessionCount} sessions · ${rank.data.shippedCount} shipped`
               : undefined
           }
           accent={accent}
-          icon="football"
           onPress={() => router.push('/forge/ranks' as any)}
         />
 
