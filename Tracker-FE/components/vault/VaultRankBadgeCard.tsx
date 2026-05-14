@@ -54,9 +54,12 @@ export function VaultRankBadgeCard({
       <View style={styles.hero}>
         {/* LEFT — info */}
         <View style={styles.info}>
-          {level != null && (
-            <Text style={[styles.level, { color }]}>LEVEL {String(level).padStart(2, '0')}</Text>
-          )}
+          <View style={{ flexDirection: 'row', flex: 1, justifyContent:'space-between', alignItems: 'center', gap: 18 }}>
+            {level != null && (
+              <Text style={[styles.level, { color }]}>LEVEL {String(level).padStart(2, '0')}</Text>
+            )}
+            <Text style={[styles.metaValue, { color }]}>{score.toLocaleString()} XP</Text>
+          </View>
           <Text style={[styles.name, { color }]} numberOfLines={2}>
             {character?.name ?? rank?.title ?? '—'}
           </Text>
@@ -79,7 +82,6 @@ export function VaultRankBadgeCard({
             </View>
           ) : null}
 
-          <View><Text style={[styles.metaValue, { color }]}>{score.toLocaleString()} XP</Text></View>
         </View>
 
         {/* RIGHT — character art, flush to the edge */}
@@ -213,7 +215,7 @@ const styles = StyleSheet.create({
   },
   pointTxt: {
     color: vaultText.primary,
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '700',
     flexShrink: 1,
   },
@@ -257,7 +259,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   metaValue: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '900',
     marginTop: 2,
     letterSpacing: -0.3,

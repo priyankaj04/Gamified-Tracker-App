@@ -60,16 +60,19 @@ export interface HunterRank {
   color: string;
 }
 
+// Quests ladder — Hunter x Hunter top-tier list. Climb from Silva (#10, entry)
+// to Meruem (#1, apex). Colors progress through cool→magenta→legendary gold.
 export const HUNTER_RANKS: HunterRank[] = [
-  { key: 'apprentice',    title: 'Apprentice Hunter', min: 0,    color: '#94a3b8' },
-  { key: 'e_rank',        title: 'E-Rank Hunter',     min: 5,    color: '#a3a3a3' },
-  { key: 'd_rank',        title: 'D-Rank Hunter',     min: 20,   color: '#86efac' },
-  { key: 'c_rank',        title: 'C-Rank Hunter',     min: 50,   color: '#38bdf8' },
-  { key: 'b_rank',        title: 'B-Rank Hunter',     min: 100,  color: '#a78bfa' },
-  { key: 'a_rank',        title: 'A-Rank Hunter',     min: 200,  color: '#f59e0b' },
-  { key: 's_rank',        title: 'S-Rank Hunter',     min: 400,  color: '#f472b6' },
-  { key: 'national',      title: 'National Hunter',   min: 750,  color: '#fb7185' },
-  { key: 'shadow',        title: 'Shadow Monarch',    min: 1500, color: '#e879f9' },
+  { key: 'silva',    title: 'Silva Zoldyck',    min: 0,    color: '#d9cfaa' },
+  { key: 'youpi',    title: 'Menthuthuyoupi',   min: 5,    color: '#86efac' },
+  { key: 'kurapika', title: 'Kurapika',         min: 15,   color: '#38bdf8' },
+  { key: 'hisoka',   title: 'Hisoka Morow',     min: 30,   color: '#f472b6' },
+  { key: 'chrollo',  title: 'Chrollo Lucilfer', min: 60,   color: '#a78bfa' },
+  { key: 'pitou',    title: 'Neferpitou',       min: 100,  color: '#fb7185' },
+  { key: 'killua',   title: 'Killua Zoldyck',   min: 200,  color: '#22d3ee' },
+  { key: 'gon',      title: 'Gon Freecss',      min: 400,  color: '#f59e0b' },
+  { key: 'netero',   title: 'Isaac Netero',     min: 800,  color: '#e879f9' },
+  { key: 'meruem',   title: 'Meruem',           min: 1500, color: '#facc15' },
 ];
 
 export const getHunterRank = (completedCount: number, sRankCount: number): HunterRank => {

@@ -24,7 +24,7 @@ import { HeroStatsBar } from '@/components/quests/HeroStatsBar';
 import { FabSpeedDial } from '@/components/quests/FabSpeedDial';
 import { QuestCreateSheet } from '@/components/quests/QuestCreateSheet';
 import { showQuestStamp } from '@/components/quests/QuestStamp';
-import { ModuleRankCard } from '@/components/gamification/ModuleRankCard';
+import { QuestRankBadgeCard } from '@/components/quests/QuestRankBadgeCard';
 import {
   useQuests,
   useCompleteQuest,
@@ -182,20 +182,18 @@ export default function QuestsScreen() {
           }
         />
 
-        <ModuleRankCard
-          kicker="HUNTER RANK"
+        <QuestRankBadgeCard
           rank={rankQ.data?.rank}
           nextRank={rankQ.data?.nextRank}
+          score={(rankQ.data?.completedCount ?? 0) + (rankQ.data?.sRankCount ?? 0)}
           progressPct={rankQ.data?.progressPct ?? 0}
           toNext={rankQ.data?.toNext ?? 0}
-          unitLabel="clears"
           subtitle={
             rankQ.data
               ? `${rankQ.data.completedCount} cleared · ${rankQ.data.sRankCount} S-rank`
               : undefined
           }
           accent={accent}
-          icon="trophy"
           onPress={() => router.push('/quest/shadow-army')}
         />
 

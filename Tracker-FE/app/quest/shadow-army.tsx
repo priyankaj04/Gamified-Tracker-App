@@ -7,6 +7,8 @@ import { palette, priorityColor, screenTheme } from '@/lib/themes';
 import { ThemedScene } from '@/components/layout/ThemedScene';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { SectionTitle } from '@/components/layout/SectionTitle';
+import { QuestRankBadgeCard } from '@/components/quests/QuestRankBadgeCard';
+import { QuestRankLadder } from '@/components/quests/QuestRankLadder';
 import { useQuestRank, useQuests } from '@/hooks/useQuests';
 import { HUNTER_RANKS } from '@/lib/xp';
 
@@ -48,68 +50,27 @@ export default function ShadowArmyScreen() {
           }
         />
 
-        <View style={{ paddingHorizontal: 20 }}>
-          <View style={[styles.rankCard, { borderColor: rank?.rank.color ?? accent }]}>
-            <View style={{ flex: 1 }}>
-              <Text style={styles.rankKicker}>CURRENT RANK</Text>
-              <Text style={[styles.rankTitle, { color: rank?.rank.color ?? palette.text }]}>
-                {rank?.rank.title ?? '—'}
-              </Text>
-              <Text style={styles.rankSub}>
-                {rank?.completedCount ?? 0} cleared · {rank?.sRankCount ?? 0} S-rank
-              </Text>
-              {rank?.nextRank && (
-                <>
-                  <View style={styles.rankBarBg}>
-                    <View
-                      style={[
-                        styles.rankBarFill,
-                        { width: `${rank.progressPct}%`, backgroundColor: rank.rank.color },
-                      ]}
-                    />
-                  </View>
-                  <Text style={styles.rankBarTxt}>
-                    {rank.toNext} clears to <Text style={{ color: rank.nextRank.color }}>{rank.nextRank.title}</Text>
-                  </Text>
-                </>
-              )}
-            </View>
-            <Ionicons name="trophy" size={48} color={rank?.rank.color ?? accent} />
-          </View>
-        </View>
+        <QuestRankBadgeCard
+          rank={rank?.rank}
+          nextRank={rank?.nextRank}
+          score={(rank?.completedCount ?? 0) + (rank?.sRankCount ?? 0)}
+          progressPct={rank?.progressPct ?? 0}
+          toNext={rank?.toNext ?? 0}
+          subtitle={
+            rank
+              ? `${rank.completedCount} cleared · ${rank.sRankCount} S-rank`
+              : undefined
+          }
+          accent={accent}
+        />
 
         <SectionTitle title="Rank Path" accent={accent} />
-        <View style={{ paddingHorizontal: 20, gap: 6 }}>
-          {HUNTER_RANKS.map((r) => {
-            const score = (rank?.completedCount ?? 0) + (rank?.sRankCount ?? 0);
-            const unlocked = score >= r.min;
-            const isCurrent = rank?.rank.key === r.key;
-            return (
-              <View
-                key={r.key}
-                style={[
-                  styles.rankRow,
-                  { borderColor: unlocked ? r.color + '88' : palette.border },
-                  isCurrent && { backgroundColor: r.color + '11', borderColor: r.color },
-                ]}>
-                <Ionicons
-                  name={unlocked ? 'checkmark-circle' : 'lock-closed'}
-                  size={20}
-                  color={unlocked ? r.color : palette.textDim}
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.rankRowTitle, { color: unlocked ? r.color : palette.textMuted }]}>
-                    {r.title}
-                  </Text>
-                  <Text style={styles.rankRowSub}>{r.min} clears required</Text>
-                </View>
-                {isCurrent && (
-                  <Text style={[styles.currentTag, { color: r.color }]}>YOU ARE HERE</Text>
-                )}
-              </View>
-            );
-          })}
-        </View>
+        <QuestRankLadder
+          ladder={HUNTER_RANKS}
+          score={(rank?.completedCount ?? 0) + (rank?.sRankCount ?? 0)}
+          currentKey={rank?.rank.key}
+          unitLabel="clears"
+        />
 
         <SectionTitle title={`Trophy Hall (${army.length})`} accent={accent} />
         {army.length === 0 ? (
@@ -139,39 +100,6 @@ export default function ShadowArmyScreen() {
 }
 
 const styles = StyleSheet.create({
-  rankCard: {
-    backgroundColor: palette.card,
-    borderRadius: 16,
-    borderWidth: 1.5,
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  rankKicker: {
-    color: palette.textMuted,
-    fontSize: 11,
-    fontWeight: '900',
-    letterSpacing: 1.2,
-    marginBottom: 4,
-  },
-  rankTitle: { fontSize: 24, fontWeight: '900' },
-  rankSub: { color: palette.textMuted, fontSize: 12, fontWeight: '700', marginTop: 2, marginBottom: 8 },
-  rankBarBg: { height: 6, backgroundColor: palette.border, borderRadius: 3, overflow: 'hidden' },
-  rankBarFill: { height: '100%', borderRadius: 3 },
-  rankBarTxt: { color: palette.textMuted, fontSize: 11, fontWeight: '800', marginTop: 6 },
-  rankRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-    backgroundColor: palette.card,
-  },
-  rankRowTitle: { fontSize: 14, fontWeight: '800' },
-  rankRowSub: { color: palette.textMuted, fontSize: 11, fontWeight: '700' },
-  currentTag: { fontSize: 9, fontWeight: '900', letterSpacing: 0.8 },
   emptyTxt: { color: palette.textMuted, paddingHorizontal: 20, fontSize: 13 },
   grid: {
     flexDirection: 'row',
