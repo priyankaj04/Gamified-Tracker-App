@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
 import { useAppStore } from '@/store/useAppStore';
+import { celebrate } from '@/lib/celebrate';
 import type {
   Account,
   Budget,
@@ -238,7 +239,14 @@ export const useContributeGoal = () => {
         )
         .then(unwrap),
     onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, res.hit ? 'Goal hit!' : 'Saved');
+      // Routine contribution = popup only. Hit = big confetti. Beaten (overshoot) = epic.
+      if (res.beaten) {
+        celebrate({ xp: res.xpEarned, label: 'Goal smashed! 🚀', level: 'epic' });
+      } else if (res.hit) {
+        celebrate({ xp: res.xpEarned, label: 'Goal hit!', level: 'big' });
+      } else if (res.xpEarned) {
+        pushPopup(res.xpEarned, 'Saved');
+      }
       res.badgesUnlocked?.forEach((b: any) => pushBadge(b));
       invalidateAll(qc);
     },
@@ -290,7 +298,12 @@ export const usePayDebt = () => {
         )
         .then(unwrap),
     onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, res.cleared ? 'Debt cleared!' : 'Payment');
+      // Routine payment = popup only. Final clear = epic (a true milestone).
+      if (res.cleared) {
+        celebrate({ xp: res.xpEarned, label: 'Debt cleared! 🎉', level: 'epic' });
+      } else if (res.xpEarned) {
+        pushPopup(res.xpEarned, 'Payment');
+      }
       res.badgesUnlocked?.forEach((b: any) => pushBadge(b));
       invalidateAll(qc);
     },

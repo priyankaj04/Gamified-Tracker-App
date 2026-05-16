@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
 import { useAppStore } from '@/store/useAppStore';
+import { celebrate } from '@/lib/celebrate';
 import { detectLevelUp } from '@/lib/levels';
 import type {
   DojoRank,
@@ -179,7 +180,6 @@ interface CreateBody {
 
 export const useCreateWorkout = () => {
   const qc = useQueryClient();
-  const pushPopup = useAppStore((s) => s.pushPopup);
   const pushBadgeUnlock = useAppStore((s) => s.pushBadgeUnlock);
   const pushLevelUp = useAppStore((s) => s.pushLevelUp);
   return useMutation({
@@ -191,7 +191,15 @@ export const useCreateWorkout = () => {
         )
         .then(unwrap),
     onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'Workout Complete');
+      // Workouts are infrequent, deliberate actions — always worth confetti.
+      // Badge unlock or PR escalates to epic; level-up will trigger its own modal+confetti elsewhere.
+      const hasBadge = (res.badgesUnlocked?.length ?? 0) > 0;
+      const hasPR = (res.personalRecordsSet?.length ?? 0) > 0;
+      celebrate({
+        xp: res.xpEarned,
+        label: hasPR ? 'New PR! 🏆' : 'Workout Complete',
+        level: hasBadge || hasPR ? 'epic' : 'big',
+      });
       (res.badgesUnlocked ?? []).forEach((b) => pushBadgeUnlock(b));
 
       const prior = qc.getQueryData<{ totalXp: number }>(gameKeys.state)?.totalXp ?? 0;

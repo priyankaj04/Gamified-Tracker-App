@@ -121,6 +121,17 @@ export interface Streak {
   lastActivityDate: string | null;
 }
 
+export interface XpPenalty {
+  id: string;
+  module: 'dojo' | 'forge' | 'spirit' | 'vault' | 'quests';
+  daysLogged: number;
+  shortfall: number;
+  levelAtTime: number;
+  xpLost: number;
+  appliedAt: string;
+  reason: string;
+}
+
 export interface GameState {
   totalXp: number;
   level: number;
@@ -128,6 +139,7 @@ export interface GameState {
   xpToNextLevel: number;
   xpProgress: number;
   streaks: Partial<Record<Module, Streak>>;
+  recentPenalties?: XpPenalty[];
 }
 
 export interface ExerciseSet {

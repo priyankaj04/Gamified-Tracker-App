@@ -4,5 +4,8 @@
   "outputDirectory": "dist",
   "rewrites": [
     { "source": "/(.*)", "destination": "/api/index" }
+  ],
+  "crons": [
+    { "path": "/api/internal/penalty-sweep", "schedule": "0 3 * * *" }
   ]
 }

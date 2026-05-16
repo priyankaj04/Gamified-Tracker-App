@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
 import { useAppStore } from '@/store/useAppStore';
+import { celebrate, streakMilestoneLevel } from '@/lib/celebrate';
 import type { Habit, HabitBundle, HabitHistoryCell, XpAwardResult } from '@/types';
 import { gameKeys } from './useGame';
 
@@ -67,8 +68,23 @@ export const useCompleteHabit = () => {
     mutationFn: (id: string) =>
       api.post<{ data: XpAwardResult & { bundleHit?: { name: string; bonusXp: number } } }>(`/spirit/habits/${id}/complete`).then(unwrap),
     onSuccess: (res) => {
-      if (res.xpEarned) pushPopup(res.xpEarned, 'Habit Done');
-      if (res.bundleHit) pushPopup(res.bundleHit.bonusXp, `Bundle: ${res.bundleHit.name}`);
+      const milestone = streakMilestoneLevel(res.streakCount);
+      if (milestone) {
+        celebrate({
+          xp: res.xpEarned,
+          label: `Habit · ${res.streakCount}-day streak 🔥`,
+          level: milestone,
+        });
+      } else if (res.xpEarned) {
+        pushPopup(res.xpEarned, 'Habit Done');
+      }
+      if (res.bundleHit) {
+        celebrate({
+          xp: res.bundleHit.bonusXp,
+          label: `Bundle: ${res.bundleHit.name}`,
+          level: 'big',
+        });
+      }
       qc.invalidateQueries({ queryKey: habitsKeys.all });
       qc.invalidateQueries({ queryKey: gameKeys.state });
     },

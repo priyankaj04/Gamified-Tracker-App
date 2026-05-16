@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { api, unwrap } from '@/lib/api';
-import { useAppStore } from '@/store/useAppStore';
+import { celebrate, type CelebrateLevel } from '@/lib/celebrate';
 import { cancelQuestReminder, scheduleQuestReminder } from '@/lib/notifications';
 import type {
   Quest,
@@ -122,19 +122,34 @@ interface CompleteResult extends XpAwardResult {
   multiplierApplied: number;
 }
 
+// Priority tiers determine celebration intensity. S = epic confetti (rare boss kills),
+// A = big confetti (notable wins), B/C = micro haptic only (routine tasks shouldn't spam confetti).
+const QUEST_PRIORITY_LEVEL: Record<'S' | 'A' | 'B' | 'C', CelebrateLevel> = {
+  S: 'epic',
+  A: 'big',
+  B: 'micro',
+  C: 'micro',
+};
+
 export const useCompleteQuest = () => {
   const qc = useQueryClient();
-  const pushPopup = useAppStore((s) => s.pushPopup);
   return useMutation({
     mutationFn: ({ id, stars }: { id: string; stars?: number }) =>
       api
         .patch<{ data: CompleteResult }>(`/quests/${id}/complete`, { stars })
         .then(unwrap),
     onSuccess: (res) => {
-      if (res.xpEarned) {
-        const label = res.comboActive ? `COMBO ${res.comboCount}× — Quest Complete` : 'Quest Complete';
-        pushPopup(res.xpEarned, label);
+      const priority = (res.quest?.priority ?? 'C') as 'S' | 'A' | 'B' | 'C';
+      let level: CelebrateLevel = QUEST_PRIORITY_LEVEL[priority] ?? 'micro';
+      // Combo escalates: 3+ combo bumps B/C up to big, A→epic.
+      if (res.comboActive && res.comboCount >= 3) {
+        if (level === 'micro') level = 'big';
+        else if (level === 'big') level = 'epic';
       }
+      const label = res.comboActive
+        ? `COMBO ${res.comboCount}× — Quest Complete`
+        : 'Quest Complete';
+      celebrate({ xp: res.xpEarned, label, level });
       if (res.quest) cancelQuestReminder(res.quest.id).catch(() => {});
       invalidateQuestData(qc);
     },

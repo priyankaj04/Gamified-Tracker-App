@@ -14,6 +14,35 @@ export interface UserSettings {
   reminderMinute: number;
   streakAtRiskEnabled: boolean;
   weeklySummaryEnabled: boolean;
+  // Forge
+  forgeCodeReminderEnabled: boolean;
+  forgeCodeReminderHour: number;
+  forgeCodeReminderMinute: number;
+  forgeStreakAtRiskEnabled: boolean;
+  forgeWeeklySummaryEnabled: boolean;
+  // Spirit
+  spiritMealRemindersEnabled: boolean;
+  spiritBreakfastHour: number;
+  spiritLunchHour: number;
+  spiritDinnerHour: number;
+  spiritHydrationEnabled: boolean;
+  spiritHydrationStartHour: number;
+  spiritHydrationEndHour: number;
+  spiritHydrationIntervalHours: number;
+  spiritWindDownEnabled: boolean;
+  spiritBedtimeHour: number;
+  spiritBedtimeMinute: number;
+  spiritHabitStreakAtRiskEnabled: boolean;
+  // Vault
+  vaultWeeklyReviewEnabled: boolean;
+  vaultWeeklyReviewWeekday: number;
+  vaultWeeklyReviewHour: number;
+  vaultSubscriptionAlertsEnabled: boolean;
+  // Quest
+  questDailySummaryEnabled: boolean;
+  questDailySummaryHour: number;
+  // Gamification
+  penaltiesEnabled: boolean;
 }
 
 export const useSettings = () =>

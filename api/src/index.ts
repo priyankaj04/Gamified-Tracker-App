@@ -30,6 +30,7 @@ import { dsaRouter } from '@/routes/dsa';
 import { standupRouter } from '@/routes/standup';
 import { forgeStatsRouter } from '@/routes/forge-stats';
 import { forgeSettingsRouter } from '@/routes/forge-settings';
+import { internalRouter } from '@/routes/internal';
 
 const app = express();
 const PORT = Number(process.env.PORT ?? 3000);
@@ -74,6 +75,7 @@ app.use('/api/dsa', dsaRouter);
 app.use('/api/standup', standupRouter);
 app.use('/api/forge-stats', forgeStatsRouter);
 app.use('/api/forge-settings', forgeSettingsRouter);
+app.use('/api/internal', internalRouter);
 
 app.use((_req, res) => res.status(404).json({ data: null, error: 'Not found' }));
 app.use(errorHandler);

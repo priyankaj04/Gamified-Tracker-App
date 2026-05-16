@@ -1,5 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { useAppStore } from '@/store/useAppStore';
+import { notifyAchievement } from '@/lib/notifications';
 
 // ── Sound (optional) ─────────────────────────────────────────────────────
 //
@@ -98,6 +99,15 @@ const levelBurst = () => {
 
 export type CelebrateLevel = 'micro' | 'normal' | 'big' | 'epic';
 
+// Streak milestone tiers. 7/14 are "big" (single confetti burst), 30/60/100 are "epic"
+// (double burst). Return null for non-milestone counts so callers can skip celebration.
+export const streakMilestoneLevel = (count: number | undefined | null): CelebrateLevel | null => {
+  if (!count) return null;
+  if (count === 30 || count === 60 || count === 100) return 'epic';
+  if (count === 7 || count === 14) return 'big';
+  return null;
+};
+
 export interface CelebrateOptions {
   xp?: number;
   label?: string;
@@ -126,6 +136,13 @@ export const celebrate = ({ xp, label, level = 'normal' }: CelebrateOptions = {}
     playLevelSound();
     store.triggerConfetti();
     setTimeout(() => store.triggerConfetti(), 500);
+    // True milestones get a local notification so backgrounded users still know.
+    if (label) {
+      void notifyAchievement({
+        title: label,
+        body: xp && xp > 0 ? `+${xp} XP earned` : 'Milestone reached',
+      });
+    }
     return;
   }
 

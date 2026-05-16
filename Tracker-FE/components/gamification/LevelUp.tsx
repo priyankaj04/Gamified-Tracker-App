@@ -22,6 +22,7 @@ export function LevelUpHost() {
 
 function LevelUpModal({ event }: { event: LevelUpEvent }) {
   const dismiss = useAppStore((s) => s.dismissLevelUp);
+  const triggerConfetti = useAppStore((s) => s.triggerConfetti);
 
   const scale = useSharedValue(0.4);
   const opacity = useSharedValue(0);
@@ -30,6 +31,9 @@ function LevelUpModal({ event }: { event: LevelUpEvent }) {
 
   useEffect(() => {
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    // Double-burst for level-up — matches celebrate('epic') intensity.
+    triggerConfetti();
+    setTimeout(() => triggerConfetti(), 500);
     opacity.value = withTiming(1, { duration: 300 });
     scale.value = withSequence(
       withSpring(1.15, { damping: 11, stiffness: 200 }),
@@ -45,7 +49,7 @@ function LevelUpModal({ event }: { event: LevelUpEvent }) {
       -1,
       true,
     );
-  }, [event.id, opacity, rotate, scale, shimmer]);
+  }, [event.id, opacity, rotate, scale, shimmer, triggerConfetti]);
 
   const cardStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,

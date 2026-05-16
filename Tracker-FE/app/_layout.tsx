@@ -13,8 +13,17 @@ import { BadgeUnlockHost } from '@/components/gamification/BadgeUnlock';
 import { LevelUpHost } from '@/components/gamification/LevelUp';
 import { ConfettiHost } from '@/components/spirit/ConfettiHost';
 import { QuestStampHost } from '@/components/quests/QuestStamp';
-import { setupChannels } from '@/lib/notifications';
+import {
+  setupChannels,
+  syncDojoReminders,
+  syncForgeReminders,
+  syncSpiritReminders,
+  syncVaultReminders,
+  syncQuestReminders,
+} from '@/lib/notifications';
 import { runQuestStartupTasks } from '@/lib/questStartup';
+import { api, unwrap } from '@/lib/api';
+import type { UserSettings } from '@/hooks/useSettings';
 import { startBgm, stopBgm, setBgmEnabled, setBgmVolume } from '@/lib/bgm';
 import { useAppStore } from '@/store/useAppStore';
 
@@ -42,6 +51,46 @@ export default function RootLayout() {
     setupChannels().catch(() => {});
     runQuestStartupTasks().catch(() => {});
     startBgm({ enabled: bgmEnabled, volume: bgmVolume }).catch(() => {});
+    // Fetch latest settings and re-sync every module's scheduled notifications
+    // so a fresh install / OS reboot doesn't leave reminders stranded.
+    api
+      .get<{ data: UserSettings }>('/settings')
+      .then(unwrap)
+      .then((s) => {
+        void syncDojoReminders(s);
+        void syncForgeReminders({
+          codeReminderEnabled: s.forgeCodeReminderEnabled,
+          codeReminderHour: s.forgeCodeReminderHour,
+          codeReminderMinute: s.forgeCodeReminderMinute,
+          streakAtRiskEnabled: s.forgeStreakAtRiskEnabled,
+          weeklySummaryEnabled: s.forgeWeeklySummaryEnabled,
+        });
+        void syncSpiritReminders({
+          mealRemindersEnabled: s.spiritMealRemindersEnabled,
+          breakfastHour: s.spiritBreakfastHour,
+          lunchHour: s.spiritLunchHour,
+          dinnerHour: s.spiritDinnerHour,
+          hydrationEnabled: s.spiritHydrationEnabled,
+          hydrationStartHour: s.spiritHydrationStartHour,
+          hydrationEndHour: s.spiritHydrationEndHour,
+          hydrationIntervalHours: s.spiritHydrationIntervalHours,
+          windDownEnabled: s.spiritWindDownEnabled,
+          bedtimeHour: s.spiritBedtimeHour,
+          bedtimeMinute: s.spiritBedtimeMinute,
+          habitStreakAtRiskEnabled: s.spiritHabitStreakAtRiskEnabled,
+        });
+        void syncVaultReminders({
+          weeklyReviewEnabled: s.vaultWeeklyReviewEnabled,
+          weeklyReviewWeekday: s.vaultWeeklyReviewWeekday,
+          weeklyReviewHour: s.vaultWeeklyReviewHour,
+          subscriptionAlertsEnabled: s.vaultSubscriptionAlertsEnabled,
+        });
+        void syncQuestReminders({
+          dailySummaryEnabled: s.questDailySummaryEnabled,
+          dailySummaryHour: s.questDailySummaryHour,
+        });
+      })
+      .catch(() => {});
     return () => {
       stopBgm().catch(() => {});
     };

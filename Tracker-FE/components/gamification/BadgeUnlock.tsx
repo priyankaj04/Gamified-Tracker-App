@@ -29,9 +29,12 @@ function BadgeUnlockModal({ unlockId }: { unlockId: string }) {
   const opacity = useSharedValue(0);
   const shimmer = useSharedValue(0);
 
+  const triggerConfetti = useAppStore((s) => s.triggerConfetti);
+
   useEffect(() => {
     if (!item) return;
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    triggerConfetti();
     opacity.value = withTiming(1, { duration: 250 });
     scale.value = withSequence(
       withSpring(1.08, { damping: 14, stiffness: 180 }),
@@ -42,7 +45,7 @@ function BadgeUnlockModal({ unlockId }: { unlockId: string }) {
       -1,
       true,
     );
-  }, [opacity, scale, shimmer, item?.id]);
+  }, [opacity, scale, shimmer, triggerConfetti, item?.id]);
 
   const cardStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],

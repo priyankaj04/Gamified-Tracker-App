@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { notifyAchievement } from '@/lib/notifications';
 import type { Badge } from '@/types';
 
 export interface XpPopup {
@@ -85,24 +86,35 @@ export const useAppStore = create<AppState>()(
       dismissPopup: (id) => set({ popups: get().popups.filter((p) => p.id !== id) }),
 
       badgeQueue: [],
-      pushBadgeUnlock: (badge) =>
+      pushBadgeUnlock: (badge) => {
         set({
           badgeQueue: [
             ...get().badgeQueue,
             { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, badge },
           ],
-        }),
+        });
+        // Fires only when app is backgrounded — see notifyAchievement.
+        void notifyAchievement({
+          title: 'Badge unlocked',
+          body: `${badge.name} · +${badge.xpReward} XP`,
+        });
+      },
       dismissBadgeUnlock: (id) =>
         set({ badgeQueue: get().badgeQueue.filter((b) => b.id !== id) }),
 
       levelUpQueue: [],
-      pushLevelUp: (event) =>
+      pushLevelUp: (event) => {
         set({
           levelUpQueue: [
             ...get().levelUpQueue,
             { id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, ...event },
           ],
-        }),
+        });
+        void notifyAchievement({
+          title: `Level ${event.newLevel} reached`,
+          body: `${event.newTitle} — keep going.`,
+        });
+      },
       dismissLevelUp: (id) =>
         set({ levelUpQueue: get().levelUpQueue.filter((l) => l.id !== id) }),
     }),
