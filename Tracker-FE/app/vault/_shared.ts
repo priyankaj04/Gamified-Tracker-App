@@ -3,16 +3,22 @@ import type { TxType } from '@/types';
 
 export const CATEGORIES = [
   'Food',
+  'Coffee',
   'Transport',
   'Entertainment',
   'Health',
+  'Gym',
+  'Badminton',
+  'Swimming',
   'Shopping',
+  'Lens',
   'Education',
   'Investment',
   'Salary',
   'Bills',
   'Subscription',
   'Transfer',
+  'Chintu',
   'Other',
 ];
 
@@ -20,16 +26,22 @@ export const EXPENSE_CATEGORIES = CATEGORIES.filter((c) => c !== 'Salary');
 
 export const CATEGORY_COLORS: Record<string, string> = {
   Food: '#fbbf24',
+  Coffee: '#a16207',
   Transport: '#22d3ee',
   Entertainment: '#e879f9',
   Health: '#4ade80',
+  Gym: '#f43f5e',
+  Badminton: '#84cc16',
+  Swimming: '#0ea5e9',
   Shopping: '#f97316',
+  Lens: '#a855f7',
   Education: '#818cf8',
   Investment: '#a3e635',
   Salary: '#4ade80',
   Bills: '#ef4444',
   Subscription: '#f472b6',
   Transfer: '#94a3b8',
+  Chintu: '#14b8a6',
   Other: '#94a3b8',
 };
 

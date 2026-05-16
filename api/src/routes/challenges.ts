@@ -18,39 +18,129 @@ interface ChallengeTemplate {
   xpReward: number;
 }
 
-// Pool of daily challenges — we deterministically pick 3 based on date
+// Major daily tasks — these are shown EVERY day, not randomized. They map
+// to the user's most important habits across modules.
 const POOL: ChallengeTemplate[] = [
-  { key: 'log-workout',  title: 'Train Hard',     description: 'Log a workout today',           module: 'dojo',   target: 1, xpReward: 100 },
-  { key: 'pr-today',     title: 'Push the limit', description: 'Set a personal record today',   module: 'dojo',   target: 1, xpReward: 150 },
-  { key: 'code-session', title: 'In The Zone',    description: 'Log a 30+ min coding session',  module: 'forge',  target: 30, xpReward: 100 },
-  { key: 'ship-feature', title: 'Ship It',        description: 'Complete a milestone',          module: 'forge',  target: 1, xpReward: 150 },
-  { key: 'weigh-in',     title: 'Inner Chakra',   description: 'Log a weight entry',            module: 'spirit', target: 1, xpReward: 80  },
-  { key: 'track-tx',     title: 'Mind the Money', description: 'Log 3 transactions',            module: 'vault',  target: 3, xpReward: 80  },
-  { key: 'quest-three',  title: 'Hunter Mode',    description: 'Complete 3 quests',             module: 'quests', target: 3, xpReward: 120 },
-  { key: 'all-modules',  title: 'Five Paths',     description: 'Use all 5 modules today',       module: 'global', target: 5, xpReward: 200 },
+  { key: 'log-workout',     title: 'Train Hard',          description: 'Log a workout today',                  module: 'dojo',   target: 1,  xpReward: 100 },
+  { key: 'priority-quests', title: "Today's Priorities",  description: 'Finish a high-priority quest (S or A)', module: 'quests', target: 1,  xpReward: 150 },
+  { key: 'track-tx',        title: 'Log Your Spendings',  description: 'Log at least one transaction',         module: 'vault',  target: 1,  xpReward: 80  },
+  { key: 'fasting-today',   title: 'Fast & Focus',        description: 'Complete a fasting session',           module: 'spirit', target: 1,  xpReward: 100 },
+  { key: 'deep-work',       title: 'Deep Work',           description: 'Code for 60+ min today',               module: 'forge',  target: 60, xpReward: 150 },
 ];
 
-const pickToday = (): ChallengeTemplate[] => {
-  const today = todayISO();
-  const seed = today.split('-').reduce((s, p) => s + Number(p), 0);
-  const picked: ChallengeTemplate[] = [];
-  const used = new Set<number>();
-  let i = seed;
-  while (picked.length < 3) {
-    const idx = i % POOL.length;
-    if (!used.has(idx)) {
-      used.add(idx);
-      picked.push(POOL[idx]);
-    }
-    i++;
-  }
-  return picked;
-};
+const pickToday = (): ChallengeTemplate[] => POOL;
 
 const endOfDayISO = () => {
   const d = new Date();
   d.setHours(23, 59, 59, 999);
   return d.toISOString();
+};
+
+// Compute the live progress for a given challenge based on today's activity
+// across the relevant module table. Returns 0 if no data / unknown key.
+const computeLiveProgress = async (
+  key: string,
+  date: string,
+): Promise<number> => {
+  const sb = supabase();
+  switch (key) {
+    case 'log-workout': {
+      const { count } = await sb
+        .from('workouts')
+        .select('id', { count: 'exact', head: true })
+        .eq('date', date);
+      return count ?? 0;
+    }
+    case 'priority-quests': {
+      const start = `${date}T00:00:00.000Z`;
+      const end = `${date}T23:59:59.999Z`;
+      const { count } = await sb
+        .from('quests')
+        .select('id', { count: 'exact', head: true })
+        .eq('completed', true)
+        .in('priority', ['S', 'A'])
+        .gte('completed_at', start)
+        .lte('completed_at', end);
+      return count ?? 0;
+    }
+    case 'track-tx': {
+      const { count } = await sb
+        .from('transactions')
+        .select('id', { count: 'exact', head: true })
+        .eq('date', date);
+      return count ?? 0;
+    }
+    case 'fasting-today': {
+      const start = `${date}T00:00:00.000Z`;
+      const end = `${date}T23:59:59.999Z`;
+      const { count } = await sb
+        .from('fasting_sessions')
+        .select('id', { count: 'exact', head: true })
+        .eq('completed', true)
+        .gte('end_time', start)
+        .lte('end_time', end);
+      return count ?? 0;
+    }
+    case 'deep-work': {
+      const { data } = await sb
+        .from('coding_sessions')
+        .select('duration_minutes')
+        .eq('date', date);
+      const total = (data ?? []).reduce(
+        (s: number, r: { duration_minutes: number | null }) =>
+          s + (r.duration_minutes ?? 0),
+        0,
+      );
+      return total;
+    }
+    case 'all-modules': {
+      // Count how many modules saw at least one activity today.
+      const start = `${date}T00:00:00.000Z`;
+      const end = `${date}T23:59:59.999Z`;
+      const [w, c, we, tx, q] = await Promise.all([
+        (async () => {
+          const { count } = await sb
+            .from('workouts')
+            .select('id', { count: 'exact', head: true })
+            .eq('date', date);
+          return (count ?? 0) > 0 ? 1 : 0;
+        })(),
+        (async () => {
+          const { count } = await sb
+            .from('coding_sessions')
+            .select('id', { count: 'exact', head: true })
+            .eq('date', date);
+          return (count ?? 0) > 0 ? 1 : 0;
+        })(),
+        (async () => {
+          const { count } = await sb
+            .from('weight_entries')
+            .select('id', { count: 'exact', head: true })
+            .eq('date', date);
+          return (count ?? 0) > 0 ? 1 : 0;
+        })(),
+        (async () => {
+          const { count } = await sb
+            .from('transactions')
+            .select('id', { count: 'exact', head: true })
+            .eq('date', date);
+          return (count ?? 0) > 0 ? 1 : 0;
+        })(),
+        (async () => {
+          const { count } = await sb
+            .from('quests')
+            .select('id', { count: 'exact', head: true })
+            .eq('completed', true)
+            .gte('completed_at', start)
+            .lte('completed_at', end);
+          return (count ?? 0) > 0 ? 1 : 0;
+        })(),
+      ]);
+      return w + c + we + tx + q;
+    }
+    default:
+      return 0;
+  }
 };
 
 challengesRouter.get(
@@ -60,7 +150,21 @@ challengesRouter.get(
     const today = todayISO();
     const { data: existing } = await sb.from('daily_challenges').select('*').eq('date', today);
     let rows = existing ?? [];
-    if (rows.length === 0) {
+
+    // If today's stored rows don't match the current pool exactly, clear and
+    // reseed. This lets us roll out new challenge sets without waiting until
+    // the next day, while preserving same-day rows when nothing changed.
+    const poolKeys = new Set(POOL.map((p) => p.key));
+    const storedKeys = new Set(rows.map((r) => r.challenge_key));
+    const needsReseed =
+      rows.length !== POOL.length ||
+      [...poolKeys].some((k) => !storedKeys.has(k)) ||
+      [...storedKeys].some((k) => !poolKeys.has(k));
+
+    if (needsReseed) {
+      if (rows.length > 0) {
+        await sb.from('daily_challenges').delete().eq('date', today);
+      }
       const picks = pickToday();
       const { data: inserted } = await sb
         .from('daily_challenges')
@@ -75,25 +179,53 @@ challengesRouter.get(
         .select();
       rows = inserted ?? [];
     }
-    const challenges = rows.map((r) => {
-      const tpl = POOL.find((p) => p.key === r.challenge_key);
-      return {
-        id: r.id,
-        challengeKey: r.challenge_key,
-        title: tpl?.title ?? r.challenge_key,
-        description: tpl?.description ?? '',
-        module: tpl?.module ?? 'global',
-        progress: r.progress,
-        target: r.target,
-        completed: r.completed,
-        xpReward: r.xp_reward,
-        expiresAt: endOfDayISO(),
-      };
-    });
+
+    // Live-recompute progress for each row, persist deltas, and award XP on
+    // first transition to complete. This keeps challenge state in sync with
+    // real activity without needing module write paths to call this API.
+    const challenges = await Promise.all(
+      rows.map(async (r) => {
+        const tpl = POOL.find((p) => p.key === r.challenge_key);
+        const target: number = r.target;
+        const rawProgress = await computeLiveProgress(r.challenge_key, today);
+        const progress = Math.min(target, rawProgress);
+        const completed = progress >= target;
+        const justCompleted = completed && !r.completed;
+
+        if (progress !== r.progress || completed !== r.completed) {
+          await sb
+            .from('daily_challenges')
+            .update({ progress, completed })
+            .eq('id', r.id);
+        }
+
+        if (justCompleted) {
+          await awardXp({
+            base: r.xp_reward,
+            source: `challenge:${r.challenge_key}`,
+          });
+        }
+
+        return {
+          id: r.id,
+          challengeKey: r.challenge_key,
+          title: tpl?.title ?? r.challenge_key,
+          description: tpl?.description ?? '',
+          module: tpl?.module ?? 'global',
+          progress,
+          target,
+          completed,
+          xpReward: r.xp_reward,
+          expiresAt: endOfDayISO(),
+        };
+      }),
+    );
+
     ok(res, { challenges });
   }),
 );
 
+// Retained for manual increments (rarely used now that GET auto-computes).
 challengesRouter.patch(
   '/:id/progress',
   validateBody(z.object({ increment: z.number().int().default(1) })),

@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, Pressable, TextInput, RefreshControl, Alert } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  TextInput,
+  RefreshControl,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { palette, screenTheme } from '@/lib/themes';
@@ -38,8 +49,13 @@ export default function SnippetsScreen() {
   const [nCat, setNCat] = useState<SnippetCategory>('Reference');
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
-      <ScrollView refreshControl={<RefreshControl tintColor={accent} refreshing={isFetching} onRefresh={refetch} />}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: palette.bg }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        refreshControl={<RefreshControl tintColor={accent} refreshing={isFetching} onRefresh={refetch} />}>
         <PageHeader
           title="Snippets"
           subtitle="Forge"
@@ -126,7 +142,7 @@ export default function SnippetsScreen() {
           }}
         />
       </BottomSheet>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

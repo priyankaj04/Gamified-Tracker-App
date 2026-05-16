@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { palette, screenTheme } from '@/lib/themes';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { GlowButton } from '@/components/ui/GlowButton';
@@ -57,8 +67,13 @@ export default function ForgeSettingsScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 60 }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: palette.bg }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 120 }}
+        keyboardShouldPersistTaps="handled">
         <PageHeader title="Forge Settings" subtitle="Configure" accent={accent} accent2={screenTheme.forge.accent2} />
         <View style={{ paddingHorizontal: 20, gap: 14 }}>
           <Row label="Daily Coding Goal (min)">
@@ -107,7 +122,7 @@ export default function ForgeSettingsScreen() {
           <GlowButton title="Save Settings" color={accent} loading={update.isPending} onPress={onSave} />
         </View>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

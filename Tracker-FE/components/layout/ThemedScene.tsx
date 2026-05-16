@@ -1,5 +1,12 @@
 import React from 'react';
-import { View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { Image, type ImageSource } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import type { ScreenKey } from '@/lib/themes';
@@ -54,7 +61,11 @@ export function ThemedScene({ scene, children, dim = 0.55, style }: Props) {
         locations={[0, 0.4, 0.75, 1]}
         style={StyleSheet.absoluteFillObject}
       />
-      <View style={styles.body}>{children}</View>
+      <KeyboardAvoidingView
+        style={styles.body}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        {children}
+      </KeyboardAvoidingView>
     </View>
   );
 }

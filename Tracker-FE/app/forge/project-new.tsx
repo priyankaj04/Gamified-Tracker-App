@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { palette, screenTheme, priorityColor } from '@/lib/themes';
@@ -72,7 +82,11 @@ export default function ProjectNew() {
   };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: palette.bg }} contentContainerStyle={{ padding: 20, gap: 12 }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: palette.bg }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+    <ScrollView contentContainerStyle={{ padding: 20, gap: 12, paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
       <Label text="Name" />
       <TextInput value={name} onChangeText={setName} style={styles.input} placeholderTextColor={palette.textDim} />
 
@@ -185,6 +199,7 @@ export default function ProjectNew() {
       <GlowButton title="Create Project" color={accent} onPress={onSave} loading={create.isPending} />
       <View style={{ height: 60 }} />
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

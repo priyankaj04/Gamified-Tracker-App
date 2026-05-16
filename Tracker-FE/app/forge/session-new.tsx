@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { palette, screenTheme } from '@/lib/themes';
 import { GlowButton } from '@/components/ui/GlowButton';
@@ -68,7 +78,11 @@ export default function SessionNew() {
   };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: palette.bg }} contentContainerStyle={{ padding: 20, gap: 12 }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: palette.bg }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+    <ScrollView contentContainerStyle={{ padding: 20, gap: 12, paddingBottom: 120 }} keyboardShouldPersistTaps="handled">
       <Text style={styles.label}>Project</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
         <Pressable onPress={() => setProjectId(null)} style={[styles.projChip, projectId === null && { borderColor: accent }]}>
@@ -139,6 +153,7 @@ export default function SessionNew() {
       <GlowButton title="Save Session" color={accent} loading={create.isPending} onPress={onSave} />
       <View style={{ height: 60 }} />
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

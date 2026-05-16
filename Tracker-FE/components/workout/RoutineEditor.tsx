@@ -8,6 +8,8 @@ import {
   Pressable,
   Alert,
   Modal,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -93,8 +95,13 @@ export function RoutineEditor({ initial }: Props) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
-      <ScrollView contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 120 }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: palette.bg }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+      <ScrollView
+        contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 200 }}
+        keyboardShouldPersistTaps="handled">
         <Text style={styles.label}>Name</Text>
         <TextInput
           value={name}
@@ -235,7 +242,7 @@ export function RoutineEditor({ initial }: Props) {
           </ScrollView>
         </View>
       </Modal>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

@@ -8,6 +8,8 @@ import {
   RefreshControl,
   TextInput,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -37,9 +39,13 @@ export default function TemplatesList() {
   }, [all, search]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: palette.bg }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
       <ScrollView
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{ padding: 16, paddingBottom: 140 }}
         refreshControl={<RefreshControl tintColor={accent} refreshing={isFetching} onRefresh={refetch} />}>
         {all.length > 0 && (
           <View style={[styles.searchWrap, { borderColor: palette.border }]}>
@@ -128,7 +134,7 @@ export default function TemplatesList() {
           onPress={() => router.push('/dojo/templates/new' as any)}
         />
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

@@ -1,5 +1,15 @@
 import React, { useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { palette } from '@/lib/themes';
 import { GlowButton } from '@/components/ui/GlowButton';
@@ -60,7 +70,13 @@ export default function DsaNew() {
   };
 
   return (
-    <ScrollView style={{ flex: 1, backgroundColor: palette.bg }} contentContainerStyle={{ padding: 20, gap: 12 }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: palette.bg }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+    <ScrollView
+      contentContainerStyle={{ padding: 20, gap: 12, paddingBottom: 120 }}
+      keyboardShouldPersistTaps="handled">
       <Text style={styles.label}>Title</Text>
       <TextInput value={title} onChangeText={setTitle} style={styles.input} placeholder="Two Sum" placeholderTextColor={palette.textDim} />
 
@@ -119,6 +135,7 @@ export default function DsaNew() {
       <GlowButton title="Log Problem" color={accent} loading={create.isPending} onPress={onSave} />
       <View style={{ height: 60 }} />
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

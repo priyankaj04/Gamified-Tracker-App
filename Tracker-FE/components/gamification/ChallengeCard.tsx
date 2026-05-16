@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import { palette, screenTheme } from '@/lib/themes';
 import type { DailyChallenge } from '@/types';
 
@@ -8,18 +9,51 @@ interface Props {
   challenge: DailyChallenge;
 }
 
+// Map each challenge key to the screen most useful for making progress.
+// Falls back to the module's tab route.
+const routeForKey = (key: string, module: string): string => {
+  switch (key) {
+    case 'log-workout':     return '/dojo/new-workout';
+    case 'priority-quests': return '/(tabs)/quests';
+    case 'track-tx':        return '/(tabs)/vault';
+    case 'fasting-today':   return '/spirit/fasting';
+    case 'deep-work':       return '/forge/session-new';
+    default:
+      if (module === 'dojo')   return '/(tabs)/dojo';
+      if (module === 'forge')  return '/(tabs)/forge';
+      if (module === 'spirit') return '/(tabs)/spirit';
+      if (module === 'vault')  return '/(tabs)/vault';
+      if (module === 'quests') return '/(tabs)/quests';
+      return '/(tabs)';
+  }
+};
+
 export function ChallengeCard({ challenge }: Props) {
+  const router = useRouter();
   const accent = challenge.module in screenTheme
     ? (screenTheme as any)[challenge.module]?.accent ?? '#a78bfa'
     : '#a78bfa';
   const pct = Math.min(1, challenge.progress / Math.max(1, challenge.target));
+  const onPress = () => {
+    if (challenge.completed) return;
+    const dest = routeForKey(challenge.challengeKey, challenge.module);
+    router.push(dest as any);
+  };
   return (
-    <View style={[styles.card, challenge.completed && { borderColor: accent }]}>
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.card,
+        challenge.completed && { borderColor: accent },
+        pressed && !challenge.completed && { opacity: 0.85, transform: [{ scale: 0.98 }] },
+      ]}>
       <View style={styles.head}>
         <View style={[styles.dot, { backgroundColor: accent }]} />
         <Text style={styles.title}>{challenge.title}</Text>
-        {challenge.completed && (
+        {challenge.completed ? (
           <Ionicons name="checkmark-circle" size={18} color={accent} style={{ marginLeft: 'auto' }} />
+        ) : (
+          <Ionicons name="chevron-forward" size={16} color={palette.textMuted} style={{ marginLeft: 'auto' }} />
         )}
       </View>
       <Text style={styles.desc}>{challenge.description}</Text>
@@ -32,7 +66,7 @@ export function ChallengeCard({ challenge }: Props) {
         </Text>
         <Text style={[styles.xp, { color: accent }]}>+{challenge.xpReward} XP</Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

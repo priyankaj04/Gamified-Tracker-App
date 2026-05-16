@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { ScrollView, View, Text, StyleSheet, Pressable, RefreshControl } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
@@ -295,6 +295,15 @@ export default function Dashboard() {
     cardio.refetch();
     weight.refetch();
   };
+
+  // Refetch challenges whenever the home tab regains focus so progress
+  // reflects activity done in other tabs (workouts, quests, transactions…).
+  useFocusEffect(
+    useCallback(() => {
+      challenges.refetch();
+      game.refetch();
+    }, []),
+  );
 
   const isFetching =
     game.isFetching || badges.isFetching || wellness.isFetching || netWorth.isFetching;

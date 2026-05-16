@@ -8,6 +8,8 @@ import {
   FlatList,
   StyleSheet,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -76,7 +78,10 @@ export default function ExerciseLibrary() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: palette.bg }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
       <View style={{ paddingHorizontal: 16, paddingTop: 12, gap: 10 }}>
         {/* Search */}
         <View style={[styles.searchWrap, { borderColor: palette.border }]}>
@@ -185,7 +190,7 @@ export default function ExerciseLibrary() {
         muscles={muscles}
         equipmentList={equipmentList}
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

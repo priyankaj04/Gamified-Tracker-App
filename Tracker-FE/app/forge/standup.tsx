@@ -1,5 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, Text, StyleSheet, TextInput, Pressable, Alert } from 'react-native';
+import {
+  ScrollView,
+  View,
+  Text,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Sharing from 'expo-sharing';
 import * as FileSystem from 'expo-file-system';
@@ -69,8 +79,11 @@ export default function StandupScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
-      <ScrollView>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: palette.bg }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+      <ScrollView keyboardShouldPersistTaps="handled">
         <PageHeader
           title="Daily Standup"
           subtitle="Forge"
@@ -129,7 +142,7 @@ export default function StandupScreen() {
         </View>
         <View style={{ height: 60 }} />
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

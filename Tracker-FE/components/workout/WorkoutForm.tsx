@@ -7,6 +7,8 @@ import {
   TextInput,
   Pressable,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -330,9 +332,12 @@ export function WorkoutForm({ mode, templateId, sourceWorkoutId }: Props) {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: palette.bg }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: palette.bg }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
       <ScrollView
-        contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 120 }}
+        contentContainerStyle={{ padding: 16, gap: 12, paddingBottom: 200 }}
         keyboardShouldPersistTaps="handled">
         {/* Top row: timer + active state badge */}
         <View style={styles.topRow}>
@@ -478,26 +483,48 @@ export function WorkoutForm({ mode, templateId, sourceWorkoutId }: Props) {
         />
 
         <View style={{ height: 12 }} />
-        <GlowButton
-          title={isActive ? 'Finish & Save' : exercises.length > 0 ? 'Start Workout' : 'Save'}
-          color={accent}
-          loading={create.isPending}
-          onPress={() => {
-            if (exercises.length > 0 && !isActive) {
-              onStart();
-            } else {
-              onSave();
-            }
-          }}
-        />
-        {isActive && (
+        {isActive ? (
+          <>
+            <GlowButton
+              title="Finish & Save"
+              color={accent}
+              loading={create.isPending}
+              onPress={onSave}
+            />
+            <GlowButton
+              title="Save Now"
+              color={accent}
+              variant="ghost"
+              onPress={onSave}
+              loading={create.isPending}
+            />
+          </>
+        ) : isEdit ? (
           <GlowButton
-            title="Save Now"
+            title="Save Workout"
             color={accent}
-            variant="ghost"
+            loading={update.isPending}
             onPress={onSave}
-            loading={create.isPending}
           />
+        ) : (
+          <View style={styles.actionRow}>
+            <View style={{ flex: 1 }}>
+              <GlowButton
+                title="Save Workout"
+                color={accent}
+                variant="ghost"
+                loading={create.isPending}
+                onPress={onSave}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <GlowButton
+                title="Start Workout"
+                color={accent}
+                onPress={onStart}
+              />
+            </View>
+          </View>
         )}
       </ScrollView>
 
@@ -532,7 +559,7 @@ export function WorkoutForm({ mode, templateId, sourceWorkoutId }: Props) {
         accent={accent}
         mode="single"
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -576,6 +603,7 @@ const styles = StyleSheet.create({
   },
   typeText: { color: palette.textMuted, fontWeight: '800', fontSize: 12 },
   addRow: { flexDirection: 'row', gap: 8 },
+  actionRow: { flexDirection: 'row', gap: 10 },
   durationRow: { gap: 6 },
   durationInput: { width: 120 },
   durationHint: { color: palette.textDim, fontSize: 11, fontStyle: 'italic' },

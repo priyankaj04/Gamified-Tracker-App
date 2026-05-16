@@ -510,7 +510,7 @@ export default function VaultScreen() {
       </Pressable>
 
       <BottomSheet visible={sheetOpen} onClose={() => setSheetOpen(false)} title="Add Transaction">
-        <ScrollView style={{ maxHeight: 560 }}>
+        <ScrollView style={{ maxHeight: 560 }} keyboardShouldPersistTaps="handled">
           <Text style={styles.fieldLabel}>Date</Text>
           <DatePicker value={txDate} onChange={setTxDate} accent={accent} />
 

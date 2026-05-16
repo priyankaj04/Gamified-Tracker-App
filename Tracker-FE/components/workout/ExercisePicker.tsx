@@ -9,6 +9,8 @@ import {
   ScrollView,
   FlatList,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -92,6 +94,9 @@ export function ExercisePicker({
 
   return (
     <Modal animationType="slide" presentationStyle="pageSheet" visible={visible} onRequestClose={onClose}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
       <SafeAreaView style={styles.root} edges={['top', 'left', 'right', 'bottom']}>
         <View style={styles.header}>
           <Pressable onPress={onClose} hitSlop={8}>
@@ -231,6 +236,7 @@ export function ExercisePicker({
           />
         )}
       </SafeAreaView>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

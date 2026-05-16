@@ -7,6 +7,8 @@ import {
   Pressable,
   TextInput,
   Switch,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { palette, screenTheme } from '@/lib/themes';
 import { useSettings, useUpdateSettings, type UserSettings } from '@/hooks/useSettings';
@@ -48,9 +50,13 @@ export default function DojoSettings() {
   };
 
   return (
-    <ScrollView
+    <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: palette.bg }}
-      contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 60 }}>
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}>
+    <ScrollView
+      contentContainerStyle={{ padding: 16, gap: 14, paddingBottom: 120 }}
+      keyboardShouldPersistTaps="handled">
       <Text style={styles.section}>Units</Text>
       <View style={styles.card}>
         <Segment
@@ -225,6 +231,7 @@ export default function DojoSettings() {
         accent={accent}
       />
     </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
